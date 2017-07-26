@@ -14,23 +14,12 @@ $_ENV[CONF]['DB']['DSN'] 			= 'mysql:dbname=%s;port=%s;host=%s';
 $_ENV[CONF]['DB']['DRIVEROPTIONS'] 	= array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8';");
 $_ENV[CONF]['DB']['PREFIX'] 		= '';
 
-if(isset($_ENV["VCAP_SERVICES"])){ //local dev
+$_ENV[CONF]['DB']['HOST'] 		= $_ENV['MYSQL_HOST'];
+$_ENV[CONF]['DB']['PORT'] 		= $_ENV['MYSQL_PORT'];
+$_ENV[CONF]['DB']['USERNAME'] 	= $_ENV['MYSQL_USERNAME'];
+$_ENV[CONF]['DB']['PASSWORD']   = $_ENV['MYSQL_PASSWORD'];
+$_ENV[CONF]['DB']['SCHEMA'] 	= $_ENV['MYSQL_SCHEMA'];
 
-	$vcap_services = json_decode($_ENV["VCAP_SERVICES" ]);
-    if($vcap_services->{'compose-for-mysql'}){ //if "mysql" db service is bound to this application
-        $db = $vcap_services->{'compose-for-mysql'}[0]->credentials;
-    }
-    else { 
-        echo "Error: No suitable MySQL database bound to the application. <br>";
-        die();
-    }
-} else { //running in Bluemix
-    $_ENV[CONF]['DB']['HOST'] 		= $_ENV['MYSQL_HOST'];
-	$_ENV[CONF]['DB']['PORT'] 		= $_ENV['MYSQL_PORT'];
-	$_ENV[CONF]['DB']['USERNAME'] 	= $_ENV['MYSQL_USERNAME'];
-	$_ENV[CONF]['DB']['PASSWORD']   = $_ENV['MYSQL_PASSWORD'];
-	$_ENV[CONF]['DB']['SCHEMA'] 	= $_ENV['MYSQL_SCHEMA'];
-}
 
 /**
 
