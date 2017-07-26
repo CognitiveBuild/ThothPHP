@@ -1,8 +1,9 @@
 ---
-language: php
-- name: php
-  modules:
-  - mbstring
-  - mysqli
-  - pdo
-  - pdo_mysql
+applications:
+ - name: GetStartedPHP
+   memory: 1024M
+   modules:
+    - mbstring
+    - mysqli
+    - pdo
+    - pdo_mysql
