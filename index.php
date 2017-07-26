@@ -1,7 +1,12 @@
 <?php
 
 require 'vendor/autoload.php';
-require 'inc/db.php';
+include 'inc/db.php';
+
+if(isset($_ENV["VCAP_SERVICES"]) === FALSE) {
+    $env = new Dotenv\Dotenv(__DIR__);
+    $env->load();
+}
 
 $app = new Slim\App();
 

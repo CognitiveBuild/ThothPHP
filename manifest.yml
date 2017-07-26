@@ -4,5 +4,3 @@ applications:
   memory: 1024M
   services:
     - Compose for MySQL-Thoth
-  env:
-    MYSQL_SCHEMA: thoth
