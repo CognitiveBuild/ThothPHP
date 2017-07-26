@@ -19,15 +19,15 @@ $container['view'] = function ($container) {
 
 $app->get('/', function ($request, $response, $args) {
     return $this->view->render($response, 'index.php', [
-        'message' => 'Hello World'
+        'message' => 'This is Thoth Asset Center'
     ]);
-})->setName('Hello');
+});
 
 $app->get('/api/v1/catalog/{q}', function ($request, $response, $args) {
     $q = isset($args['q']) ? $args['q'] : 'INDUSTRY';
     $list = db::query('SELECT `id`, `name` FROM `catalog` WHERE `key` = ?;', $q);
     $result = json_encode($list);
-    return $response->write($result);
+    return $response->withHeader('Content-Type', 'application/json')->write($result);
 });
 
 $app->run();
