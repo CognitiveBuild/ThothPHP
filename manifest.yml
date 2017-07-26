@@ -1,0 +1,7 @@
+applications:
+- name: GetStartedPHP
+  modules:
+  - mbstring
+  - mysqli
+  - pdo
+  - pdo_mysql
