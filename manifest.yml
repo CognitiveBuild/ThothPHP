@@ -1,5 +1,6 @@
-applications:
-- name: thoth-assets
+---
+language: php
+- name: php
   modules:
   - mbstring
   - mysqli
