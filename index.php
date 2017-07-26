@@ -10,7 +10,7 @@ if(isset($_ENV["VCAP_SERVICES"])) {
     if($vcap_services->{'compose-for-mysql'}) {
         $credentials = $vcap_services->{'compose-for-mysql'}[0]->credentials;
 
-		$_ENV['MYSQL_HOST'] =$credentials->hostname;
+		$_ENV['MYSQL_HOST'] = $credentials->hostname;
 		$_ENV['MYSQL_PORT'] = $credentials->port;
 		$_ENV['MYSQL_USERNAME'] = $credentials->username; 
 		$_ENV['MYSQL_PASSWORD'] = $credentials->password;
