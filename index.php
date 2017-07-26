@@ -2,8 +2,7 @@
 
 require 'vendor/autoload.php';
 
-$env = new Dotenv\Dotenv(__DIR__);
-
+$dotenv = new Dotenv\Dotenv(__DIR__);
 // Bluemix
 if(isset($_ENV["VCAP_SERVICES"])) {
 	$vcap_services = json_decode($_ENV["VCAP_SERVICES" ]);
@@ -22,10 +21,10 @@ if(isset($_ENV["VCAP_SERVICES"])) {
 }
 // Localhost
 else {
-    $env->load();
+    $dotenv->load();
 }
 
-include 'inc/db.php';
+require 'inc/db.php';
 
 $app = new Slim\App();
 
