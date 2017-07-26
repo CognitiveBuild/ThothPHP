@@ -16,11 +16,11 @@ $_ENV[CONF]['DB']['PREFIX'] 		= '';
 
 if(isset($_ENV["VCAP_SERVICES"])){ //local dev
 
-	$vcap_services = json_decode($_ENV["VCAP_SERVICES" ]);
-    if($vcap_services->{'compose-for-mysql'}){ //if "mysql" db service is bound to this application
+	$vcap_services = json_decode($_ENV["VCAP_SERVICES"]);
+    if($vcap_services->{'compose-for-mysql'}) {
         $db = $vcap_services->{'compose-for-mysql'}[0]->credentials;
     }
-    else { 
+    else {
         echo "Error: No suitable MySQL database bound to the application. <br>";
         die();
     }
