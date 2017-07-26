@@ -1,5 +1,5 @@
 applications:
-- name: GetStartedPHP
+- name: thoth-assets
   modules:
   - mbstring
   - mysqli
