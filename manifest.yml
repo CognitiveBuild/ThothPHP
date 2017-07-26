@@ -1,6 +1,8 @@
 ---
 applications:
- - name: thoth-assets
-   memory: 1024M
-   services:
-     - Compose for MySQL-Thoth
+- name: thoth-assets
+  memory: 1024M
+  services:
+    - Compose for MySQL-Thoth
+  env:
+    MYSQL_SCHEMA: thoth
