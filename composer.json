@@ -1,7 +1,7 @@
 {
     "require": {
-        "ext-pdo_mysql": "*",
-        "slim/slim": "^3.0", 
-        "vlucas/phpdotenv": "^2.4"
+        "php": "7.0.*", 
+        "ext-mbstring": "*",
+        "slim/slim": "^3.0"
     }
 }
