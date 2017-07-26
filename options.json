@@ -1,0 +1,13 @@
+{
+    "PHP_EXTENSIONS": [
+        "bz2",
+        "pdo",
+        "zlib",
+        "curl",
+        "mcrypt",
+        "mbstring",
+        "gd",
+        "zip",
+        "pdo_mysql"
+    ]
+}

@@ -1,9 +1,4 @@
 ---
 applications:
- - name: GetStartedPHP
+ - name: thoth-assets
    memory: 1024M
-   modules:
-    - mbstring
-    - mysqli
-    - pdo
-    - pdo_mysql

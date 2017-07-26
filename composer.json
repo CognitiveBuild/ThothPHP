@@ -1,7 +1,6 @@
 {
     "require": {
         "php": "7.0.*", 
-        "ext-mbstring": "*",
         "slim/slim": "^3.0"
     }
 }
