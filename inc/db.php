@@ -107,7 +107,7 @@ final class db
 	 * @param string $sql
 	 * @param mix $args
 	 */
-	public static function queryRow($sql, $args = array())
+	public static function queryFirst($sql, $args = array())
 	{
 		$rs = self::__query($sql, $args);
 		if($rs == null) return array();
@@ -149,6 +149,45 @@ final class db
 			return $retval;
 		}
 		return false;
+	}
+
+	public static function update($sql, $args = array()) 
+	{
+		if(self::getInstance())
+		{
+			$rs = self::$_instance->prepare($sql);
+
+			self::begin();
+
+			$args = is_array($args) ? $args : array($args);
+
+			$retval = $rs->execute($args);
+			self::commit();
+
+			self::$_count++;
+			self::$_rowCount = $rs->rowCount();
+		}
+	}
+
+	public static function insert($sql, $args = array(), $binds = array()) 
+	{
+		$id = 0;
+		if(self::getInstance())
+		{
+			$rs = self::$_instance->prepare($sql);
+
+			self::begin();
+
+			$args = is_array($args) ? $args : array($args);
+
+			$retval = $rs->execute($args);
+			$id = self::getLastInsertId();
+			self::commit();
+
+			self::$_count++;
+			self::$_rowCount = $rs->rowCount();
+		}
+		return $id;
 	}
 
 	/**
