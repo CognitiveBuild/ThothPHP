@@ -11,6 +11,13 @@ $(function(){
         }
     });
 
+    var highlightMenu = function() {
+        var path = window.location.pathname;
+        $('a[href="'+path+'"]').parent().addClass('active');
+    };
+
+    highlightMenu();
+
     // Remove the image input from form
     $('.form-group').on('click', '.file-upload-remove', function(evt) {
 
@@ -58,5 +65,51 @@ $(function(){
                 group.remove();
             }
         }
+    });
+
+    $('.ui-modal-button-catalog').on('click', function(evt){
+        var jButton = $(this);
+        var target = jButton.data('target');
+        var id = jButton.data('id');
+        var name = jButton.data('name');
+        $('#_name').val(name);
+        $('#_id').val(id);
+    });
+
+    $('.btn-catalog-save').on('click', function(evt) {
+
+        var jName = $('#_name');
+        var jId = $('#_id');
+        var jType = $('#_type');
+
+        var name = jName.val();
+        var id = jId.val();
+        var type = jType.val();
+
+        if(name.length === 0) {
+            jName.focus();
+            return;
+        }
+
+        var jModal = $('.modal-catalog');
+
+        $.ajax({
+            url: '/api/v1/catalog', 
+            method: 'POST',
+            data: {
+                name: name, 
+                id: id, 
+                type: type
+            }, 
+            success: function(result){
+                console.log('### success ###');
+                jModal.modal('hide');
+                window.location.reload(true);
+            }, 
+            error: function(error){
+                console.log('### error ###');
+                console.log(error);
+            }
+        });
     });
 });

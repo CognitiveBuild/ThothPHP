@@ -2,6 +2,7 @@
 require 'vendor/autoload.php';
 include 'inc/db.php';
 include 'inc/managers/asset-manager.php';
+include 'inc/managers/catalog-manager.php';
 
 define("KEY_INDUSTRY", "INDUSTRY");
 define("KEY_TECHNOLOGY", "TECHNOLOGY");
@@ -37,6 +38,21 @@ $app->get('/assets', function ($request, $response, $args) {
     ]);
 });
 
+
+$app->get('/catalog/{name}', function ($request, $response, $args) {
+
+    $result = array();
+
+    $name = isset($args['name']) ? $args['name'] : KEY_INDUSTRY;
+
+    $result = CatalogManager::getCatalog($name);
+
+    return $this->view->render($response, 'catalog.php', [
+        'catalogs' => $result, 
+        'type' => $name
+    ]);
+});
+
 // POST asset
 $app->post('/assets/{id}', function ($request, $response, $args) {
 
@@ -52,12 +68,13 @@ $app->post('/assets/{id}', function ($request, $response, $args) {
         // update asset
         $result = AssetManager::updateAsset($id, $post['name'], $post['idindustry'], $post['description'], $post['logourl'], $post['videourl'], $post['linkurl']);
 
-        AssetManager::deleteCatalog($id);
+        AssetManager::deleteCatalogToAsset($id);
         foreach($technologies as $idcatalog) {
-            AssetManager::addCatalog(KEY_TECHNOLOGY, $id, $idcatalog);
+            AssetManager::addCatalogToAsset(KEY_TECHNOLOGY, $id, $idcatalog);
         }
 
         AssetManager::addFiles($id, $images);
+        AssetManager::updateFileIds($id);
 
         return $response->withStatus(200)->withHeader('Location', "/assets/{$id}");
     }
@@ -65,13 +82,15 @@ $app->post('/assets/{id}', function ($request, $response, $args) {
     $id = AssetManager::addAsset($post['name'], $post['idindustry'], $post['description'], $post['logourl'], $post['videourl'], $post['linkurl']);
 
     if($id > 0) {
-        AssetManager::deleteCatalog($id);
+        AssetManager::deleteCatalogToAsset($id);
         foreach($technologies as $idcatalog) {
-            AssetManager::addCatalog(KEY_TECHNOLOGY, $id, $idcatalog);
+            AssetManager::addCatalogToAsset(KEY_TECHNOLOGY, $id, $idcatalog);
         }
 
         AssetManager::addFiles($id, $images);
+        AssetManager::updateFileIds($id);
     }
+
     return $response->withStatus(200)->withHeader('Location', "/assets");
 });
 
@@ -89,8 +108,8 @@ $app->get('/assets/{id}', function ($request, $response, $args) {
         'videourl' => ''
     ];
 
-    $industries = AssetManager::getCatalog(KEY_INDUSTRY);
-    $technologies = AssetManager::getCatalog(KEY_TECHNOLOGY);
+    $industries = CatalogManager::getCatalog(KEY_INDUSTRY);
+    $technologies = CatalogManager::getCatalog(KEY_TECHNOLOGY);
     $technologies_applied = array();
     $attachments = array();
 
@@ -121,14 +140,40 @@ $app->get('/assets/{id}', function ($request, $response, $args) {
 $app->get('/api/v1/catalog/{q}', function ($request, $response, $args) {
 
     $q = isset($args['q']) ? $args['q'] : KEY_INDUSTRY;
-    $list = AssetManager::getCatalog($q);
+    $list = CatalogManager::getCatalog($q);
     return $response->withJson($list);
+});
+$app->post('/api/v1/catalog', function ($request, $response, $args) {
+    $post = $request->getParsedBody();
+
+    $id = isset($post['id']) ? $post['id'] : 0;
+    $key = isset($post['type']) ? $post['type'] : KEY_INDUSTRY;
+    $name = isset($post['name']) ? $post['name'] : '';
+
+    if($name === '') {
+        return $response->withStatus(400)->withJson(array('status' => 400));
+    }
+
+    if($id === 0) {
+        CatalogManager::addCatalog($key, $name);
+    }
+    else {
+        CatalogManager::updateCatalog($key, $id, $name);
+    }
+
+    return $response->withStatus(200)->withJson(array('status' => 200));
 });
 // delete attachment
 $app->delete('/api/v1/assets/attachment/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
-    $result = AssetManager::deleteFile($id);
+
+    $file = AssetManager::readFile($id);
+    $result = FALSE;
+    if(isset($file['id'])) {
+        $result = AssetManager::deleteFile($id);
+        AssetManager::updateFileIds($file['idasset']);
+    }
 
     return $response->withJson(array('status' => $result));
 });
