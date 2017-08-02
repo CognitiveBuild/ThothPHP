@@ -2,29 +2,32 @@
 
 class AssetManager {
 
+    private static $asset_columns = '`asset`.`id`, `asset`.`name`, `asset`.`description`, `asset`.`logoUrl`, `asset`.`linkUrl`, `asset`.`videoUrl`, `asset`.`attachments`';
     public static function getTable($name) {
         return db::query("SELECT * FROM `{$name}`;");
     }
     public static function getAssets() {
 
-        return db::query('SELECT `*` FROM `asset`;');
+        $asset_columns = self::$asset_columns;
+        return db::query("SELECT {$asset_columns} FROM `asset`;");
     }
 
     public static function getAssetsByCatalogName($key, $name) {
 
         $result = array();
+        $asset_columns = self::$asset_columns;
         if($key === KEY_INDUSTRY) {
-            $result = db::query('SELECT `asset`.`*` FROM `asset` 
+            $result = db::query("SELECT {$asset_columns} FROM `asset` 
                 JOIN `catalog` ON `catalog`.`id` = `asset`.`idindustry`
-                WHERE `catalog`.`key` = ? AND `catalog`.`name` LIKE ?;', 
+                WHERE `catalog`.`key` = ? AND `catalog`.`name` LIKE ?;", 
                 array($key, $name)
             );
         }
         else {
-            $result =  db::query('SELECT `asset`.`*` FROM `asset` 
+            $result =  db::query("SELECT {$asset_columns} FROM `asset` 
                 JOIN `catalog_to_asset` ON `catalog_to_asset`.`idasset` = `asset`.`id` 
                 JOIN `catalog` ON `catalog`.`id` = `catalog_to_asset`.`idcatalog` 
-                WHERE `catalog`.`key` = ? AND `catalog`.`name` LIKE ?;', 
+                WHERE `catalog`.`key` = ? AND `catalog`.`name` LIKE ?;", 
                 array($key, $name)
             );
         }
@@ -38,11 +41,16 @@ class AssetManager {
     private static function fetchAttachments($result) {
         if(count($result) > 0) {
             foreach($result as $key => $val) {
-                $query = self::getFileIDList($val['id']);
-                foreach($query as $q => $v) {
-                    $query[$q]['url'] = "/api/v1/assets/attachment/{$v['id']}";
+
+                $list = array();
+                $query = json_decode($val['attachments'], TRUE);
+
+                if(is_array($query)) {
+                    foreach($query as $k => $v) {
+                        array_push($list, "/api/v1/assets/attachment/{$v['id']}");
+                    }
                 }
-                $result[$key]['attachments'] = $query;
+                $result[$key]['attachments'] = $list;
             }
         }
         return $result;
@@ -52,14 +60,15 @@ class AssetManager {
     public static function getAssetsByCatalogId($key, $id) {
 
         $result = array();
+        $asset_columns = self::$asset_columns;
         if($key === KEY_INDUSTRY) {
-            $result = db::query('SELECT `asset`.`*` FROM `asset` WHERE `asset`.`idindustry` = ?', array($id));
+            $result = db::query("SELECT {$asset_columns} FROM `asset` WHERE `asset`.`idindustry` = ?", array($id));
         }
         else {
-            $result =  db::query('SELECT `asset`.`*` FROM `asset` 
+            $result =  db::query("SELECT {$asset_columns} FROM `asset` 
                 JOIN `catalog_to_asset` ON `catalog_to_asset`.`idasset` = `asset`.`id` 
                 JOIN `catalog` ON `catalog`.`id` = `catalog_to_asset`.`idcatalog` 
-                WHERE `catalog`.`key` = ? AND `catalog`.`id` = ?;', 
+                WHERE `catalog`.`key` = ? AND `catalog`.`id` = ?;", 
                 array($key, $id)
             );
         }
@@ -91,17 +100,12 @@ class AssetManager {
         return db::execute('DELETE FROM `asset` WHERE `id` = ?;', $id);
     }
 
-    public static function getCatalog($key) {
-
-        return db::query("SELECT `id`, `name` FROM `catalog` WHERE `key` = ?;", $key);
-    }
-
-    public static function deleteCatalog($id) {
+    public static function deleteCatalogToAsset($id) {
 
         return db::execute("DELETE FROM `catalog_to_asset` WHERE `idasset` = ?;", $id);
     }
 
-    public static function addCatalog($key, $idasset, $idcatalog) {
+    public static function addCatalogToAsset($key, $idasset, $idcatalog) {
 
         return db::insert(
             "INSERT INTO `catalog_to_asset` (`key`, `idasset`, `idcatalog`) VALUES (?,?,?);", 
@@ -135,6 +139,13 @@ class AssetManager {
             );
 
         }
+
+    }
+
+    public static function updateFileIds($id) {
+        $result = self::getFileIDList($id);
+        $data = json_encode($result);
+        db::execute("UPDATE `asset` SET `attachments` = ? WHERE `id` = ?", array($data, $id));
     }
 
 
