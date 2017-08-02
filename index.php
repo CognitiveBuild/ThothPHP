@@ -151,17 +151,17 @@ $app->post('/api/v1/catalog', function ($request, $response, $args) {
     $name = isset($post['name']) ? $post['name'] : '';
 
     if($name === '') {
-        return $response->withStatus(400)->withJson(array('status' => 400));
+        return $response->withStatus(400)->withJson(array('status' => 400, 'id' => $id));
     }
 
-    if($id === 0) {
-        CatalogManager::addCatalog($key, $name);
+    if($id === 0 || $id === '0') {
+        $id = CatalogManager::addCatalog($name, $key);
     }
     else {
         CatalogManager::updateCatalog($key, $id, $name);
     }
 
-    return $response->withStatus(200)->withJson(array('status' => 200));
+    return $response->withStatus(200)->withJson(array('status' => 200, 'id' => $id));
 });
 // delete attachment
 $app->delete('/api/v1/assets/attachment/{id}', function ($request, $response, $args) {

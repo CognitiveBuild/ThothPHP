@@ -6,14 +6,14 @@ final class CatalogManager {
         return db::query("SELECT `id`, `name` FROM `catalog` WHERE `key` = ?;", $key);
     }
 
-    public static function addCatalog($key, $name) {
+    public static function addCatalog($name, $key) {
 
-        return db::insert("INSERT INTO `catalog` (`key`, `name`) VALUES (?,?);", array($key, $name));
+        return db::insert("INSERT INTO `catalog` (`name`, `key`) VALUES (?,?);", array($name, $key));
 
     }
 
     public static function updateCatalog($key, $id, $name) {
-        return db::insert("UPDATE `catalog` SET `key` = ?, `name` = ? WHERE `id` = ?;", array($key, $name, $id));
+        return db::execute("UPDATE `catalog` SET `key` = ?, `name` = ? WHERE `id` = ?;", array($key, $name, $id));
     }
 
 }
