@@ -1,8 +1,13 @@
 <?php
 require 'vendor/autoload.php';
 include 'inc/db.php';
+
+// Managers
 include 'inc/managers/asset-manager.php';
 include 'inc/managers/catalog-manager.php';
+include 'inc/managers/company-manager.php';
+include 'inc/managers/visitor-manager.php';
+include 'inc/managers/event-manager.php';
 
 define("KEY_INDUSTRY", "INDUSTRY");
 define("KEY_TECHNOLOGY", "TECHNOLOGY");
@@ -29,6 +34,7 @@ $app->get('/', function ($request, $response, $args) {
     ]);
 });
 
+// Assets
 $app->get('/assets', function ($request, $response, $args) {
 
     $list = AssetManager::getAssets();
@@ -38,7 +44,76 @@ $app->get('/assets', function ($request, $response, $args) {
     ]);
 });
 
+// Companies
+$app->get('/companies', function ($request, $response, $args) {
 
+    $list = CompanyManager::getCompanies();
+
+    return $this->view->render($response, 'companies.php', [
+        'companies' => $list
+    ]);
+});
+
+// Company details
+$app->get('/companies/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $industries = CatalogManager::getCatalog(KEY_INDUSTRY);
+
+    $result = array(
+        'id' => 0, 
+        'name' => '', 
+        'description' => '', 
+        'logo' => NULL, 
+        'idindustry' => 0
+    );
+
+    if($id > 0) {
+        $result = CompanyManager::getCompany($id);
+    }
+
+    return $this->view->render($response, 'company.php', [
+        'id' => $id, 
+        'company' => $result, 
+        'industries' => $industries
+    ]);
+});
+
+// Company update
+$app->post('/companies/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $post = $request->getParsedBody();
+    $files = $request->getUploadedFiles();
+
+    $logo = NULL;
+    if(isset($files['logo']) && count($files['logo']) === 1) {
+        $size = $files['logo'][0]->getSize();
+        if($size > 0) {
+            $logo = file_get_contents($files['logo'][0]->file);
+        }
+    }
+    $isNew = TRUE;
+    if($id > 0) {
+        CompanyManager::updateCompany($id, $post['name'], $post['idindustry'], $post['description']);
+        $isNew = FALSE;
+    }
+    else {
+        $id = CompanyManager::addCompany($post['name'], $post['idindustry'], $post['description']);
+    }
+
+    if($id > 0 && $logo !== NULL) {
+        CompanyManager::updateLogo($id, $logo);
+    }
+
+    if($isNew) {
+        return $response->withStatus(200)->withHeader('Location', "/companies");
+    }
+
+    return $response->withStatus(200)->withHeader('Location', "/companies/{$id}");
+});
+
+// Catalogs
 $app->get('/catalog/{name}', function ($request, $response, $args) {
 
     $result = array();
@@ -53,7 +128,7 @@ $app->get('/catalog/{name}', function ($request, $response, $args) {
     ]);
 });
 
-// POST asset
+// Asset update
 $app->post('/assets/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
@@ -94,6 +169,7 @@ $app->post('/assets/{id}', function ($request, $response, $args) {
     return $response->withStatus(200)->withHeader('Location', "/assets");
 });
 
+// Asset details
 $app->get('/assets/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
@@ -128,6 +204,111 @@ $app->get('/assets/{id}', function ($request, $response, $args) {
         'attachments' => $attachments
     ]);
 })->setName('asset-details');
+
+// Visitors
+$app->get('/visitors', function ($request, $response, $args) {
+
+    $list = VisitorManager::getVisitors();
+
+    return $this->view->render($response, 'visitors.php', [
+        'visitors' => $list
+    ]);
+});
+
+// Visitor details
+$app->get('/visitors/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+
+    $result = [
+        'id' => 0, 
+        'firstname' => '', 
+        'lastname' => '', 
+        'idcompany' => 0, 
+        'linkedin' => '', 
+        'facebook' => '',
+        'twitter' => ''
+    ];
+
+    $visitor = VisitorManager::getVisitor($id);
+    $companies = CompanyManager::getCompanies();
+
+    return $this->view->render($response, 'visitor.php', [
+        'id' => $id, 
+        'visitor' => $visitor, 
+        'companies' => $companies
+    ]);
+});
+
+// Visitor update
+$app->post('/visitors/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $post = $request->getParsedBody();
+
+    if($id > 0) {
+        VisitorManager::updateVisitor($id, $post['firstname'], $post['lastname'], $post['idcompany'], $post['linkedin'], $post['facebook'], $post['twitter']);
+    }
+    else {
+        $id = VisitorManager::addVisitor($post['firstname'], $post['lastname'], $post['idcompany'], $post['linkedin'], $post['facebook'], $post['twitter']);
+        return $response->withStatus(200)->withHeader('Location', "/visitors");
+    }
+
+    return $response->withStatus(200)->withHeader('Location', "/visitors/{$id}");
+});
+
+// Events
+$app->get('/events', function ($request, $response, $args) {
+
+    $list = EventManager::getEvents();
+
+    return $this->view->render($response, 'events.php', [
+        'events' => $list
+    ]);
+});
+
+// Event details
+$app->get('/events/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $today = date("Y-m-d");
+    $result = [
+        'id' => 0, 
+        'visitdate' => $today, 
+        'idcompany' => 0, 
+        'isactive' => 'Y', 
+        'displayas' => ''
+    ];
+
+    $companies = CompanyManager::getCompanies();
+
+    if($id > 0) {
+        $result = EventManager::getEvent($id);
+    }
+
+    return $this->view->render($response, 'event.php', [
+        'id' => $id, 
+        'event' => $result, 
+        'companies' => $companies
+    ]);
+});
+
+// Event update
+$app->post('/events/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $post = $request->getParsedBody();
+
+    if($id > 0) {
+        EventManager::updateEvent($id, $post['visitdate'], $post['displayas'], $post['idcompany'], $post['isactive']);
+        return $response->withStatus(200)->withHeader('Location', "/events/{$id}");
+    }
+
+    EventManager::addEvent($post['visitdate'], $post['displayas'], $post['idcompany'], $post['isactive']);
+    return $response->withStatus(200)->withHeader('Location', "/events");
+});
+
+
 
 
 
@@ -203,6 +384,39 @@ $app->get('/api/v1/assets/catalog/{catalog}/id/{id}', function ($request, $respo
     $list = AssetManager::getAssetsByCatalogId($catalog, $id);
     return $response->withJson($list);
 });
+
+// company
+
+// get logo image
+$app->get('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $result = CompanyManager::getCompany($id);
+
+    return $response->write($result['logo']);
+});
+
+// delete logo
+$app->delete('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $result = CompanyManager::updateLogo($id, NULL);
+
+    return $response->withJson(array('status' => $result));
+});
+
+$app->get('/api/v1/visitors/company/{idcompany}/event/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $idcompany = isset($args['idcompany']) ? $args['idcompany'] : 0;
+    // Get visitors and selected IDs
+    $all = VisitorManager::getVisitorsByCompanyId($idcompany);
+    $selected = EventManager::getVisitorsByEventId($id);
+
+    return $response->withJson(array('all' => $all, 'selected' => $selected));
+});
+
+
 // unused
 $app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {
 
@@ -213,5 +427,7 @@ $app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {
         'asset' => $result
     ]);
 });
+
+
 
 $app->run();

@@ -3,9 +3,9 @@ include('inc/header.html');
 
 ?>
 
-<div class="ui-catalog">
+<div id="t-wrapper" class="catalog">
 
-    <div class="panel panel-default ui-catalog-industries">
+    <div class="panel panel-default ui-catalog">
         <div class="panel-heading">Catalog 
 <?php
 echo <<<EOT

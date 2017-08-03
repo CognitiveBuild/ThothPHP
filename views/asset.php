@@ -2,16 +2,16 @@
 include('inc/header.html');
 ?>
 
-<div class="ui-catalog">
+<div id="t-wrapper" class="asset">
 
-    <div class="panel panel-default ui-catalog-industries">
+    <div class="panel panel-default ui-asset">
         <div class="panel-heading">Asset details</div>
         <div class="panel-body">
             <form class="list list-group" method="POST" enctype="multipart/form-data">
 
 <?php
 $industryHTML = '';
-if($id === 0) {
+if($id == '0') {
     $industryHTML = '<option value="0">Please choose one</option>';
 }
 

@@ -145,7 +145,7 @@ class AssetManager {
     public static function updateFileIds($id) {
         $result = self::getFileIDList($id);
         $data = json_encode($result);
-        db::execute("UPDATE `asset` SET `attachments` = ? WHERE `id` = ?", array($data, $id));
+        return db::execute("UPDATE `asset` SET `attachments` = ? WHERE `id` = ?", array($data, $id));
     }
 
 

@@ -2,9 +2,9 @@
 include('inc/header.html');
 ?>
 
-<div class="ui-catalog">
+<div id="t-wrapper" class="asset">
 
-    <div class="panel panel-default ui-catalog-industries">
+    <div class="panel panel-default ui-asset">
         <div class="panel-heading">Assets <a href="/assets/0" class="ui-right ui-modal-button" data-id="0">Add a new Asset</a></div>
         <div class="panel-body">
             <ul class="list list-group list-group-highlight">

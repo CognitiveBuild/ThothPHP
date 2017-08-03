@@ -67,13 +67,15 @@ body {
     text-align: center;
   }
 
-  .file-group .file-upload-input {
+  .file-group .file-upload-input, 
+  .file-group .company-logo-input{
     width: 80px;
     opacity: 0;
     top: 0;
     position: absolute;
   }
-  .file-group .file-upload-remove {
+  .file-group .file-upload-remove, 
+  .file-group .company-logo-remove {
     position: absolute;
     top: 0px;
     right: 5px;
@@ -82,16 +84,27 @@ body {
     display: none;
   }
 
-  .file-group.ready .file-upload-remove {
+  .file-group.ready .file-upload-remove, 
+  .file-group.ready .company-logo-remove {
     display: block;
   }
-  .file-group.ready .file-upload-remove {
+
+  .file-group.ready .file-upload-remove, 
+  .file-group.ready .company-logo-remove {
     color: #cc0000;
   }
+
   .glyphicon-icon-right { 
     margin-left: 5px;
   }
 
   .list-group-highlight li.list-group-item:hover {
     background: #fafafa;
+  }
+
+  .badge-red {
+    background-color: #cc0000;
+  }
+  .badge-green {
+    background-color: #00aa00;
   }
