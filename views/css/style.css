@@ -88,3 +88,10 @@ body {
   .file-group.ready .file-upload-remove {
     color: #cc0000;
   }
+  .glyphicon-icon-right { 
+    margin-left: 5px;
+  }
+
+  .list-group-highlight li.list-group-item:hover {
+    background: #fafafa;
+  }

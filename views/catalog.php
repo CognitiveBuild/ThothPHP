@@ -21,8 +21,7 @@ echo <<<EOT
 
 <li class="list-group-item">
     <a href="#" class="ui-modal-button-catalog" data-target=".modal-catalog" data-toggle="modal" data-id="{$val['id']}" data-type="{$type}" data-name="{$val['name']}">{$val['name']}</a>
-    <span class="badge no-badge edit" ref="data-id">Edit</span>
-    <span class="badge no-badge delete" ref="data-id">Delete</span>
+    <span class="badge" ref="data-id">{$val['count']}</span>
 </li>
 
 EOT;

@@ -45,7 +45,7 @@ $app->get('/catalog/{name}', function ($request, $response, $args) {
 
     $name = isset($args['name']) ? $args['name'] : KEY_INDUSTRY;
 
-    $result = CatalogManager::getCatalog($name);
+    $result = CatalogManager::getCatalogWithAssetCount($name);
 
     return $this->view->render($response, 'catalog.php', [
         'catalogs' => $result, 
