@@ -33,10 +33,12 @@ body {
   padding: 10px;
   margin: 0px 6px 12px 0px;
   font-weight: normal;
+  cursor: pointer;
 }
   .ui-button-block input{
     opacity: 0;
-    margin-left: -20px;
+    left: -20px;
+    position: absolute;
   }
 
 .ui-button-block-selected {
