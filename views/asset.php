@@ -40,7 +40,7 @@ foreach($technologies as $technology) {
     }
 
     $technologyHTML .= <<<EOT
-    <label class="checkbox-inline ui-button-block{$selected_label}">
+    <label class="ui-button-block{$selected_label}">
         <input type="checkbox" name="technology[]" value="{$technology['id']}"{$selected} />
         {$technology['name']}
     </label>
