@@ -282,6 +282,8 @@ $app->get('/events/{id}', function ($request, $response, $args) {
 
     $companies = CompanyManager::getCompanies();
 
+    $timelines = EventManager::getTimelinesByEventId($id);
+
     if($id > 0) {
         $result = EventManager::getEvent($id);
     }
@@ -289,7 +291,8 @@ $app->get('/events/{id}', function ($request, $response, $args) {
     return $this->view->render($response, 'event.php', [
         'id' => $id, 
         'event' => $result, 
-        'companies' => $companies
+        'companies' => $companies, 
+        'timelines' => $timelines
     ]);
 });
 
@@ -298,14 +301,32 @@ $app->post('/events/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
     $post = $request->getParsedBody();
+    $visitors = isset($post['idvisitor']) ? $post['idvisitor'] : array();
+    // $timelines = $post['timelines'];
+//     echo '<pre>';
+//     print_r($post);
+// die;
+    $isNew = TRUE;
 
     if($id > 0) {
+        $isNew = FALSE;
         EventManager::updateEvent($id, $post['visitdate'], $post['displayas'], $post['idcompany'], $post['isactive']);
-        return $response->withStatus(200)->withHeader('Location', "/events/{$id}");
+    }
+    else {
+        $id = EventManager::addEvent($post['visitdate'], $post['displayas'], $post['idcompany'], $post['isactive']);
     }
 
-    EventManager::addEvent($post['visitdate'], $post['displayas'], $post['idcompany'], $post['isactive']);
-    return $response->withStatus(200)->withHeader('Location', "/events");
+    EventManager::delteVisitorByEventId($id);
+
+    foreach($visitors as $key => $idvisitor) {
+        EventManager::addVisitorByEventId($id, $idvisitor);
+    }
+
+    if($isNew) {
+        return $response->withStatus(200)->withHeader('Location', "/events");
+    }
+
+    return $response->withStatus(200)->withHeader('Location', "/events/{$id}");
 });
 
 
@@ -317,7 +338,7 @@ $app->post('/events/{id}', function ($request, $response, $args) {
 
 /// APIs
 
-// catalog
+// Catalog
 $app->get('/api/v1/catalog/{q}', function ($request, $response, $args) {
 
     $q = isset($args['q']) ? $args['q'] : KEY_INDUSTRY;
@@ -344,7 +365,7 @@ $app->post('/api/v1/catalog', function ($request, $response, $args) {
 
     return $response->withStatus(200)->withJson(array('status' => 200, 'id' => $id));
 });
-// delete attachment
+// Delete attachment
 $app->delete('/api/v1/assets/attachment/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
@@ -358,7 +379,7 @@ $app->delete('/api/v1/assets/attachment/{id}', function ($request, $response, $a
 
     return $response->withJson(array('status' => $result));
 });
-// get attachment rendered
+// Attachment render
 $app->get('/api/v1/assets/attachment/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
@@ -366,7 +387,7 @@ $app->get('/api/v1/assets/attachment/{id}', function ($request, $response, $args
 
     return $response->withHeader('Content-Type', $result['type'])->write($result['binary']);
 });
-// query assets by catalog, INDUSTRY | TECHNOLOGY
+// Query assets by catalog, INDUSTRY | TECHNOLOGY
 $app->get('/api/v1/assets/catalog/{catalog}/name/{name}', function ($request, $response, $args) {
 
     $catalog = isset($args['catalog']) ? $args['catalog'] : KEY_INDUSTRY;
@@ -375,7 +396,7 @@ $app->get('/api/v1/assets/catalog/{catalog}/name/{name}', function ($request, $r
     $list = AssetManager::getAssetsByCatalogName($catalog, $name);
     return $response->withJson($list);
 });
-// query assets by catalog id
+// Query assets by catalog id
 $app->get('/api/v1/assets/catalog/{catalog}/id/{id}', function ($request, $response, $args) {
 
     $catalog = isset($args['catalog']) ? $args['catalog'] : KEY_INDUSTRY;
@@ -385,9 +406,9 @@ $app->get('/api/v1/assets/catalog/{catalog}/id/{id}', function ($request, $respo
     return $response->withJson($list);
 });
 
-// company
+// Company
 
-// get logo image
+// Get logo image
 $app->get('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
@@ -396,7 +417,7 @@ $app->get('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
     return $response->write($result['logo']);
 });
 
-// delete logo
+// Delete logo
 $app->delete('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
@@ -405,6 +426,7 @@ $app->delete('/api/v1/companies/logo/{id}', function ($request, $response, $args
     return $response->withJson(array('status' => $result));
 });
 
+// Visitors selected by event
 $app->get('/api/v1/visitors/company/{idcompany}/event/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;

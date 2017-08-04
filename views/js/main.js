@@ -89,64 +89,91 @@ $(function(){
                 }
             });
         }, 
-        event: function() {
-            console.log('event');
-            // events
-            var jCompany = $('.ui-event #company');
-            var jId = $('.ui-event #id');
-            //
-            var loadVisitors = function(evt) {
-                var idcompany = jCompany.val();
-                var id = jId.val();
+        event: {
+            init: function() {
+                console.log('event');
+            }, 
+            details: function() {
+                // events
+                var jCompany = $('.ui-event #company');
+                var jId = $('.ui-event #id');
+                var jForm = $('.ui-event form');
+                var areVisitorsLoaded = false;
+                jForm.on('submit', function(evt) {
+                    return areVisitorsLoaded;
+                });
 
-                $.ajax({
-                    url: '/api/v1/visitors/company/' + idcompany + '/event/' + id + '', 
-                    method: 'GET', 
-                    success: function(response) {
-                        var jGroup = $('.form-group-visitors');
-                        var jLabel = $('<label for="_company">Visitors</label>');
-                        var jContainer = $('<div class="form-control form-control-auto-height" id="_company"></div>');
-                        //
-                        var all = response.all;
-                        var selected = response.selected;
-
-                        var html = '';
-                        for(var i in all) {
-                            var jBlock = $('<label class="ui-button-block"></label>');
-                            var jBox = $('<input type="checkbox" name="idvisitor[]" value="'+all[i].id+'" />');
-
-                            selected.findIndex(function(x) { 
-                                if(x.idvisitor == all[i].id) {
-                                    jBox.attr('checked', true);
-
-                                    jBlock.addClass('ui-button-block-selected');
-                                }
-                            });
-
-                            jBlock.append(jBox);
-
-                            jBlock.append(all[i].firstname + ', ' + all[i].lastname);
-                            jContainer.append(jBlock);
-                        }
-                        
-                        //
-                        jGroup.empty()
-                            .append(jLabel)
-                            .append(jContainer);
-                    }, 
-                    error: function(error) {
-
+                $('.ui-event').on('click', '.timeline-remove', function(evt) {
+                    var id = $(this).data('id');
+                    var jContainer = $(this).closest('.form-group-container');
+                    if(id == '0') {
+                        jContainer.remove();
+                        return;
                     }
-                })
-            };
-            jCompany.on('change', loadVisitors);
-            loadVisitors();
+                    // ajax remove
+                    
+                });
+                $('.ui-event .timeline-add').on('click', function(evt) {
+                    var html = $('.ui-template-timeline').html();
+                    var jTimeline = $(html);
+                    var jContainer = $('.ui-event .timeline-container');
+                    jContainer.append(jTimeline);
+                });
+                //
+                var loadVisitors = function(evt) {
+                    var idcompany = jCompany.val();
+                    var id = jId.val();
 
-            // datepicker
-            var datePicker = $('.datepicker').datepicker({format: 'yyyy-mm-dd'}).on('changeDate', function(evt) {
-                datePicker.hide();
-            }).data('datepicker');
+                    $.ajax({
+                        url: '/api/v1/visitors/company/' + idcompany + '/event/' + id + '', 
+                        method: 'GET', 
+                        success: function(response) {
+                            var jGroup = $('.form-group-visitors');
+                            var jLabel = $('<label for="_company">Visitors</label>');
+                            var jContainer = $('<div class="form-control form-control-auto-height" id="_company"></div>');
+                            //
+                            var all = response.all;
+                            var selected = response.selected;
 
+                            var html = '';
+                            for(var i in all) {
+                                var jBlock = $('<label class="ui-button-block"></label>');
+                                var jBox = $('<input type="checkbox" name="idvisitor[]" value="'+all[i].id+'" />');
+
+                                selected.findIndex(function(x) { 
+                                    if(x.idvisitor == all[i].id) {
+                                        jBox.attr('checked', true);
+
+                                        jBlock.addClass('ui-button-block-selected');
+                                    }
+                                });
+
+                                jBlock.append(jBox);
+
+                                jBlock.append(all[i].firstname + ', ' + all[i].lastname);
+                                jContainer.append(jBlock);
+                            }
+                            
+                            //
+                            jGroup.empty()
+                                .append(jLabel)
+                                .append(jContainer);
+
+                            areVisitorsLoaded = true;
+                        }, 
+                        error: function(error) {
+                            areVisitorsLoaded = true;
+                        }
+                    })
+                };
+                jCompany.on('change', loadVisitors);
+                loadVisitors();
+
+                // datepicker
+                var datePicker = $('.datepicker').datepicker({format: 'yyyy-mm-dd'}).on('changeDate', function(evt) {
+                    datePicker.hide();
+                }).data('datepicker');
+            }
         }, 
         company: function() {
             console.log('company');

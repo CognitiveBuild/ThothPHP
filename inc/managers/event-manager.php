@@ -30,4 +30,19 @@ final class EventManager {
         return db::query("SELECT * FROM `event_to_visitor` WHERE `idevent` = ?;", $id);
     }
 
+    public static function addVisitorByEventId($id, $idvisitor) {
+
+        return db::insert("INSERT INTO `event_to_visitor` (`idevent`, `idvisitor`) VALUES (?,?);", array($id, $idvisitor));
+    }
+
+    public static function delteVisitorByEventId($id) {
+
+        return db::insert("DELETE FROM `event_to_visitor` WHERE `idevent` = ?;", array($id));
+    }
+
+    public static function getTimelinesByEventId($id) {
+
+        return db::query("SELECT * FROM `event_timeline` WHERE `idevent` = ?;", $id);
+    }
+
 }

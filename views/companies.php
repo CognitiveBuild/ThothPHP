@@ -13,6 +13,7 @@ foreach($companies as $company) {
 
     echo <<<EOT
 <li class="list-group-item">
+    <span class="glyphicon glyphicon-globe"></span>
     <a href="/companies/{$company['id']}" class="name ui-modal-button">{$company['name']}</a>
 </li>
 EOT;

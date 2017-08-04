@@ -94,17 +94,25 @@ body {
     color: #cc0000;
   }
 
-  .glyphicon-icon-right { 
-    margin-left: 5px;
-  }
+.glyphicon-icon-right { 
+  margin-left: 5px;
+}
 
-  .list-group-highlight li.list-group-item:hover {
-    background: #fafafa;
-  }
+.list-group-highlight li.list-group-item:hover {
+  background: #fafafa;
+}
 
-  .badge-red {
-    background-color: #cc0000;
-  }
-  .badge-green {
-    background-color: #00aa00;
-  }
+.badge-red {
+  background-color: #cc0000;
+}
+.badge-green {
+  background-color: #00aa00;
+}
+.glyphicon-remove-width-input {
+  line-height: 34px;
+  color: #cc0000;
+  cursor: pointer;
+}
+.ui-template {
+  display: none;
+}
