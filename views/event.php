@@ -63,7 +63,7 @@ EOT;
         }
     }
     else {
-        $timelineHTML = '<div class="form-group">No timlines.</div>';
+        $timelineHTML = '<div class="form-group form-group-no-data">No timlines.</div>';
     }
 }
 

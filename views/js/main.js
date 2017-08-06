@@ -117,6 +117,8 @@ $(function(){
                     var html = $('.ui-template-timeline').html();
                     var jTimeline = $(html);
                     var jContainer = $('.ui-event .timeline-container');
+
+                    jContainer.find('.form-group-no-data').hide();
                     jContainer.append(jTimeline);
                 });
                 //
