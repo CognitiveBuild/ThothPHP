@@ -32,13 +32,14 @@ if($id > 0) {
     $count = count($timelines);
 
     if($count > 0) {
+        $i = 0;
         foreach($timelines as $timeline) {
             $timelineHTML .= <<<EOT
             <div class="form-group-container">
                 <div class="form-group">
                     <div class="row">
                         <div class="col-md-5">
-                            <input type="text" class="form-control form-control-inline" name="timeline_timestart[]" placeholder="Start time" maxlength="5" value="{$timeline['timestart']}" />
+                            <input type="text" class="form-control form-control-inline" name="timeline_timestart[{$i}]" placeholder="Start time" maxlength="5" value="{$timeline['timestart']}" />
                         </div>
 
                         <div class="col-md-1">
@@ -46,7 +47,7 @@ if($id > 0) {
                         </div>
 
                         <div class="col-md-5">
-                            <input type="text" class="form-control form-control-inline" name="timeline_timeend[]" placeholder="End time" maxlength="5" value="{$timeline['timeend']}" />
+                            <input type="text" class="form-control form-control-inline" name="timeline_timeend[{$i}]" placeholder="End time" maxlength="5" value="{$timeline['timeend']}" />
                         </div>
 
                         <div class="col-md-1">
@@ -56,14 +57,12 @@ if($id > 0) {
                 </div>
 
                 <div class="form-group">
-                    <textarea class="form-control" name="timeline_activity[]" placeholder="Activity">{$timeline['activity']}</textarea>
+                    <textarea class="form-control" name="timeline_activity[{$i}]" placeholder="Activity">{$timeline['activity']}</textarea>
                 </div>
             </div>
 EOT;
+            $i++;
         }
-    }
-    else {
-        $timelineHTML = '<div class="form-group form-group-no-data">No timlines.</div>';
     }
 }
 
@@ -96,6 +95,7 @@ echo <<<EOT
             <label for="linkedin">Timeline</label>
             <div class="timeline-container">
                 {$timelineHTML}
+                <div class="form-group form-group-no-data">No timlines.</div>
             </div>
         </div>
     </div>
@@ -118,7 +118,7 @@ EOT;
             <div class="form-group">
                 <div class="row">
                     <div class="col-md-5">
-                        <input type="text" class="form-control form-control-inline" name="timeline_timestart[]" placeholder="Start time" maxlength="5" value="" />
+                        <input type="text" class="form-control form-control-inline timeline-timestart" data-name="timeline_timestart" placeholder="Start time" maxlength="5" value="" />
                     </div>
 
                     <div class="col-md-1">
@@ -126,7 +126,7 @@ EOT;
                     </div>
 
                     <div class="col-md-5">
-                        <input type="text" class="form-control form-control-inline" name="timeline_timeend[]" placeholder="End time" maxlength="5" value="" />
+                        <input type="text" class="form-control form-control-inline timeline-timeend" data-name="timeline_timeend" placeholder="End time" maxlength="5" value="" />
                     </div>
 
                     <div class="col-md-1">
@@ -136,7 +136,7 @@ EOT;
             </div>
 
             <div class="form-group">
-                <textarea class="form-control" name="timeline_activity[]" placeholder="Activity"></textarea>
+                <textarea class="form-control timeline-activity" data-name="timeline_activity" placeholder="Activity"></textarea>
             </div>
         </div>
     </div>

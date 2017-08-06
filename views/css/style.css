@@ -116,3 +116,6 @@ body {
 .ui-template {
   display: none;
 }
+.form-group-no-data {
+  display: none;
+}

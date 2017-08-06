@@ -103,20 +103,46 @@ $(function(){
                     return areVisitorsLoaded;
                 });
 
+                var checkTimeline = function() {
+                    var jTimelines = $('.form-group-timeline .timeline-container .form-group-container');
+                    var jEmpty = $('.form-group-timeline .timeline-container .form-group-no-data');
+                    
+                    if(jTimelines.length === 0) {
+                        jEmpty.show();
+                    }
+                    else {
+                        jEmpty.hide();
+                    }
+                };
+
                 $('.ui-event').on('click', '.timeline-remove', function(evt) {
                     var id = $(this).data('id');
                     var jContainer = $(this).closest('.form-group-container');
+
                     if(id == '0') {
                         jContainer.remove();
+                        checkTimeline();
                         return;
                     }
                     // ajax remove
-                    
+                    checkTimeline();
                 });
+                checkTimeline();
+
                 $('.ui-event .timeline-add').on('click', function(evt) {
+                    var count = $('.form-group-timeline .timeline-container .form-group-container').length;
+
                     var html = $('.ui-template-timeline').html();
                     var jTimeline = $(html);
                     var jContainer = $('.ui-event .timeline-container');
+
+                    var jControls = jTimeline.find('.form-control');
+
+                    jControls.each(function(i) {
+                        var name = $(this).data('name');
+                        console.log(name);
+                        $(this).prop('name', name+'['+count+']');
+                    });
 
                     jContainer.find('.form-group-no-data').hide();
                     jContainer.append(jTimeline);

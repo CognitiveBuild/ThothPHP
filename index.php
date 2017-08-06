@@ -301,11 +301,17 @@ $app->post('/events/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
     $post = $request->getParsedBody();
+
     $visitors = isset($post['idvisitor']) ? $post['idvisitor'] : array();
-    // $timelines = $post['timelines'];
-//     echo '<pre>';
-//     print_r($post);
-// die;
+
+    $timestarts = isset($post['timeline_timestart']) ? $post['timeline_timestart'] : array();
+    $timeends = isset($post['timeline_timeend']) ? $post['timeline_timeend'] : array(); 
+    $activitis = isset($post['timeline_activity']) ? $post['timeline_activity'] : array();
+
+    echo '<pre>';
+    print_r($post);
+die;
+
     $isNew = TRUE;
 
     if($id > 0) {
@@ -317,9 +323,17 @@ $app->post('/events/{id}', function ($request, $response, $args) {
     }
 
     EventManager::delteVisitorByEventId($id);
-
     foreach($visitors as $key => $idvisitor) {
         EventManager::addVisitorByEventId($id, $idvisitor);
+    }
+
+    EventManager::deleteTimelineByEventId($id);
+    foreach($timestarts as $key => $time_start) {
+
+        $time_end = $timeends[$key];
+        $activity = $activitis[$key];
+
+        EventManager::addTimeline($time_start, $time_end, $activity);
     }
 
     if($isNew) {
