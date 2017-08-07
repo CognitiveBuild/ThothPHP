@@ -12,6 +12,11 @@ include 'inc/managers/event-manager.php';
 define("KEY_INDUSTRY", "INDUSTRY");
 define("KEY_TECHNOLOGY", "TECHNOLOGY");
 
+define("OPTION_YES", "Y");
+define("OPTION_NO", "N");
+
+date_default_timezone_set('PRC');
+
 if(isset($_ENV["VCAP_SERVICES"]) === FALSE) {
     $env = new Dotenv\Dotenv(__DIR__);
     $env->load();
@@ -245,12 +250,29 @@ $app->post('/visitors/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
     $post = $request->getParsedBody();
+    $files = $request->getUploadedFiles();
 
+    $avatar = NULL;
+    if(isset($files['avatar']) && count($files['avatar']) === 1) {
+        $size = $files['avatar'][0]->getSize();
+        if($size > 0) {
+            $avatar = file_get_contents($files['avatar'][0]->file);
+        }
+    }
+    $isNew = TRUE;
     if($id > 0) {
+        $isNew = FALSE;
         VisitorManager::updateVisitor($id, $post['firstname'], $post['lastname'], $post['idcompany'], $post['linkedin'], $post['facebook'], $post['twitter']);
     }
     else {
         $id = VisitorManager::addVisitor($post['firstname'], $post['lastname'], $post['idcompany'], $post['linkedin'], $post['facebook'], $post['twitter']);
+    }
+
+    if($id > 0 && $avatar !== NULL) {
+        VisitorManager::updateAvatar($id, $avatar);
+    }
+
+    if($isNew) {
         return $response->withStatus(200)->withHeader('Location', "/visitors");
     }
 
@@ -307,19 +329,21 @@ $app->post('/events/{id}', function ($request, $response, $args) {
     $timestarts = isset($post['timeline_timestart']) ? $post['timeline_timestart'] : array();
     $timeends = isset($post['timeline_timeend']) ? $post['timeline_timeend'] : array(); 
     $activitis = isset($post['timeline_activity']) ? $post['timeline_activity'] : array();
-
-    echo '<pre>';
-    print_r($post);
-die;
+    $isactive = isset($post['isactive']) ? $post['isactive'] : OPTION_NO;
 
     $isNew = TRUE;
 
+    // Make sure there is no conflict events on same date
+    if($isactive === OPTION_YES) {
+        EventManager::deactivateEvent();
+    }
+
     if($id > 0) {
         $isNew = FALSE;
-        EventManager::updateEvent($id, $post['visitdate'], $post['displayas'], $post['idcompany'], $post['isactive']);
+        EventManager::updateEvent($id, $post['visitdate'], $post['displayas'], $post['idcompany'], $isactive);
     }
     else {
-        $id = EventManager::addEvent($post['visitdate'], $post['displayas'], $post['idcompany'], $post['isactive']);
+        $id = EventManager::addEvent($post['visitdate'], $post['displayas'], $post['idcompany'], $isactive);
     }
 
     EventManager::delteVisitorByEventId($id);
@@ -330,10 +354,11 @@ die;
     EventManager::deleteTimelineByEventId($id);
     foreach($timestarts as $key => $time_start) {
 
+        $time_start = $timestarts[$key];
         $time_end = $timeends[$key];
         $activity = $activitis[$key];
 
-        EventManager::addTimeline($time_start, $time_end, $activity);
+        EventManager::addTimeline($id, $time_start, $time_end, $activity);
     }
 
     if($isNew) {
@@ -352,13 +377,14 @@ die;
 
 /// APIs
 
-// Catalog
+// Catalogs by query
 $app->get('/api/v1/catalog/{q}', function ($request, $response, $args) {
 
     $q = isset($args['q']) ? $args['q'] : KEY_INDUSTRY;
     $list = CatalogManager::getCatalog($q);
     return $response->withJson($list);
 });
+// Catalogs
 $app->post('/api/v1/catalog', function ($request, $response, $args) {
     $post = $request->getParsedBody();
 
@@ -430,7 +456,6 @@ $app->get('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
 
     return $response->write($result['logo']);
 });
-
 // Delete logo
 $app->delete('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
 
@@ -439,7 +464,6 @@ $app->delete('/api/v1/companies/logo/{id}', function ($request, $response, $args
 
     return $response->withJson(array('status' => $result));
 });
-
 // Visitors selected by event
 $app->get('/api/v1/visitors/company/{idcompany}/event/{id}', function ($request, $response, $args) {
 
@@ -451,7 +475,49 @@ $app->get('/api/v1/visitors/company/{idcompany}/event/{id}', function ($request,
 
     return $response->withJson(array('all' => $all, 'selected' => $selected));
 });
+// unused, tobe used for Watson
+$app->get('/api/v1/event/today', function ($request, $response, $args) {
 
+    $event = EventManager::getEventOfToday();
+    if($event === FALSE) {
+        $event = new stdClass();
+    }
+    return $response->withJson($event);
+});
+
+// Visitor avatar
+$app->get('/api/v1/visitor/avatar/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $result = VisitorManager::getVisitor($id);
+
+    return $response->write($result['avatar']);
+});
+// Visitor avatar delete
+$app->delete('/api/v1/visitors/avatar/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $result = VisitorManager::updateAvatar($id, NULL);
+
+    return $response->withJson(array('status' => $result));
+});
+// Visitors today
+$app->get('/api/v1/visitors/today', function ($request, $response, $args) {
+
+    $visitors = VisitorManager::getVisitorsOfToday();
+    if($visitors === FALSE) {
+        $visitors = array();
+    }
+    return $response->withJson($visitors);
+});
+
+$app->delete('/api/v1/timelines/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $result = EventManager::deleteTimelineById($id);
+
+    return $response->withJson(array('status' => $result));
+});
 
 // unused
 $app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {

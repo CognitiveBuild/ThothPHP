@@ -29,4 +29,17 @@ final class VisitorManager {
         );
     }
 
+    public static function updateAvatar($id, $avatar) {
+
+        return db::execute("UPDATE `visitor` SET `avatar` = ? WHERE `id` = ?;", array($avatar, $id));
+    }
+
+    public static function getVisitorsOfToday() {
+
+        return db::query("SELECT `visitor`.`id`, `visitor`.`firstname`, `visitor`.`lastname`, `visitor`.`facebook`, `visitor`.`linkedin`, `visitor`.`twitter`, `company`.`name` AS `company` FROM `visitor`
+        LEFT JOIN `company` ON `company`.`id` = `visitor`.`idcompany`
+        LEFT JOIN `event` ON `event`.`idcompany` = `company`.`id`
+        WHERE `event`.`visitdate` = current_date() AND `event`.`isactive` = ?;", OPTION_YES);
+    }
+
 }

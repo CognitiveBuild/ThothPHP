@@ -124,8 +124,15 @@ $(function(){
                         checkTimeline();
                         return;
                     }
-                    // ajax remove
-                    checkTimeline();
+                    $.ajax({
+                        url: '/api/v1/timelines/' + id, 
+                        method: 'DELETE', 
+                        success: function(response) {
+                            jContainer.remove();
+                            checkTimeline();
+                        }
+                    });
+                    
                 });
                 checkTimeline();
 
@@ -260,6 +267,56 @@ $(function(){
         }, 
         visitor: function() {
             console.log('visitor');
+            // Company
+            $('.form-group').on('change', '.visitor-avatar-input', function(evt) {
+
+                var group = $(this).parent();
+                var label = group.find('label');
+                var files = $(this).get(0).files;
+
+                if(files.length > 0) {
+                    var reader = new FileReader();
+                    var file = files[0];
+
+                    $(reader).on("load", function(evt) {
+                        group.addClass('ready').css('background-image', 'url('+evt.target.result+')');
+                        label.text('');
+                    });
+                    reader.readAsDataURL(file);
+                }
+                else {
+
+                }
+            });
+            // Remove the image input from form
+            // Company
+            $('.form-group').on('click', '.visitor-avatar-remove', function(evt) {
+
+                var group = $(this).parent();
+                var label = group.find('label');
+                var id = group.data('id');
+                var jFile = $('.visitor-avatar-input');
+
+                if(id == '0') {
+                    jFile.val('');
+                    group.removeClass('ready').css('background-image', 'inherit');
+                    label.html('<span class="glyphicon glyphicon-plus"></span>');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/api/v1/visitors/avatar/' + id, 
+                    method: 'DELETE', 
+                    success: function() {
+                        jFile.val('');
+                        group.removeClass('ready').css('background-image', 'inherit');
+                        label.html('<span class="glyphicon glyphicon-plus"></span>');
+                    }, 
+                    error: function() {
+
+                    }
+                });
+            });
         }, 
         catalog: function() {
             console.log('catalog');

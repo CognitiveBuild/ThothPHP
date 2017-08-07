@@ -27,6 +27,16 @@ foreach($companies as $company) {
 EOT;
 }
 
+$avatarReadyState = '';
+$avatarAddButton = '';
+if($visitor['avatar'] === NULL) {
+    $avatarAddButton = '<span class="glyphicon glyphicon-plus"></span>';
+}
+else {
+    $avatarReadyState = ' ready';
+}
+
+
 echo <<<EOT
     <input type="hidden" name="id" value="{$id}" />
     <div class="form-group">
@@ -61,6 +71,16 @@ echo <<<EOT
         <input type="text" class="form-control" id="twitter" name="twitter" placeholder="Twitter URL" value="{$visitor['twitter']}" />
     </div>
 
+    <div class="form-group attachment-group">
+            <label for="description">Avatar</label>
+            <div class="attachments">
+                <div class="file-group{$avatarReadyState}" style="background-image: url(/api/v1/visitor/avatar/{$visitor['id']})" data-id="{$visitor['id']}">
+                    <div class="visitor-avatar-remove glyphicon glyphicon-remove"></div>
+                    <label>{$avatarAddButton}</label>
+                    <input type="file" name="avatar[]" class="visitor-avatar-input" />
+                </div>
+            </div>
+    </div>
 EOT;
 
 ?>

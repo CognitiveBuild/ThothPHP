@@ -25,6 +25,11 @@ final class EventManager {
         );
     }
 
+    public static function deactivateEvent() {
+
+        return db::execute("UPDATE `event` SET `isactive` = ? WHERE `visitdate` = current_date();", OPTION_NO);
+    }
+
     public static function getVisitorsByEventId($id) {
 
         return db::query("SELECT * FROM `event_to_visitor` WHERE `idevent` = ?;", $id);
@@ -42,7 +47,31 @@ final class EventManager {
 
     public static function getTimelinesByEventId($id) {
 
-        return db::query("SELECT * FROM `event_timeline` WHERE `idevent` = ?;", $id);
+        return db::query("SELECT * FROM `event_timeline` WHERE `idevent` = ?;", array($id));
+    }
+
+    public static function deleteTimelineByEventId($id) {
+
+        return db::execute("DELETE FROM `event_timeline` WHERE `idevent` = ?", array($id));
+    }
+
+    public static function deleteTimelineById($id) {
+        
+        return db::execute("DELETE FROM `event_timeline` WHERE `id` = ?", array($id));
+    }
+
+    public static function addTimeline($id, $time_start, $time_end, $activity) {
+
+        return db::insert("INSERT INTO `event_timeline` (`idevent`, `timestart`, `timeend`, `activity`) VALUES (?,?,?,?);", array($id, $time_start, $time_end, $activity));
+    }
+
+    public static function getEventOfToday() {
+
+        return db::queryFirst("SELECT `event`.`id`, `event`.`displayas`, `company`.`name`, `catalog`.`name` AS `industry`, `catalog`.`id` AS `idindustry` 
+        FROM `event` 
+        LEFT JOIN `company` ON `event`.`idcompany` = `company`.`id`
+        LEFT JOIN `catalog` ON `company`.`idindustry` = `catalog`.`id`
+        WHERE `event`.`visitdate` = current_date() AND `event`.`isactive` = ?;", OPTION_YES);
     }
 
 }

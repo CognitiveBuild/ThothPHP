@@ -11,7 +11,12 @@ include('inc/header.html');
 <?php
 foreach($events as $event) {
     $visit_date = $event['visitdate'];
+    $is_active = (isset($event['isactive']) && ($event['isactive'] === OPTION_YES));
     $extra_display = '';
+    $status = '<span class="glyphicon glyphicon-remove"></span>';
+    if($is_active) {
+        $status = '<span class="glyphicon glyphicon-ok"></span>';
+    }
 
     if($visit_date == date('Y-m-d')) {
         $extra_display = '<span class="badge badge-red">Today</span>';
@@ -30,7 +35,7 @@ foreach($events as $event) {
     }
     echo <<<EOT
 <li class="list-group-item">
-    <span class="glyphicon glyphicon-tasks"></span>
+    {$status}
     <a href="/events/{$event['id']}" class="name ui-modal-button">[{$visit_date}] {$event['displayas']}</a>
     {$extra_display}
 </li>

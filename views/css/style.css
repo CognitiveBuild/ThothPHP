@@ -68,14 +68,16 @@ body {
   }
 
   .file-group .file-upload-input, 
-  .file-group .company-logo-input{
+  .file-group .company-logo-input, 
+  .file-group .visitor-avatar-input {
     width: 80px;
     opacity: 0;
     top: 0;
     position: absolute;
   }
   .file-group .file-upload-remove, 
-  .file-group .company-logo-remove {
+  .file-group .company-logo-remove, 
+  .file-group .visitor-avatar-remove {
     position: absolute;
     top: 0px;
     right: 5px;
@@ -85,12 +87,14 @@ body {
   }
 
   .file-group.ready .file-upload-remove, 
-  .file-group.ready .company-logo-remove {
+  .file-group.ready .company-logo-remove, 
+  .file-group.ready .visitor-avatar-remove {
     display: block;
   }
 
   .file-group.ready .file-upload-remove, 
-  .file-group.ready .company-logo-remove {
+  .file-group.ready .company-logo-remove, 
+  .file-group.ready .visitor-avatar-remove {
     color: #cc0000;
   }
 
