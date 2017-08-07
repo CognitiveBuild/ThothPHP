@@ -30,7 +30,7 @@ final class db
 					"mysql:dbname={$_ENV['MYSQL_SCHEMA']};port={$_ENV['MYSQL_PORT']};host={$_ENV['MYSQL_HOST']}", 
 					$_ENV['MYSQL_USERNAME'],
 					$_ENV['MYSQL_PASSWORD'],
-					array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8';")
+					array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8, time_zone = '+8:00'")
 				);
 				self::$_instance->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
 				self::$_connect++;
