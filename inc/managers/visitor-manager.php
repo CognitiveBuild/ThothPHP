@@ -8,7 +8,8 @@ final class VisitorManager {
     }
 
     public static function getVisitorsByCompanyId($idcompany) {
-        return db::query("SELECT * FROM `visitor` WHERE `idcompany` = ?;", $idcompany);
+
+        return db::query("SELECT `id`, `firstname`, `lastname`, `idcompany`, `linkedin`, `facebook`, `twitter` FROM `visitor` WHERE `idcompany` = ?;", $idcompany);
     }
 
     public static function getVisitor($id) {

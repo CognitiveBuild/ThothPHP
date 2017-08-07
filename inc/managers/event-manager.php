@@ -67,7 +67,7 @@ final class EventManager {
 
     public static function getEventOfToday() {
 
-        return db::queryFirst("SELECT `event`.`id`, `event`.`displayas`, `company`.`name`, `catalog`.`name` AS `industry`, `catalog`.`id` AS `idindustry` 
+        return db::queryFirst("SELECT `event`.`id`, `event`.`displayas`, `company`.`name` AS `company`, `company`.`id` AS `idcompany`, `catalog`.`name` AS `industry`, `catalog`.`id` AS `idindustry` 
         FROM `event` 
         LEFT JOIN `company` ON `event`.`idcompany` = `company`.`id`
         LEFT JOIN `catalog` ON `company`.`idindustry` = `catalog`.`id`

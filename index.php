@@ -479,10 +479,14 @@ $app->get('/api/v1/visitors/company/{idcompany}/event/{id}', function ($request,
 $app->get('/api/v1/event/today', function ($request, $response, $args) {
 
     $event = EventManager::getEventOfToday();
+    $visitors = VisitorManager::getVisitorsOfToday();
+    if($visitors === FALSE) {
+        $visitors = array();
+    }
     if($event === FALSE) {
         $event = new stdClass();
     }
-    return $response->withJson($event);
+    return $response->withJson(array( 'event' => $event, 'visitors' => $visitors ));
 });
 
 // Visitor avatar
@@ -501,16 +505,8 @@ $app->delete('/api/v1/visitors/avatar/{id}', function ($request, $response, $arg
 
     return $response->withJson(array('status' => $result));
 });
-// Visitors today
-$app->get('/api/v1/visitors/today', function ($request, $response, $args) {
 
-    $visitors = VisitorManager::getVisitorsOfToday();
-    if($visitors === FALSE) {
-        $visitors = array();
-    }
-    return $response->withJson($visitors);
-});
-
+// Timeline delete
 $app->delete('/api/v1/timelines/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
