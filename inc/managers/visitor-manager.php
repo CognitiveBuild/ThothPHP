@@ -37,10 +37,14 @@ final class VisitorManager {
 
     public static function getVisitorsOfToday() {
 
-        return db::query("SELECT `visitor`.`id`, `visitor`.`firstname`, `visitor`.`lastname`, `visitor`.`facebook`, `visitor`.`linkedin`, `visitor`.`twitter`, `company`.`name` AS `company` FROM `visitor`
+        return db::query("SELECT `visitor`.`id`, `visitor`.`firstname`, `visitor`.`lastname`, `visitor`.`facebook`, `visitor`.`linkedin`, `visitor`.`twitter`, `company`.`name` AS `company` 
+        FROM `visitor`
         LEFT JOIN `company` ON `company`.`id` = `visitor`.`idcompany`
         LEFT JOIN `event` ON `event`.`idcompany` = `company`.`id`
-        WHERE `event`.`visitdate` = current_date() AND `event`.`isactive` = ?;", OPTION_YES);
+        LEFT JOIN `event_to_visitor` ON `event_to_visitor`.`idevent` = `event`.`id` 
+        WHERE `event`.`visitdate` = current_date() 
+        AND `event`.`isactive` = ? 
+        AND `event_to_visitor`.`idvisitor` = `visitor`.`id`;", OPTION_YES);
     }
 
 }
