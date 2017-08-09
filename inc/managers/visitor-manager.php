@@ -4,12 +4,16 @@ final class VisitorManager {
 
     public static function getVisitors() {
 
-        return db::query("SELECT * FROM `visitor`;");
+        return db::query("SELECT `visitor`.`*`, `company`.`name` AS `companyname` FROM `visitor` 
+        LEFT JOIN `company` ON `company`.`id` = `visitor`.`idcompany`;");
     }
 
     public static function getVisitorsForEvent() {
 
-        return db::query("SELECT `id`, `firstname`, `lastname`, `idcompany`, `linkedin`, `facebook`, `twitter` FROM `visitor`;");
+        return db::query("SELECT `visitor`.`id`, `visitor`.`firstname`, `visitor`.`lastname`, `visitor`.`idcompany`, `visitor`.`linkedin`, `visitor`.`facebook`, `visitor`.`twitter`, `company`.`name` AS `company` 
+        FROM `visitor` 
+        LEFT JOIN `company` ON `company`.`id` = `visitor`.`idcompany`
+        ORDER BY `company`.`name`;");
     }
 
     public static function getVisitor($id) {
@@ -44,7 +48,7 @@ final class VisitorManager {
         LEFT JOIN `company` ON `company`.`id` = `visitor`.`idcompany`
         WHERE `event`.`visitdate` = current_date() 
         AND `event_to_visitor`.`idvisitor` = `visitor`.`id`
-        AND `event`.`isactive` = ?;", OPTION_YES);
+        AND `event`.`isactive` = ? ORDER BY `company`.`name`;", OPTION_YES);
     }
 
 }

@@ -123,3 +123,12 @@ body {
 .form-group-no-data {
   display: none;
 }
+.clear {
+  clear: both;
+  line-height: 1px;
+  height: 1px;
+  display: block;
+}
+.ui-label-block {
+  display: block;
+}

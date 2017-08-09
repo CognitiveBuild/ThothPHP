@@ -171,9 +171,19 @@ $(function(){
                             var selected = response.selected;
 
                             var html = '';
+                            var company = all.length > 0 ? all[0].company : '';
+                            var subtitle = $('<label class="ui-label-block"></label>').text(company);
+                            jContainer.append(subtitle);
                             for(var i in all) {
                                 var jBlock = $('<label class="ui-button-block"></label>');
                                 var jBox = $('<input type="checkbox" name="idvisitor[]" value="'+all[i].id+'" />');
+
+                                if(all[i].company != company) {
+                                    company = all[i].company;
+                                    jContainer.append('<div class="clear"></div>');
+                                    var subtitle = $('<label class="ui-label-block"></label>').text(company);
+                                    jContainer.append(subtitle);
+                                }
 
                                 selected.findIndex(function(x) { 
                                     if(x.idvisitor == all[i].id) {
@@ -186,7 +196,9 @@ $(function(){
                                 jBlock.append(jBox);
 
                                 jBlock.append(all[i].firstname + ', ' + all[i].lastname);
+
                                 jContainer.append(jBlock);
+                                
                             }
                             
                             //

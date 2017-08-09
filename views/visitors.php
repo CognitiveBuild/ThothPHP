@@ -14,7 +14,7 @@ foreach($visitors as $visitor) {
     echo <<<EOT
 <li class="list-group-item">
     <span class="glyphicon glyphicon-user"></span>
-    <a href="/visitors/{$visitor['id']}" class="name ui-modal-button">{$visitor['firstname']}, {$visitor['lastname']}</a>
+    <a href="/visitors/{$visitor['id']}" class="name ui-modal-button">[{$visitor['companyname']}] {$visitor['firstname']}, {$visitor['lastname']}</a>
 </li>
 EOT;
 }
