@@ -10,7 +10,7 @@ include('inc/header.html');
             <ul class="list list-group list-group-highlight">
 <?php
 foreach($events as $event) {
-    $visit_date = $event['visitdate'];
+    $visit_date_string = $event['visitdate'];
     $is_active = (isset($event['isactive']) && ($event['isactive'] === OPTION_YES));
     $extra_display = '';
     $status = '<span class="glyphicon glyphicon-remove"></span>';
@@ -18,25 +18,30 @@ foreach($events as $event) {
         $status = '<span class="glyphicon glyphicon-ok"></span>';
     }
 
-    if($visit_date == date('Y-m-d')) {
-        $extra_display = '<span class="badge badge-red">Today</span>';
+    $now_string = date('Y-m-d');
+
+    $now = date_create($now_string);
+    $visit_date = date_create($visit_date_string);
+    $interval = date_diff($now, $visit_date);
+    $count = $interval->format('%R%a');
+
+    if($visit_date_string == $now_string) {
+        $extra_display = <<<EOT
+<span class="badge badge-red">Today {$count}</span>
+EOT;
     }
     else {
-        $now = date_create();
-        $future = date_create($visit_date);
-        $interval = date_diff($now, $future);
-        $count = $interval->format('%R%a');
         if($count > 0) {
             $extra_display = "<span class=\"badge\">{$count} days</span>";
         }
         else {
-            $extra_display = "<span class=\"badge badge-green\">Completed</span>";
+            $extra_display = "<span class=\"badge badge-green\">Completed {$count}</span>";
         }
     }
     echo <<<EOT
 <li class="list-group-item">
     {$status}
-    <a href="/events/{$event['id']}" class="name ui-modal-button">[{$visit_date}] {$event['displayas']}</a>
+    <a href="/events/{$event['id']}" class="name ui-modal-button">[{$visit_date_string}] {$event['displayas']}</a>
     {$extra_display}
 </li>
 EOT;
