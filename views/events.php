@@ -27,7 +27,7 @@ foreach($events as $event) {
 
     if($visit_date_string == $now_string) {
         $extra_display = <<<EOT
-<span class="badge badge-red">Today {$count}</span>
+<span class="badge badge-red">Today</span>
 EOT;
     }
     else {
@@ -35,7 +35,7 @@ EOT;
             $extra_display = "<span class=\"badge\">{$count} days</span>";
         }
         else {
-            $extra_display = "<span class=\"badge badge-green\">Completed {$count}</span>";
+            $extra_display = "<span class=\"badge badge-green\">Completed</span>";
         }
     }
     echo <<<EOT
