@@ -47,7 +47,8 @@ class AssetManager {
 
                 if(is_array($query)) {
                     foreach($query as $k => $v) {
-                        array_push($list, "/api/v1/assets/attachment/{$v['id']}");
+                        //array_push($list, "/api/v1/assets/attachment/{$v['id']}");
+                        array_push($list, $v['id']);
                     }
                 }
                 $result[$key]['attachments'] = $list;
@@ -85,6 +86,8 @@ class AssetManager {
         $asset_columns = self::$asset_columns;
 
         $result = db::query("SELECT {$asset_columns} FROM `asset` WHERE `videourl` != '' ORDER BY RAND() LIMIT 10 ;"); //, array($id)
+
+        $result = self::fetchAttachments($result);
 
         return $result;      
     }
