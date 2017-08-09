@@ -7,9 +7,9 @@ final class VisitorManager {
         return db::query("SELECT * FROM `visitor`;");
     }
 
-    public static function getVisitorsByCompanyId($idcompany) {
+    public static function getVisitorsForEvent() {
 
-        return db::query("SELECT `id`, `firstname`, `lastname`, `idcompany`, `linkedin`, `facebook`, `twitter` FROM `visitor` WHERE `idcompany` = ?;", $idcompany);
+        return db::query("SELECT `id`, `firstname`, `lastname`, `idcompany`, `linkedin`, `facebook`, `twitter` FROM `visitor`;");
     }
 
     public static function getVisitor($id) {
@@ -37,14 +37,14 @@ final class VisitorManager {
 
     public static function getVisitorsOfToday() {
 
-        return db::query("SELECT `visitor`.`id`, `visitor`.`firstname`, `visitor`.`lastname`, `visitor`.`facebook`, `visitor`.`linkedin`, `visitor`.`twitter`, `company`.`name` AS `company` 
-        FROM `visitor`
-        LEFT JOIN `company` ON `company`.`id` = `visitor`.`idcompany`
-        LEFT JOIN `event` ON `event`.`idcompany` = `company`.`id`
+        return db::query("SELECT `visitor`.`id`, `visitor`.`idcompany`, `visitor`.`firstname`, `visitor`.`lastname`, `visitor`.`facebook`, `visitor`.`linkedin`, `visitor`.`twitter`, `company`.`name` AS `company` 
+        FROM `event`
         LEFT JOIN `event_to_visitor` ON `event_to_visitor`.`idevent` = `event`.`id` 
+        LEFT JOIN `visitor` ON `visitor`.`id` = `event_to_visitor`.`idvisitor`
+        LEFT JOIN `company` ON `company`.`id` = `visitor`.`idcompany`
         WHERE `event`.`visitdate` = current_date() 
-        AND `event`.`isactive` = ? 
-        AND `event_to_visitor`.`idvisitor` = `visitor`.`id`;", OPTION_YES);
+        AND `event_to_visitor`.`idvisitor` = `visitor`.`id`
+        AND `event`.`isactive` = ?;", OPTION_YES);
     }
 
 }

@@ -470,7 +470,8 @@ $app->get('/api/v1/visitors/company/{idcompany}/event/{id}', function ($request,
     $id = isset($args['id']) ? $args['id'] : 0;
     $idcompany = isset($args['idcompany']) ? $args['idcompany'] : 0;
     // Get visitors and selected IDs
-    $all = VisitorManager::getVisitorsByCompanyId($idcompany);
+    //$all = VisitorManager::getVisitorsByCompanyId($idcompany);
+    $all = VisitorManager::getVisitorsForEvent();
     $selected = EventManager::getVisitorsByEventId($id);
 
     return $response->withJson(array('all' => $all, 'selected' => $selected));
