@@ -436,6 +436,14 @@ $app->get('/api/v1/assets/catalog/{catalog}/name/{name}', function ($request, $r
     $list = AssetManager::getAssetsByCatalogName($catalog, $name);
     return $response->withJson($list);
 });
+// Query assets by company
+$app->get('/api/v1/assets/company/id/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+
+    $list = AssetManager::getAssetsByCompanyId($id);
+    return $response->withJson($list);
+});
 // Query assets by catalog id
 $app->get('/api/v1/assets/catalog/{catalog}/id/{id}', function ($request, $response, $args) {
 

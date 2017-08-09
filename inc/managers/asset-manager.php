@@ -79,6 +79,16 @@ class AssetManager {
         return $result;
     }
 
+    public static function getAssetsByCompanyId($id) {
+
+        $result = array();
+        $asset_columns = self::$asset_columns;
+
+        $result = db::query("SELECT {$asset_columns} FROM `asset` WHERE `videourl` != '' ORDER BY RAND() LIMIT 10 ;"); //, array($id)
+
+        return $result;      
+    }
+
     public static function addAsset($name, $idindustry, $description, $logourl, $videourl, $linkurl) {
 
         return db::insert(
