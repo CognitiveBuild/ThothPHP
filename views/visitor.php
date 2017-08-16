@@ -57,6 +57,11 @@ echo <<<EOT
     </div>
 
     <div class="form-group">
+        <label for="website">Website</label>
+        <input type="text" class="form-control" id="website" name="website" placeholder="Website URL" value="{$visitor['Website']}" />
+    </div>
+
+    <div class="form-group">
         <label for="linkedin">Linked-In</label>
         <input type="text" class="form-control" id="linkedin" name="linkedin" placeholder="Linked-In URL" value="{$visitor['linkedin']}" />
     </div>

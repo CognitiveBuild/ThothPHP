@@ -10,7 +10,7 @@ final class VisitorManager {
 
     public static function getVisitorsForEvent() {
 
-        return db::query("SELECT `visitor`.`id`, `visitor`.`firstname`, `visitor`.`lastname`, `visitor`.`idcompany`, `visitor`.`linkedin`, `visitor`.`facebook`, `visitor`.`twitter`, `company`.`name` AS `company` 
+        return db::query("SELECT `visitor`.`id`, `visitor`.`firstname`, `visitor`.`lastname`, `visitor`.`idcompany`, `visitor`.`website`, `visitor`.`linkedin`, `visitor`.`facebook`, `visitor`.`twitter`, `company`.`name` AS `company` 
         FROM `visitor` 
         LEFT JOIN `company` ON `company`.`id` = `visitor`.`idcompany`
         ORDER BY `company`.`name`;");
@@ -21,16 +21,16 @@ final class VisitorManager {
         return db::queryFirst("SELECT * FROM `visitor` WHERE `id` = ?", $id);
     }
 
-    public static function addVisitor($firstname, $lastname, $idcompany, $linkedin, $facebook, $twitter) {
+    public static function addVisitor($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter) {
 
-        return db::insert("INSERT INTO `visitor` (`firstname`, `lastname`, `idcompany`, `linkedin`, `facebook`, `twitter`) VALUES (?,?,?,?,?,?);", 
-        array($firstname, $lastname, $idcompany, $linkedin, $facebook, $twitter));
+        return db::insert("INSERT INTO `visitor` (`firstname`, `lastname`, `idcompany`, `website`, `linkedin`, `facebook`, `twitter`) VALUES (?,?,?,?,?,?,?);", 
+        array($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter));
     }
 
     public static function updateVisitor($id, $firstname, $lastname, $idcompany, $linkedin, $facebook, $twitter) {
 
-        return db::execute("UPDATE `visitor` SET `firstname` = ?, `lastname` = ?, `idcompany` = ?, `linkedin` = ?, `facebook` = ?, `twitter` = ? WHERE `id` = ?;", 
-            array($firstname, $lastname, $idcompany, $linkedin, $facebook, $twitter, $id)
+        return db::execute("UPDATE `visitor` SET `firstname` = ?, `lastname` = ?, `idcompany` = ?, `website` = ?, `linkedin` = ?, `facebook` = ?, `twitter` = ? WHERE `id` = ?;", 
+            array($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $id)
         );
     }
 
@@ -41,7 +41,7 @@ final class VisitorManager {
 
     public static function getVisitorsOfToday() {
 
-        return db::query("SELECT `visitor`.`id`, `visitor`.`idcompany`, `visitor`.`firstname`, `visitor`.`lastname`, `visitor`.`facebook`, `visitor`.`linkedin`, `visitor`.`twitter`, `company`.`name` AS `company` 
+        return db::query("SELECT `visitor`.`id`, `visitor`.`idcompany`, `visitor`.`firstname`, `visitor`.`lastname`, `visitor`.`facebook`, `visitor`.`website`, `visitor`.`linkedin`, `visitor`.`twitter`, `company`.`name` AS `company` 
         FROM `event`
         LEFT JOIN `event_to_visitor` ON `event_to_visitor`.`idevent` = `event`.`id` 
         LEFT JOIN `visitor` ON `visitor`.`id` = `event_to_visitor`.`idvisitor`

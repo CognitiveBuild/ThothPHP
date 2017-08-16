@@ -262,10 +262,10 @@ $app->post('/visitors/{id}', function ($request, $response, $args) {
     $isNew = TRUE;
     if($id > 0) {
         $isNew = FALSE;
-        VisitorManager::updateVisitor($id, $post['firstname'], $post['lastname'], $post['idcompany'], $post['linkedin'], $post['facebook'], $post['twitter']);
+        VisitorManager::updateVisitor($id, $post['firstname'], $post['lastname'], $post['idcompany'], $post['website'], $post['linkedin'], $post['facebook'], $post['twitter']);
     }
     else {
-        $id = VisitorManager::addVisitor($post['firstname'], $post['lastname'], $post['idcompany'], $post['linkedin'], $post['facebook'], $post['twitter']);
+        $id = VisitorManager::addVisitor($post['firstname'], $post['lastname'], $post['idcompany'], $post['website'], $post['linkedin'], $post['facebook'], $post['twitter']);
     }
 
     if($id > 0 && $avatar !== NULL) {
@@ -484,7 +484,7 @@ $app->get('/api/v1/visitors/company/{idcompany}/event/{id}', function ($request,
 
     return $response->withJson(array('all' => $all, 'selected' => $selected));
 });
-// unused, tobe used for Watson
+// Event of today, Watson uses it
 $app->get('/api/v1/event/today', function ($request, $response, $args) {
 
     $event = EventManager::getEventOfToday();
@@ -497,7 +497,6 @@ $app->get('/api/v1/event/today', function ($request, $response, $args) {
     }
     return $response->withJson(array( 'event' => $event, 'visitors' => $visitors ));
 });
-
 // Visitor avatar
 $app->get('/api/v1/visitor/avatar/{id}', function ($request, $response, $args) {
 
@@ -514,7 +513,6 @@ $app->delete('/api/v1/visitors/avatar/{id}', function ($request, $response, $arg
 
     return $response->withJson(array('status' => $result));
 });
-
 // Timeline delete
 $app->delete('/api/v1/timelines/{id}', function ($request, $response, $args) {
 
