@@ -230,6 +230,7 @@ $app->get('/visitors/{id}', function ($request, $response, $args) {
         'firstname' => '', 
         'lastname' => '', 
         'idcompany' => 0, 
+        'website' => '', 
         'linkedin' => '', 
         'facebook' => '',
         'twitter' => ''
