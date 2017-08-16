@@ -27,7 +27,7 @@ final class VisitorManager {
         array($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter));
     }
 
-    public static function updateVisitor($id, $firstname, $lastname, $idcompany, $linkedin, $facebook, $twitter) {
+    public static function updateVisitor($id, $firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter) {
 
         return db::execute("UPDATE `visitor` SET `firstname` = ?, `lastname` = ?, `idcompany` = ?, `website` = ?, `linkedin` = ?, `facebook` = ?, `twitter` = ? WHERE `id` = ?;", 
             array($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $id)
