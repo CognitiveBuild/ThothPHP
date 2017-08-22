@@ -72,8 +72,13 @@ echo <<<EOT
     </div>
 
     <div class="form-group">
-        <label for="facebook">Twitter</label>
+        <label for="twitter">Twitter</label>
         <input type="text" class="form-control" id="twitter" name="twitter" placeholder="Twitter URL" value="{$visitor['twitter']}" />
+    </div>
+
+    <div class="form-group">
+        <label for="order">Order</label>
+        <input type="number" class="form-control" id="order" name="order" placeholder="Order" value="{$visitor['order']}" />
     </div>
 
     <div class="form-group attachment-group">

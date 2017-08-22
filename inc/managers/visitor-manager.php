@@ -5,15 +5,15 @@ final class VisitorManager {
     public static function getVisitors() {
 
         return db::query("SELECT `visitor`.`*`, `company`.`name` AS `companyname` FROM `visitor` 
-        LEFT JOIN `company` ON `company`.`id` = `visitor`.`idcompany`;");
+        LEFT JOIN `company` ON `company`.`id` = `visitor`.`idcompany` ORDER BY `visitor`.`order` ASC;");
     }
 
     public static function getVisitorsForEvent() {
 
-        return db::query("SELECT `visitor`.`id`, `visitor`.`firstname`, `visitor`.`lastname`, `visitor`.`idcompany`, `visitor`.`website`, `visitor`.`linkedin`, `visitor`.`facebook`, `visitor`.`twitter`, `company`.`name` AS `company` 
+        return db::query("SELECT `visitor`.`id`, `visitor`.`firstname`, `visitor`.`lastname`, `visitor`.`idcompany`, `visitor`.`website`, `visitor`.`linkedin`, `visitor`.`facebook`, `visitor`.`twitter`, `visitor`.`order`, `company`.`name` AS `company` 
         FROM `visitor` 
         LEFT JOIN `company` ON `company`.`id` = `visitor`.`idcompany`
-        ORDER BY `company`.`name`;");
+        ORDER BY `company`.`name` ASC, `visitor`.`order` ASC;");
     }
 
     public static function getVisitor($id) {
@@ -21,16 +21,16 @@ final class VisitorManager {
         return db::queryFirst("SELECT * FROM `visitor` WHERE `id` = ?", $id);
     }
 
-    public static function addVisitor($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter) {
+    public static function addVisitor($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $order = 0) {
 
-        return db::insert("INSERT INTO `visitor` (`firstname`, `lastname`, `idcompany`, `website`, `linkedin`, `facebook`, `twitter`) VALUES (?,?,?,?,?,?,?);", 
-        array($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter));
+        return db::insert("INSERT INTO `visitor` (`firstname`, `lastname`, `idcompany`, `website`, `linkedin`, `facebook`, `twitter`, `order`) VALUES (?,?,?,?,?,?,?,?);", 
+        array($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $order));
     }
 
-    public static function updateVisitor($id, $firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter) {
+    public static function updateVisitor($id, $firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $order = 0) {
 
-        return db::execute("UPDATE `visitor` SET `firstname` = ?, `lastname` = ?, `idcompany` = ?, `website` = ?, `linkedin` = ?, `facebook` = ?, `twitter` = ? WHERE `id` = ?;", 
-            array($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $id)
+        return db::execute("UPDATE `visitor` SET `firstname` = ?, `lastname` = ?, `idcompany` = ?, `website` = ?, `linkedin` = ?, `facebook` = ?, `twitter` = ?, `order` = ? WHERE `id` = ?;", 
+            array($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $order, $id)
         );
     }
 
@@ -48,7 +48,7 @@ final class VisitorManager {
         LEFT JOIN `company` ON `company`.`id` = `visitor`.`idcompany`
         WHERE `event`.`visitdate` = current_date() 
         AND `event_to_visitor`.`idvisitor` = `visitor`.`id`
-        AND `event`.`isactive` = ? ORDER BY `company`.`name`;", OPTION_YES);
+        AND `event`.`isactive` = ? ORDER BY `visitor`.`order` ASC;", OPTION_YES);
     }
 
 }

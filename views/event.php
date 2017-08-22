@@ -86,13 +86,13 @@ echo <<<EOT
     </div>
 
     <div class="form-group">
-        <label for="linkedin">Is active</label>
+        <label for="isactive">Is active</label>
         <input type="text" class="form-control" id="isactive" name="isactive" placeholder="Is active" value="{$event['isactive']}" />
     </div>
 
     <div class="form-group form-group-timeline">
         <div class="form-control form-control-auto-height">
-            <label for="linkedin">Timeline</label>
+            <label for="timeline">Timeline</label>
             <div class="timeline-container">
                 {$timelineHTML}
                 <div class="form-group form-group-no-data">No timlines.</div>
