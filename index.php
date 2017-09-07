@@ -1,5 +1,9 @@
 <?php
 require 'vendor/autoload.php';
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7;
+use GuzzleHttp\Exception\RequestException;
+
 include 'inc/db.php';
 
 // Managers
@@ -46,6 +50,14 @@ $app->get('/assets', function ($request, $response, $args) {
 
     return $this->view->render($response, 'assets.php', [
         'assets' => $list
+    ]);
+});
+$app->get('/download', function ($request, $response, $args) {
+
+    $bundle = 'com.ibm.cio.be.ifundit.platform.mobile';
+
+    return $this->view->render($response, 'download.php', [
+        'bundle' => $bundle
     ]);
 });
 
@@ -522,6 +534,120 @@ $app->delete('/api/v1/timelines/{id}', function ($request, $response, $args) {
 
     return $response->withJson(array('status' => $result));
 });
+$app->get('/api/v1/download', function ($request, $response, $args) {
+    $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
+    $client = new Client();
+    try {
+        // Send out HTTP request
+        $result = $client->request('POST', 'https://identity.open.softlayer.com/v3/auth/tokens', [
+            'json' => [
+                'auth' => [
+                    'identity' => [
+                        'methods' => [ 'password' ], 
+                        'password' => [ 
+                            'user' => [
+                                'id' => '6083522eae4b4bad9d7ea9deee2df6f4', 
+                                'password' => 'wx{WB#Ncd0j6]X#n'
+                            ]
+                        ]
+                    ], 
+                    'scope' => [
+                        'project' => [
+                            'id' => 'd92fbca7a9574e94b1c3d6c5a1283a6d'
+                        ]
+                    ]
+                ]
+            ], 
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        
+        $content = $result->getBody()->getContents();
+        $headers = $result->getHeader('X-Subject-Token');
+        $json = json_decode($content, TRUE);
+
+        //echo '<pre>';
+        // echo $content;die;
+
+        $base = '';
+        $token = $headers[0];
+
+        $catalogs = $json['token']['catalog'];
+        foreach($catalogs as $key => $val) {
+            $endpoints = $val['endpoints'];
+            if('object-store' === $val['type']) {
+                foreach($endpoints as $endpointKey => $endpoint) {
+                    if($endpoint['region'] === 'dallas' && $endpoint['interface'] == 'public') {
+                        $base = $endpoint['url'];
+                        break;
+                    }
+                }
+            }
+        }
+        $binaryUrl = "{$base}/builds/{$id}.ipa";
+        // echo $binaryUrl;die;
+        $result = $client->request('GET', $binaryUrl, [
+            'headers' => [
+                'X-Auth-Token' => $token
+            ]
+        ]);
+        $fileName = "attachment; filename=\"{$id}.ipa\"";
+        return $response->withHeader('Content-Type', 'application/octet-stream')
+            ->withHeader('Content-Disposition', $fileName)
+            ->withHeader('Content-Transfer-Encoding', 'binary')
+            ->write($result);
+        // echo $result;
+    }
+    catch (RequestException $e) {
+        $message = $e->getMessage();
+        if ($e->hasResponse()) {
+            $message = Psr7\str($e->getResponse());
+        }
+        echo $message;
+    }
+    
+});
+$app->get('/api/v1/download/meta', function ($request, $response, $args) {
+
+    $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
+    $xml = <<<EOT
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>items</key>
+    <array>
+        <dict>
+            <key>assets</key>
+            <array>
+                <dict>
+                    <key>kind</key>
+                    <string>software-package</string>
+                    <key>url</key>
+                    <string>https://thoth-assets.mybluemix.net/api/v1/download/{$id}</string>
+                </dict>
+            </array>
+            <key>metadata</key>
+            <dict>
+                <key>bundle-identifier</key>
+                <string>{$id}</string>
+                <key>bundle-version</key>
+                <string>1.0</string>
+                <key>kind</key>
+                <string>software</string>
+                <key>title</key>
+                <string>iFundIT</string>
+            </dict>
+        </dict>
+    </array>
+</dict>
+</plist>
+EOT;
+
+    return $response->withStatus(200)->withHeader('Content-Type', "application/xml")->write($xml);
+});
+
 
 // unused
 $app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {
