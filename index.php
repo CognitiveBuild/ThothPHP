@@ -592,12 +592,13 @@ $app->get('/api/v1/download', function ($request, $response, $args) {
                 'X-Auth-Token' => $token
             ]
         ]);
+
         $fileName = "attachment; filename=\"{$id}.ipa\"";
         $response->withHeader('Content-Type', 'application/octet-stream')
             ->withHeader('Content-Disposition', $fileName)
             ->withHeader('Content-Transfer-Encoding', 'binary')
-            ;
-        echo $result;
+            ->withBody($result->getBody());
+        // echo $result->getBody();
         // echo $result;
     }
     catch (RequestException $e) {
@@ -626,7 +627,7 @@ $app->get('/api/v1/download/meta', function ($request, $response, $args) {
                     <key>kind</key>
                     <string>software-package</string>
                     <key>url</key>
-                    <string>https://thoth-assets.mybluemix.net/api/v1/download?id={$id}</string>
+                    <string>https://thoth-assets.mybluemix.net/api/v1/download?id=gi{$id}</string>
                 </dict>
             </array>
             <key>metadata</key>
