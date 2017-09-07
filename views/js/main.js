@@ -380,6 +380,15 @@ $(function(){
                 });
             });
 
+        }, 
+        download: function() {
+            $('.btn-download').on('click', function(evt) {
+                var id = $('.bundle-id').val();
+                var url = 'itms-services://?action=download-manifest&amp;url=https://{$host}/api/v1/download/meta?id=' + id;
+                console.log(url);
+                //window.location.href = url;
+                
+            });
         }
     };
     methods.init();

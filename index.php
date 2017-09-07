@@ -54,10 +54,12 @@ $app->get('/assets', function ($request, $response, $args) {
 });
 $app->get('/download', function ($request, $response, $args) {
 
-    $bundle = 'com.ibm.cio.be.ifundit.platform.mobile';
+    $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
+    $host = $_SERVER['HTTP_HOST'];
 
     return $this->view->render($response, 'download.php', [
-        'bundle' => $bundle
+        'id' => $id, 
+        'host' => $host
     ]);
 });
 
