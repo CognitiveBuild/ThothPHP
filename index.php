@@ -594,12 +594,11 @@ $app->get('/api/v1/download', function ($request, $response, $args) {
         ]);
 
         $fileName = "attachment; filename=\"{$id}.ipa\"";
-        $response->withHeader('Content-Type', 'application/octet-stream')
-            ->withHeader('Content-Disposition', $fileName)
-            ->withHeader('Content-Transfer-Encoding', 'binary')
-            ->withBody($result->getBody());
-        // echo $result->getBody();
-        // echo $result;
+
+        header("Content-Disposition: {$fileName}");
+        header("Content-Type: application/octet-stream");
+        echo $result->getBody();
+
     }
     catch (RequestException $e) {
         $message = $e->getMessage();
