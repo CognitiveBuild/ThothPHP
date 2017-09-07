@@ -13,7 +13,6 @@ include('inc/header.html');
     </div>
 </form>
 
-
 <?php
 include('inc/footer.html');
 ?>
