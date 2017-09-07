@@ -1,8 +1,10 @@
 <?php
 include('inc/header.html');
-?>
+$host = $_SERVER['HTTP_HOST'];
 
-<form action="/api/v1/download/meta" method="GET">
+echo <<<EOT
+
+<form action="itms-services://?action=download-manifest&amp;url=https://{$host}/api/v1/download/meta" method="GET">
     <div class="form-group">
         <label>ID:</label>
         <br />
@@ -13,6 +15,7 @@ include('inc/header.html');
     </div>
 </form>
 
-<?php
+EOT;
+
 include('inc/footer.html');
 ?>
