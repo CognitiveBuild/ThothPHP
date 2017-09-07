@@ -2,7 +2,7 @@
 include('inc/header.html');
 ?>
 
-<form action="/api/v1/download" method="GET">
+<form action="/api/v1/download/meta" method="GET">
     <div class="form-group">
         <label>ID:</label>
         <br />
