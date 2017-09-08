@@ -479,159 +479,6 @@ if(SessionManager::validate()) {
     });
 
 
-
-
-
-
-
-
-    /// APIs
-
-    // Catalogs by query
-    $app->get('/api/v1/catalog/{q}', function ($request, $response, $args) {
-
-        $q = isset($args['q']) ? $args['q'] : KEY_INDUSTRY;
-        $list = CatalogManager::getCatalog($q);
-        return $response->withJson($list);
-    });
-    // Catalogs
-    $app->post('/api/v1/catalog', function ($request, $response, $args) {
-        $post = $request->getParsedBody();
-
-        $id = isset($post['id']) ? $post['id'] : 0;
-        $key = isset($post['type']) ? $post['type'] : KEY_INDUSTRY;
-        $name = isset($post['name']) ? $post['name'] : '';
-
-        if($name === '') {
-            return $response->withStatus(400)->withJson(array('status' => 400, 'id' => $id));
-        }
-
-        if($id === 0 || $id === '0') {
-            $id = CatalogManager::addCatalog($name, $key);
-        }
-        else {
-            CatalogManager::updateCatalog($key, $id, $name);
-        }
-
-        return $response->withStatus(200)->withJson(array('status' => 200, 'id' => $id));
-    });
-    // Delete attachment
-    $app->delete('/api/v1/assets/attachment/{id}', function ($request, $response, $args) {
-
-        $id = isset($args['id']) ? $args['id'] : 0;
-
-        $file = AssetManager::readFile($id);
-        $result = FALSE;
-        if(isset($file['id'])) {
-            $result = AssetManager::deleteFile($id);
-            AssetManager::updateFileIds($file['idasset']);
-        }
-
-        return $response->withJson(array('status' => $result));
-    });
-    // Attachment render
-    $app->get('/api/v1/assets/attachment/{id}', function ($request, $response, $args) {
-
-        $id = isset($args['id']) ? $args['id'] : 0;
-        $result = AssetManager::readFile($id);
-
-        return $response->withHeader('Content-Type', $result['type'])->write($result['binary']);
-    });
-    // Query assets by catalog, INDUSTRY | TECHNOLOGY
-    $app->get('/api/v1/assets/catalog/{catalog}/name/{name}', function ($request, $response, $args) {
-
-        $catalog = isset($args['catalog']) ? $args['catalog'] : KEY_INDUSTRY;
-        $name = isset($args['name']) ? $args['name'] : '';
-
-        $list = AssetManager::getAssetsByCatalogName($catalog, $name);
-        return $response->withJson($list);
-    });
-    // Query assets by company
-    $app->get('/api/v1/assets/company/id/{id}', function ($request, $response, $args) {
-
-        $id = isset($args['id']) ? $args['id'] : 0;
-
-        $list = AssetManager::getAssetsByCompanyId($id);
-        return $response->withJson($list);
-    });
-    // Query assets by catalog id
-    $app->get('/api/v1/assets/catalog/{catalog}/id/{id}', function ($request, $response, $args) {
-
-        $catalog = isset($args['catalog']) ? $args['catalog'] : KEY_INDUSTRY;
-        $id = isset($args['id']) ? $args['id'] : 0;
-
-        $list = AssetManager::getAssetsByCatalogId($catalog, $id);
-        return $response->withJson($list);
-    });
-
-    // Company
-
-    // Get logo image
-    $app->get('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
-
-        $id = isset($args['id']) ? $args['id'] : 0;
-        $result = CompanyManager::getCompany($id);
-
-        return $response->write($result['logo']);
-    });
-    // Delete logo
-    $app->delete('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
-
-        $id = isset($args['id']) ? $args['id'] : 0;
-        $result = CompanyManager::updateLogo($id, NULL);
-
-        return $response->withJson(array('status' => $result));
-    });
-    // Visitors selected by event
-    $app->get('/api/v1/visitors/company/{idcompany}/event/{id}', function ($request, $response, $args) {
-
-        $id = isset($args['id']) ? $args['id'] : 0;
-        $idcompany = isset($args['idcompany']) ? $args['idcompany'] : 0;
-        // Get visitors and selected IDs
-        //$all = VisitorManager::getVisitorsByCompanyId($idcompany);
-        $all = VisitorManager::getVisitorsForEvent();
-        $selected = EventManager::getVisitorsByEventId($id);
-
-        return $response->withJson(array('all' => $all, 'selected' => $selected));
-    });
-    // Event of today, Watson uses it
-    $app->get('/api/v1/event/today', function ($request, $response, $args) {
-
-        $event = EventManager::getEventOfToday();
-        $visitors = VisitorManager::getVisitorsOfToday();
-        if($visitors === FALSE) {
-            $visitors = array();
-        }
-        if($event === FALSE) {
-            $event = new stdClass();
-        }
-        return $response->withJson(array( 'event' => $event, 'visitors' => $visitors ));
-    });
-    // Visitor avatar
-    $app->get('/api/v1/visitor/avatar/{id}', function ($request, $response, $args) {
-
-        $id = isset($args['id']) ? $args['id'] : 0;
-        $result = VisitorManager::getVisitor($id);
-
-        return $response->write($result['avatar']);
-    });
-    // Visitor avatar delete
-    $app->delete('/api/v1/visitors/avatar/{id}', function ($request, $response, $args) {
-
-        $id = isset($args['id']) ? $args['id'] : 0;
-        $result = VisitorManager::updateAvatar($id, NULL);
-
-        return $response->withJson(array('status' => $result));
-    });
-    // Timeline delete
-    $app->delete('/api/v1/timelines/{id}', function ($request, $response, $args) {
-
-        $id = isset($args['id']) ? $args['id'] : 0;
-        $result = EventManager::deleteTimelineById($id);
-
-        return $response->withJson(array('status' => $result));
-    });
-
     $app->get('/signout', function ($request, $response, $args) {
         $display = Session::init()->getUser()->getDisplay();
         SessionManager::signOut();
@@ -704,5 +551,153 @@ else {
         return $this->view->render($response, $template, $data);
     });
 }
+
+
+/// APIs
+
+// Catalogs by query
+$app->get('/api/v1/catalog/{q}', function ($request, $response, $args) {
+    
+    $q = isset($args['q']) ? $args['q'] : KEY_INDUSTRY;
+    $list = CatalogManager::getCatalog($q);
+    return $response->withJson($list);
+});
+// Catalogs
+$app->post('/api/v1/catalog', function ($request, $response, $args) {
+    $post = $request->getParsedBody();
+
+    $id = isset($post['id']) ? $post['id'] : 0;
+    $key = isset($post['type']) ? $post['type'] : KEY_INDUSTRY;
+    $name = isset($post['name']) ? $post['name'] : '';
+
+    if($name === '') {
+        return $response->withStatus(400)->withJson(array('status' => 400, 'id' => $id));
+    }
+
+    if($id === 0 || $id === '0') {
+        $id = CatalogManager::addCatalog($name, $key);
+    }
+    else {
+        CatalogManager::updateCatalog($key, $id, $name);
+    }
+
+    return $response->withStatus(200)->withJson(array('status' => 200, 'id' => $id));
+});
+// Delete attachment
+$app->delete('/api/v1/assets/attachment/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+
+    $file = AssetManager::readFile($id);
+    $result = FALSE;
+    if(isset($file['id'])) {
+        $result = AssetManager::deleteFile($id);
+        AssetManager::updateFileIds($file['idasset']);
+    }
+
+    return $response->withJson(array('status' => $result));
+});
+// Attachment render
+$app->get('/api/v1/assets/attachment/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $result = AssetManager::readFile($id);
+
+    return $response->withHeader('Content-Type', $result['type'])->write($result['binary']);
+});
+// Query assets by catalog, INDUSTRY | TECHNOLOGY
+$app->get('/api/v1/assets/catalog/{catalog}/name/{name}', function ($request, $response, $args) {
+
+    $catalog = isset($args['catalog']) ? $args['catalog'] : KEY_INDUSTRY;
+    $name = isset($args['name']) ? $args['name'] : '';
+
+    $list = AssetManager::getAssetsByCatalogName($catalog, $name);
+    return $response->withJson($list);
+});
+// Query assets by company
+$app->get('/api/v1/assets/company/id/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+
+    $list = AssetManager::getAssetsByCompanyId($id);
+    return $response->withJson($list);
+});
+// Query assets by catalog id
+$app->get('/api/v1/assets/catalog/{catalog}/id/{id}', function ($request, $response, $args) {
+
+    $catalog = isset($args['catalog']) ? $args['catalog'] : KEY_INDUSTRY;
+    $id = isset($args['id']) ? $args['id'] : 0;
+
+    $list = AssetManager::getAssetsByCatalogId($catalog, $id);
+    return $response->withJson($list);
+});
+
+// Company
+
+// Get logo image
+$app->get('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $result = CompanyManager::getCompany($id);
+
+    return $response->write($result['logo']);
+});
+// Delete logo
+$app->delete('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $result = CompanyManager::updateLogo($id, NULL);
+
+    return $response->withJson(array('status' => $result));
+});
+// Visitors selected by event
+$app->get('/api/v1/visitors/company/{idcompany}/event/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $idcompany = isset($args['idcompany']) ? $args['idcompany'] : 0;
+    // Get visitors and selected IDs
+    //$all = VisitorManager::getVisitorsByCompanyId($idcompany);
+    $all = VisitorManager::getVisitorsForEvent();
+    $selected = EventManager::getVisitorsByEventId($id);
+
+    return $response->withJson(array('all' => $all, 'selected' => $selected));
+});
+// Event of today, Watson uses it
+$app->get('/api/v1/event/today', function ($request, $response, $args) {
+
+    $event = EventManager::getEventOfToday();
+    $visitors = VisitorManager::getVisitorsOfToday();
+    if($visitors === FALSE) {
+        $visitors = array();
+    }
+    if($event === FALSE) {
+        $event = new stdClass();
+    }
+    return $response->withJson(array( 'event' => $event, 'visitors' => $visitors ));
+});
+// Visitor avatar
+$app->get('/api/v1/visitor/avatar/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $result = VisitorManager::getVisitor($id);
+
+    return $response->write($result['avatar']);
+});
+// Visitor avatar delete
+$app->delete('/api/v1/visitors/avatar/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $result = VisitorManager::updateAvatar($id, NULL);
+
+    return $response->withJson(array('status' => $result));
+});
+// Timeline delete
+$app->delete('/api/v1/timelines/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $result = EventManager::deleteTimelineById($id);
+
+    return $response->withJson(array('status' => $result));
+});
 
 $app->run();

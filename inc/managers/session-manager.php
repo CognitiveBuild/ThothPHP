@@ -35,6 +35,7 @@ final class SessionManager {
     }
 
     public static function signOut() {
+
         Session::init()->unsetUser();
     }
 
