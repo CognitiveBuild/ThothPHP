@@ -41,104 +41,6 @@ $container['view'] = function ($container) {
     return new \Slim\Views\PhpRenderer('views/');
 };
 
-$app->get('/download', function ($request, $response, $args) {
-
-    $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
-    $host = $_SERVER['HTTP_HOST'];
-
-    if(IS_LOCAL) {
-        $host = 'thoth-assets.mybluemix.net';
-    }
-
-    $url = urlencode("https://{$host}/api/v1/download/meta?id={$id}");    
-
-    return $this->view->render($response, 'download.php', [
-        'id' => $id, 
-        'host' => $host, 
-        'url' => $url
-    ]);
-});
-
-$app->get('/api/v1/download', function ($request, $response, $args) {
-    $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
-    $client = new Client();
-    try {
-        // Send out HTTP request
-        $result = $client->request('POST', 'https://identity.open.softlayer.com/v3/auth/tokens', [
-            'json' => [
-                'auth' => [
-                    'identity' => [
-                        'methods' => [ 'password' ], 
-                        'password' => [ 
-                            'user' => [
-                                'id' => '6083522eae4b4bad9d7ea9deee2df6f4', 
-                                'password' => 'wx{WB#Ncd0j6]X#n'
-                            ]
-                        ]
-                    ], 
-                    'scope' => [
-                        'project' => [
-                            'id' => 'd92fbca7a9574e94b1c3d6c5a1283a6d'
-                        ]
-                    ]
-                ]
-            ], 
-            'headers' => [
-                'Content-Type' => 'application/json'
-            ]
-        ]);
-        
-        $content = $result->getBody()->getContents();
-        $headers = $result->getHeader('X-Subject-Token');
-        $json = json_decode($content, TRUE);
-
-        $base = '';
-        $token = $headers[0];
-
-        $catalogs = $json['token']['catalog'];
-        foreach($catalogs as $key => $val) {
-            $endpoints = $val['endpoints'];
-            if('object-store' === $val['type']) {
-                foreach($endpoints as $endpointKey => $endpoint) {
-                    if($endpoint['region'] === 'dallas' && $endpoint['interface'] == 'public') {
-                        $base = $endpoint['url'];
-                        break;
-                    }
-                }
-            }
-        }
-        $binaryUrl = "{$base}/builds/{$id}.ipa";
-        // echo $binaryUrl;die;
-        $result = $client->request('GET', $binaryUrl, [
-            'headers' => [
-                'X-Auth-Token' => $token
-            ]
-        ]);
-
-        header("Content-Type: application/octet-stream");
-        echo $result->getBody();
-    }
-    catch (RequestException $e) {
-        $message = $e->getMessage();
-        if ($e->hasResponse()) {
-            $message = Psr7\str($e->getResponse());
-        }
-        echo $message;
-    }
-
-});
-
-$app->get('/api/v1/download/meta', function ($request, $response, $args) {
-
-    $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
-    $xmlResponse = $response->withHeader('Content-type', 'application/xml');
-
-    return $this->view->render($xmlResponse, 'plist.php', [
-        'id' => $id
-    ]);
-});
-// todo: login page
-
 if(SessionManager::validate()) {
 
     $app->get('/', function ($request, $response, $args) {
@@ -478,7 +380,7 @@ if(SessionManager::validate()) {
         return $response->withStatus(200)->withHeader('Location', "/events/{$id}");
     });
 
-
+    // Sign out
     $app->get('/signout', function ($request, $response, $args) {
         $display = Session::init()->getUser()->getDisplay();
         SessionManager::signOut();
@@ -492,17 +394,46 @@ if(SessionManager::validate()) {
         ]);
     });
 
-    // unused
-    $app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {
+    // Private APIs
+
+    // Delete attachment
+    $app->delete('/api/v1/assets/attachment/{id}', function ($request, $response, $args) {
 
         $id = isset($args['id']) ? $args['id'] : 0;
-        $result = AssetManager::deleteAsset($id);
 
-        return $this->view->render($response, 'asset.php', [
-            'asset' => $result
-        ]);
+        $file = AssetManager::readFile($id);
+        $result = FALSE;
+        if(isset($file['id'])) {
+            $result = AssetManager::deleteFile($id);
+            AssetManager::updateFileIds($file['idasset']);
+        }
+
+        return $response->withJson(array('status' => $result));
     });
+    // Delete logo
+    $app->delete('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
+        
+            $id = isset($args['id']) ? $args['id'] : 0;
+            $result = CompanyManager::updateLogo($id, NULL);
+        
+            return $response->withJson(array('status' => $result));
+    });
+    // Visitor avatar delete
+    $app->delete('/api/v1/visitors/avatar/{id}', function ($request, $response, $args) {
     
+        $id = isset($args['id']) ? $args['id'] : 0;
+        $result = VisitorManager::updateAvatar($id, NULL);
+    
+        return $response->withJson(array('status' => $result));
+    });
+    // Timeline delete
+    $app->delete('/api/v1/timelines/{id}', function ($request, $response, $args) {
+    
+        $id = isset($args['id']) ? $args['id'] : 0;
+        $result = EventManager::deleteTimelineById($id);
+    
+        return $response->withJson(array('status' => $result));
+    });
 }
 else {
     $app->get('/', function ($request, $response, $args) {
@@ -514,8 +445,6 @@ else {
             'message' => ''
         ]);
     });
-
-
     $app->get('/signout', function ($request, $response, $args) {
 
         $login = '';
@@ -526,7 +455,6 @@ else {
             'message' => ''
         ]);
     });
-
     $app->post('/', function ($request, $response, $args) {
 
         $post = $request->getParsedBody();
@@ -583,20 +511,6 @@ $app->post('/api/v1/catalog', function ($request, $response, $args) {
 
     return $response->withStatus(200)->withJson(array('status' => 200, 'id' => $id));
 });
-// Delete attachment
-$app->delete('/api/v1/assets/attachment/{id}', function ($request, $response, $args) {
-
-    $id = isset($args['id']) ? $args['id'] : 0;
-
-    $file = AssetManager::readFile($id);
-    $result = FALSE;
-    if(isset($file['id'])) {
-        $result = AssetManager::deleteFile($id);
-        AssetManager::updateFileIds($file['idasset']);
-    }
-
-    return $response->withJson(array('status' => $result));
-});
 // Attachment render
 $app->get('/api/v1/assets/attachment/{id}', function ($request, $response, $args) {
 
@@ -642,14 +556,7 @@ $app->get('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
 
     return $response->write($result['logo']);
 });
-// Delete logo
-$app->delete('/api/v1/companies/logo/{id}', function ($request, $response, $args) {
 
-    $id = isset($args['id']) ? $args['id'] : 0;
-    $result = CompanyManager::updateLogo($id, NULL);
-
-    return $response->withJson(array('status' => $result));
-});
 // Visitors selected by event
 $app->get('/api/v1/visitors/company/{idcompany}/event/{id}', function ($request, $response, $args) {
 
@@ -683,21 +590,121 @@ $app->get('/api/v1/visitor/avatar/{id}', function ($request, $response, $args) {
 
     return $response->write($result['avatar']);
 });
-// Visitor avatar delete
-$app->delete('/api/v1/visitors/avatar/{id}', function ($request, $response, $args) {
+
+
+// unused
+$app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
-    $result = VisitorManager::updateAvatar($id, NULL);
+    $result = AssetManager::deleteAsset($id);
 
-    return $response->withJson(array('status' => $result));
-});
-// Timeline delete
-$app->delete('/api/v1/timelines/{id}', function ($request, $response, $args) {
-
-    $id = isset($args['id']) ? $args['id'] : 0;
-    $result = EventManager::deleteTimelineById($id);
-
-    return $response->withJson(array('status' => $result));
+    return $this->view->render($response, 'asset.php', [
+        'asset' => $result
+    ]);
 });
 
+$app->get('/download', function ($request, $response, $args) {
+
+    $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
+    $host = $_SERVER['HTTP_HOST'];
+
+    if(IS_LOCAL) {
+        $host = 'thoth-assets.mybluemix.net';
+    }
+
+    $url = urlencode("https://{$host}/api/v1/download/meta?id={$id}");    
+
+    return $this->view->render($response, 'download.php', [
+        'id' => $id, 
+        'host' => $host, 
+        'url' => $url
+    ]);
+});
+
+$app->get('/api/v1/download', function ($request, $response, $args) {
+    $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
+    $client = new Client();
+    try {
+        // Send out HTTP request
+        $result = $client->request('POST', 'https://identity.open.softlayer.com/v3/auth/tokens', [
+            'json' => [
+                'auth' => [
+                    'identity' => [
+                        'methods' => [ 'password' ], 
+                        'password' => [ 
+                            'user' => [
+                                'id' => '6083522eae4b4bad9d7ea9deee2df6f4', 
+                                'password' => 'wx{WB#Ncd0j6]X#n'
+                            ]
+                        ]
+                    ], 
+                    'scope' => [
+                        'project' => [
+                            'id' => 'd92fbca7a9574e94b1c3d6c5a1283a6d'
+                        ]
+                    ]
+                ]
+            ], 
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        
+        $content = $result->getBody()->getContents();
+        $headers = $result->getHeader('X-Subject-Token');
+        
+        $json = json_decode($content, TRUE);
+
+        $base = '';
+        $token = $headers[0];
+
+        $catalogs = $json['token']['catalog'];
+        foreach($catalogs as $key => $val) {
+            $endpoints = $val['endpoints'];
+            if('object-store' === $val['type']) {
+                foreach($endpoints as $endpointKey => $endpoint) {
+                    if($endpoint['region'] === 'dallas' && $endpoint['interface'] == 'public') {
+                        $base = $endpoint['url'];
+                        break;
+                    }
+                }
+            }
+        }
+        $binaryUrl = "{$base}/builds/{$id}.ipa";
+        // echo $binaryUrl;die;
+        $result = $client->request('GET', $binaryUrl, [
+            'headers' => [
+                'X-Auth-Token' => $token
+            ]
+        ]);
+
+        $size = $result->getHeader('Content-Length');
+
+        header("Content-Type: application/octet-stream");
+        // header("Content-Length: {$size}");
+        header("Content-Disposition: attachment; filename=\"Build.ipa\"");
+        $stream = $result->getBody();
+        $newResponse = $response->withBody($stream);
+        return $newResponse;
+    }
+    catch (RequestException $e) {
+        $message = $e->getMessage();
+        if ($e->hasResponse()) {
+            $message = Psr7\str($e->getResponse());
+        }
+        echo $message;
+    }
+
+});
+
+$app->get('/api/v1/download/meta', function ($request, $response, $args) {
+
+    $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
+    $xmlResponse = $response->withHeader('Content-type', 'application/xml');
+
+    return $this->view->render($xmlResponse, 'plist.php', [
+        'id' => $id
+    ]);
+});
+    
 $app->run();
