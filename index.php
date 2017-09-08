@@ -141,7 +141,7 @@ $app->get('/api/v1/download/meta', function ($request, $response, $args) {
                     <key>kind</key>
                     <string>software-package</string>
                     <key>url</key>
-                    <string>https://thoth-assets.mybluemix.net/api/v1/download?id=gi{$id}</string>
+                    <string>https://thoth-assets.mybluemix.net/api/v1/download?id={$id}</string>
                 </dict>
             </array>
             <key>metadata</key>

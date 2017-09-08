@@ -10,7 +10,7 @@ echo <<<EOT
         <input type="hidden" name="bundle-host" value="{$host}" class="bundle-host" />
         <br /><br />
 
-        <input type="submit" class="btn btn-primary btn-download" />
+        <a class="btn btn-primary btn-download" href="itms-services://?action=download-manifest&amp;url=https://{$host}/api/v1/download/meta?id={$id}">Download {$id}</a>
     </div>
 </div>
 EOT;

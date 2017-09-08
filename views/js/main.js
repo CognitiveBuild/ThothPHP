@@ -382,12 +382,7 @@ $(function(){
 
         }, 
         download: function() {
-            $('.btn-download').on('click', function(evt) {
-                var host = $('.bundle-host').val();
-                var id = $('.bundle-id').val();
-                var url = 'itms-services://?action=download-manifest&amp;url=https://'+host+'/api/v1/download/meta?id=' + id;
-                $(window).location.href = url;
-            });
+            
         }
     };
     methods.init();
