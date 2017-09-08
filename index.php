@@ -659,13 +659,15 @@ if(SessionManager::validate()) {
     });
 
     $app->get('/signout', function ($request, $response, $args) {
-
+        $display = Session::init()->getUser()->getDisplay();
         SessionManager::signOut();
         $login = '';
         $passcode = '';
+
         return $this->view->render($response, 'signin.php', [
             'login' => $login, 
-            'passcode' => $passcode
+            'passcode' => $passcode, 
+            'message' => 'Hi '.$display.', you have signed out.'
         ]);
     });
 
@@ -687,7 +689,8 @@ else {
         $passcode = '';
         return $this->view->render($response, 'signin.php', [
             'login' => $login, 
-            'passcode' => $passcode
+            'passcode' => $passcode, 
+            'message' => ''
         ]);
     });
 
@@ -698,7 +701,8 @@ else {
         $passcode = '';
         return $this->view->render($response, 'signin.php', [
             'login' => $login, 
-            'passcode' => $passcode
+            'passcode' => $passcode, 
+            'message' => ''
         ]);
     });
 
@@ -709,6 +713,7 @@ else {
         $passcode = $post['passcode'];
 
         $data = [
+            'message' => 'Sign in failed, please use different credentials and try again.',
             'login' => $login, 
             'passcode' => $passcode
         ];
@@ -716,7 +721,9 @@ else {
         $template = 'signin.php';
 
         if(SessionManager::signIn($login, $passcode)) {
-            $data = ['message' => 'Welcome back, '.Session::init()->getUser()->getDisplay() ];
+            $data = [
+                'message' => 'Welcome back, '.Session::init()->getUser()->getDisplay() 
+            ];
             $template = 'index.php';
         }
 

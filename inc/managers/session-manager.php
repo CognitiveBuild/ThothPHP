@@ -3,6 +3,7 @@ final class SessionManager {
 
     public static function signIn($login, $passcode) {
 
+        $succeed = FALSE;
         $time = time();
         $newToken = self::generateToken($login, $passcode, $time);
         $encryptedPasscode = self::generateToken($login, $passcode);
@@ -10,24 +11,27 @@ final class SessionManager {
         $result = db::queryFirst("SELECT * FROM `user` WHERE `login` = ?;", array($login));
 
         if($result === NULL) {
-            return FALSE;
+            return $succeed;
         }
 
         // Special case for first login user
         // @todo: Remove
         if($result['passcode'] === '') {
             db::update("UPDATE `user` SET `passcode` = ?, `token` = ?, `activetime` = ? WHERE `login` = ?", array($encryptedPasscode, $newToken, $time, $login));
+            $succeed = TRUE;
         }
 
         if($result['passcode'] === $encryptedPasscode) {
             db::update("UPDATE `user` SET `token` = ?, `activetime` = ? WHERE `login` = ?", array($newToken, $time, $login));
+            $succeed = TRUE;
         }
 
-        $user = new User($result['id'], $login, $result['display'], $newToken, $time);
+        if($succeed) {
+            $user = new User($result['id'], $login, $result['display'], $newToken, $time);
+            Session::init()->setUser($user);
+        }
 
-        Session::init()->setUser($user);
-
-        return TRUE;
+        return $succeed;
     }
 
     public static function signOut() {

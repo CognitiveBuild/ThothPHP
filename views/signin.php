@@ -16,6 +16,10 @@ echo <<<EOT
         <input type="password" class="form-control" id="passcode" name="passcode" placeholder="Passcode" value="{$passcode}" />
     </div>
 
+    <div class="form-group">
+        <div class="ui-notice">{$message}</div>
+    </div>
+
     <input type="submit" class="btn btn-primary btn-event-save" />
 </form>
 </div>

@@ -132,3 +132,6 @@ body {
 .ui-label-block {
   display: block;
 }
+.ui-notice {
+  color:#666;
+}
