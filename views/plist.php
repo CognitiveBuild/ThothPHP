@@ -14,19 +14,19 @@ echo <<<EOT
                     <key>kind</key>
                     <string>software-package</string>
                     <key>url</key>
-                    <string>https://thoth-assets.mybluemix.net/api/v1/download?id={$id}</string>
+                    <string>https://thoth-assets.mybluemix.net/api/v1/download/{$id}</string>
                 </dict>
             </array>
             <key>metadata</key>
             <dict>
                 <key>bundle-identifier</key>
-                <string>{$id}</string>
+                <string>{$uid}</string>
                 <key>bundle-version</key>
-                <string>1.0</string>
+                <string>{$version}</string>
                 <key>kind</key>
                 <string>software</string>
                 <key>title</key>
-                <string>iFundIT</string>
+                <string>{$display}</string>
             </dict>
         </dict>
     </array>

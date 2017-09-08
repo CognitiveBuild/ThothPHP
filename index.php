@@ -1,8 +1,5 @@
 <?php
 require 'vendor/autoload.php';
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7;
-use GuzzleHttp\Exception\RequestException;
 date_default_timezone_set('PRC');
 
 include 'inc/db.php';
@@ -16,6 +13,7 @@ include 'inc/managers/catalog-manager.php';
 include 'inc/managers/company-manager.php';
 include 'inc/managers/visitor-manager.php';
 include 'inc/managers/event-manager.php';
+include 'inc/managers/distribution-manager.php';
 
 define("KEY_INDUSTRY", "INDUSTRY");
 define("KEY_TECHNOLOGY", "TECHNOLOGY");
@@ -603,7 +601,7 @@ $app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {
     ]);
 });
 
-$app->get('/download', function ($request, $response, $args) {
+$app->get('/upload', function ($request, $response, $args) {
 
     $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
     $host = $_SERVER['HTTP_HOST'];
@@ -612,98 +610,131 @@ $app->get('/download', function ($request, $response, $args) {
         $host = 'thoth-assets.mybluemix.net';
     }
 
-    $url = urlencode("https://{$host}/api/v1/download/meta?id={$id}");    
-
-    return $this->view->render($response, 'download.php', [
+    return $this->view->render($response, 'upload.php', [
         'id' => $id, 
         'host' => $host, 
         'url' => $url
     ]);
 });
 
-$app->get('/api/v1/download', function ($request, $response, $args) {
-    $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
-    $client = new Client();
-    try {
-        // Send out HTTP request
-        $result = $client->request('POST', 'https://identity.open.softlayer.com/v3/auth/tokens', [
-            'json' => [
-                'auth' => [
-                    'identity' => [
-                        'methods' => [ 'password' ], 
-                        'password' => [ 
-                            'user' => [
-                                'id' => '6083522eae4b4bad9d7ea9deee2df6f4', 
-                                'password' => 'wx{WB#Ncd0j6]X#n'
-                            ]
-                        ]
-                    ], 
-                    'scope' => [
-                        'project' => [
-                            'id' => 'd92fbca7a9574e94b1c3d6c5a1283a6d'
-                        ]
-                    ]
-                ]
-            ], 
-            'headers' => [
-                'Content-Type' => 'application/json'
-            ]
-        ]);
-        
-        $content = $result->getBody()->getContents();
-        $headers = $result->getHeader('X-Subject-Token');
-        
-        $json = json_decode($content, TRUE);
+$app->get('/download/{id}', function ($request, $response, $args) {
 
-        $base = '';
-        $token = $headers[0];
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $build = DistributionManager::getDistributionById($id);
 
-        $catalogs = $json['token']['catalog'];
-        foreach($catalogs as $key => $val) {
-            $endpoints = $val['endpoints'];
-            if('object-store' === $val['type']) {
-                foreach($endpoints as $endpointKey => $endpoint) {
-                    if($endpoint['region'] === 'dallas' && $endpoint['interface'] == 'public') {
-                        $base = $endpoint['url'];
-                        break;
-                    }
-                }
-            }
-        }
-        $binaryUrl = "{$base}/builds/{$id}.ipa";
-        // echo $binaryUrl;die;
-        $result = $client->request('GET', $binaryUrl, [
-            'headers' => [
-                'X-Auth-Token' => $token
-            ]
-        ]);
+    return $this->view->render($response, 'download.php', [
+        'build' => $build
+    ]);
+});
 
-        $size = $result->getHeader('Content-Length');
+$app->get('/builds', function ($request, $response, $args) {
 
-        header("Content-Type: application/octet-stream");
-        // header("Content-Length: {$size}");
-        header("Content-Disposition: attachment; filename=\"Build.ipa\"");
-        $stream = $result->getBody();
-        $newResponse = $response->withBody($stream);
-        return $newResponse;
+    $builds = DistributionManager::getDistributions();
+
+    return $this->view->render($response, 'downloads.php', [
+        'builds' => $builds
+    ]);
+});
+
+$app->get('/builds/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+
+    $build = array(
+        'name' => '', 
+        'display' => '', 
+        'uid' => '', 
+        'platform' => '', 
+        'region' => '',
+        'container' => '', 
+        'version' => ''
+    );
+
+    if($id > 0) {
+        $build = DistributionManager::getDistributionById($id);
     }
-    catch (RequestException $e) {
-        $message = $e->getMessage();
-        if ($e->hasResponse()) {
-            $message = Psr7\str($e->getResponse());
+
+    return $this->view->render($response, 'upload.php', [
+        'build' => $build, 
+        'id' => $id
+    ]);
+});
+
+// Upload build
+$app->post('/builds/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $post = $request->getParsedBody();
+    $files = $request->getUploadedFiles();
+
+    $builds = $files['binary'];
+
+    $build = array(
+        'name' => $post['name'], 
+        'display' => $post['display'], 
+        'uid' => $post['uid'], 
+        'platform' => $post['platform'], 
+        'region' => $post['region'], 
+        'container' => $post['container'], 
+        'version' => $post['version']
+    );
+
+    DistributionManager::addFiles($build, $builds);
+
+    return $this->view->render($response, 'upload.php', [
+        'build' => $build, 
+        'id' => $id
+    ]);
+});
+
+$app->get('/api/v1/download/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    if($id > 0) {
+        $build = DistributionManager::getDistributionById($id);
+        $uid = $build['uid'];
+        $version = $build['version'];
+        $platform = $build['platform'];
+
+        try {
+            $result = DistributionManager::sendBuild('GET', $uid, $version, $platform);
+
+            $size = $result->getHeader('Content-Length');
+
+            header("Content-Type: application/octet-stream");
+            // header("Content-Length: {$size}");
+            header("Content-Disposition: attachment; filename=\"{$uid}.ipa\"");
+            $stream = $result->getBody();
+            $newResponse = $response->withBody($stream);
+            return $newResponse;
         }
-        echo $message;
+        catch (RequestException $e) {
+            $message = $e->getMessage();
+            if ($e->hasResponse()) {
+                $message = Psr7\str($e->getResponse());
+            }
+            echo $message;
+        }
     }
 
 });
 
-$app->get('/api/v1/download/meta', function ($request, $response, $args) {
+$app->get('/api/v1/download/meta/{id}', function ($request, $response, $args) {
 
-    $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
+    $id = isset($args['id']) ? $args['id'] : 0;
+
+    $build = DistributionManager::getDistributionById($id);
+
+    $uid = $build['uid'];
+    $version = $build['version'];
+    $display = $build['display'];
+
     $xmlResponse = $response->withHeader('Content-type', 'application/xml');
 
     return $this->view->render($xmlResponse, 'plist.php', [
-        'id' => $id
+        'id' => $id, 
+        'uid' => $uid, 
+        'version' => $version
     ]);
 });
     
