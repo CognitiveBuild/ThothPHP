@@ -6,7 +6,8 @@ echo <<<EOT
     <div class="form-group">
         <label>ID:</label>
         <br />
-        <input name="id" value="{$id}" class="form-control bundle-id" />
+        <input type="text" name="id" value="{$id}" class="form-control bundle-id" />
+        <input type="hidden" name="bundle-host" value="{$host}" class="bundle-host" />
         <br /><br />
 
         <input type="submit" class="btn btn-primary btn-download" />
