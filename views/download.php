@@ -1,19 +1,22 @@
 <?php
-include('inc/header.html');
+include('inc/header.download.html');
 
 echo <<<EOT
 <div id="t-wrapper" class="download">
     <div class="form-group">
-        <label>ID:</label>
-        <br />
-        <input type="text" name="id" value="{$id}" class="form-control bundle-id" />
-        <input type="hidden" name="bundle-host" value="{$host}" class="bundle-host" />
-        <br /><br />
+        <h1>OTA Install for iOS</h1>
+        <p class="ui-note">{$id}</p>
+    </div>
 
-        <a class="btn-download" href="itms-services://?action=download-manifest&amp;url=https://{$host}/api/v1/download/meta?id={$id}">Download {$id}</a>
+    <div class="form-group">
+        <i class="glyphicon glyphicon-apple glyphicon-apple-big"></i>
+    </div>
+
+    <div class="form-group">
+        <a class="btn btn-primary btn-download" href="itms-services://?action=download-manifest&amp;url={$url}">Download this Build now</a>
     </div>
 </div>
 EOT;
 
-include('inc/footer.html');
+include('inc/footer.download.html');
 ?>

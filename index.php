@@ -26,6 +26,10 @@ define("OPTION_NO", "N");
 if(isset($_ENV["VCAP_SERVICES"]) === FALSE) {
     $env = new Dotenv\Dotenv(__DIR__);
     $env->load();
+    define("IS_LOCAL", TRUE);
+}
+else {
+    define("IS_LOCAL", FALSE);
 }
 
 $app = new Slim\App();
@@ -42,9 +46,16 @@ $app->get('/download', function ($request, $response, $args) {
     $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
     $host = $_SERVER['HTTP_HOST'];
 
+    if(IS_LOCAL) {
+        $host = 'thoth-assets.mybluemix.net';
+    }
+
+    $url = urlencode("https://{$host}/api/v1/download/meta?id={$id}");    
+
     return $this->view->render($response, 'download.php', [
         'id' => $id, 
-        'host' => $host
+        'host' => $host, 
+        'url' => $url
     ]);
 });
 
@@ -81,9 +92,6 @@ $app->get('/api/v1/download', function ($request, $response, $args) {
         $headers = $result->getHeader('X-Subject-Token');
         $json = json_decode($content, TRUE);
 
-        //echo '<pre>';
-        // echo $content;die;
-
         $base = '';
         $token = $headers[0];
 
@@ -109,7 +117,6 @@ $app->get('/api/v1/download', function ($request, $response, $args) {
 
         header("Content-Type: application/octet-stream");
         echo $result->getBody();
-
     }
     catch (RequestException $e) {
         $message = $e->getMessage();
@@ -118,47 +125,17 @@ $app->get('/api/v1/download', function ($request, $response, $args) {
         }
         echo $message;
     }
-    
+
 });
 
 $app->get('/api/v1/download/meta', function ($request, $response, $args) {
 
     $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
-    $xml = <<<EOT
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>items</key>
-    <array>
-        <dict>
-            <key>assets</key>
-            <array>
-                <dict>
-                    <key>kind</key>
-                    <string>software-package</string>
-                    <key>url</key>
-                    <string>https://thoth-assets.mybluemix.net/api/v1/download?id={$id}</string>
-                </dict>
-            </array>
-            <key>metadata</key>
-            <dict>
-                <key>bundle-identifier</key>
-                <string>{$id}</string>
-                <key>bundle-version</key>
-                <string>1.0</string>
-                <key>kind</key>
-                <string>software</string>
-                <key>title</key>
-                <string>iFundIT</string>
-            </dict>
-        </dict>
-    </array>
-</dict>
-</plist>
-EOT;
+    $xmlResponse = $response->withHeader('Content-type', 'application/xml');
 
-    return $response->withStatus(200)->withHeader('Content-Type', "application/xml")->write($xml);
+    return $this->view->render($xmlResponse, 'plist.php', [
+        'id' => $id
+    ]);
 });
 // todo: login page
 

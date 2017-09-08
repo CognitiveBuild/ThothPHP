@@ -139,3 +139,17 @@ body {
   padding: 10px;
   border: 1px solid #eee;
 }
+
+body.download {
+  padding: 50px 0px;
+}
+
+.download .main {
+  padding: 15px;
+  text-align: center;
+}
+
+.glyphicon-apple-big {
+  font-size: 96px;
+  margin: 30px auto;
+}
