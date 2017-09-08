@@ -135,3 +135,7 @@ body {
 .ui-notice {
   color:#666;
 }
+.btn-download {
+  padding: 10px;
+  border: 1px solid #eee;
+}

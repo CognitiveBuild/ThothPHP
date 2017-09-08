@@ -107,9 +107,6 @@ $app->get('/api/v1/download', function ($request, $response, $args) {
             ]
         ]);
 
-        $fileName = "attachment; filename=\"{$id}.ipa\"";
-
-        header("Content-Disposition: {$fileName}");
         header("Content-Type: application/octet-stream");
         echo $result->getBody();
 
