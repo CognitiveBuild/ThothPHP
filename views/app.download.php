@@ -2,6 +2,7 @@
 include('inc/header.download.html');
 
 $isLatest = FALSE;
+$count = count($builds);
 foreach($builds as $key => $val) {
     $build = new BuildModel($val['idbuild'], $val['idapp'], $val['uid'], $val['display'], $val['platform'], $val['version'], $val['time']);
     $icon = $build->getPlatform() === BuildModel::IOS ? '<i class="glyphicon glyphicon-apple glyphicon-apple-big"></i>' : '<i class="glyphicon glyphicon-text-color glyphicon-apple-big"></i>';    
@@ -9,6 +10,11 @@ foreach($builds as $key => $val) {
 
     if($isLatest) {
 
+        echo <<<EOT
+        <li class="list-group-item">
+            <a href="{$url}" class="name ui-modal-button">Download v{$build->getVersion()} for {$build->getPlatform()}</a>
+        </li>
+EOT;
     }
     else {
         $isLatest = TRUE;
@@ -36,6 +42,12 @@ foreach($builds as $key => $val) {
                 <a href="/api/v1/app/code/{$build->getBuildId()}"><img src="/api/v1/app/code/{$build->getBuildId()}" class="ui-qr-code" /></a>
             </div>
         </div>
+EOT;
+        if($count > 1)
+            echo <<<EOT
+    <div class="form-group">
+        <label>Other previous versions</label>
+    </div>
 EOT;
     }
 }
