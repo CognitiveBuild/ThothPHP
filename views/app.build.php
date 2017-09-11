@@ -2,10 +2,9 @@
 include('inc/header.html');
 $uploadHTML = '';
 $platformHTML = '';
-$regionHTML = '';
 $downloadHTML = '';
 
-if($build->getId() === BuildModel::NEW_ID) {
+if($build->getBuildId() === BuildModel::NEW_ID) {
     $platformHTML = '<option value="0">Please choose one</option>';
     $uploadHTML = <<<EOT
 <div class="form-group attachment-group">
@@ -20,12 +19,12 @@ EOT;
 }
 else {
     $downloadHTML = <<<EOT
-    <a class="btn btn-secondary btn-build-download" href="/api/v1/download/{$build->getId()}">Download build</a>
+    <a class="btn btn-secondary btn-build-download" href="/api/v1/app/{$build->getBuildId()}">Download build</a>
 EOT;
-    $uploadHTML = <<<EOT
 
+    $uploadHTML = <<<EOT
 <div class="form-group">
-    <img src="/api/v1/download/code/{$build->getId()}" class="ui-qr-code" />
+    <a href="/api/v1/app/code/{$build->getBuildId()}"><img src="/api/v1/app/code/{$build->getBuildId()}" class="ui-qr-code" /></a>
 </div>
 EOT;
 }
@@ -44,19 +43,6 @@ foreach($platforms as $platform) {
 EOT;
 }
 
-$regions = array('Dallas' => 'dallas', 'London' => 'london');
-foreach($regions as $label => $val) {
-
-    $selected = '';
-    if($val === $build->getRegion()) {
-        $selected = ' selected="selected"';
-    }
-
-    $regionHTML .= <<<EOT
-    <option value="{$val}"{$selected}>{$label}</option>
-EOT;
-}
-
 ?>
 
 <div id="t-wrapper" class="build">
@@ -67,11 +53,8 @@ EOT;
             <form class="list list-group" method="POST" enctype="multipart/form-data">
 <?php
 echo <<<EOT
-    <input type="hidden" name="id" value="{$build->getId()}" />
-    <div class="form-group">
-        <label for="name">Name (Prefix)</label>
-        <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="{$build->getName()}" />
-    </div>
+    <input type="hidden" name="idbuild" value="{$build->getBuildId()}" />
+    <input type="hidden" name="idapp" value="{$app->getId()}" />
 
     <div class="form-group">
         <label for="display">Display name</label>
@@ -88,18 +71,6 @@ echo <<<EOT
         <select class="form-control" id="platform" name="platform">
         {$platformHTML}
         </select>
-    </div>
-
-    <div class="form-group">
-        <label for="region">Region</label>
-        <select class="form-control" id="region" name="region">
-        {$regionHTML}
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label for="container">Container</label>
-        <input type="text" class="form-control" id="container" name="container" placeholder="Container" value="{$build->getContainer()}" />
     </div>
 
     <div class="form-group">

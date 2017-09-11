@@ -6,26 +6,48 @@ use Endroid\QrCode\QrCode;
 
 final class DistributionManager {
 
-    public static function getDistributions() {
+    private static $buildSQL = 'SELECT `build`.* FROM `build` WHERE `idbuild` = ?;';
 
-        return db::query("SELECT * FROM `build`;");
+    public static function getApps() {
+
+        return db::query("SELECT * FROM `app` ORDER BY `name` ASC");
     }
 
-    public static function getDistributionById($id) {
+    public static function getAppById($id) {
+
+        $app = new AppModel();
+
+        if($id > AppModel::NEW_ID) {
+            $result = db::queryFirst("SELECT * FROM `app` WHERE `id` = ?", array($id));
+            if($result != NULL) {
+                $app->setId($result['id']);
+                $app->setName($result['name']);
+                $app->setRegion($result['region']);
+                $app->setContainer($result['container']);
+            }
+        }
+
+        return $app;
+    }
+
+    public static function getBuildsByAppId($id) {
+
+        return db::query("SELECT * FROM `build` WHERE `idapp` = ? ORDER BY `time` DESC", array($id));
+    }
+
+    public static function getBuildById($id) {
 
         $build = new BuildModel();
 
         if($id > BuildModel::NEW_ID) {
 
-            $result = db::queryFirst("SELECT * FROM `build` WHERE `id` = ?;", array($id));
+            $result = db::queryFirst(self::$buildSQL, array($id));
             if($result != NULL) {
-                $build->setId($result['id']);
+                $build->setBuildId($result['idbuild']);
+                $build->setAppId($result['idapp']);
                 $build->setUid($result['uid']);
-                $build->setName($result['name']);
                 $build->setDisplay($result['display']);
                 $build->setPlatform($result['platform']);
-                $build->setRegion($result['region']);
-                $build->setContainer($result['container']);
                 $build->setVersion($result['version']);
                 $build->setTime($result['time']);
             }
@@ -44,20 +66,20 @@ final class DistributionManager {
 
     public static function getMetadataLink($id) {
 
-        return CommonUtility::getBaseUrl("/api/v1/download/meta/{$id}", TRUE);
+        return CommonUtility::getBaseUrl("/api/v1/app/meta/{$id}", TRUE);
     }
 
     public static function getDownloadUrl($id, $platform = BuildModel::IOS) {
 
         if($platform === BuildModel::IOS) {
-            $metaLink = CommonUtility::getBaseUrl("/api/v1/download/meta/{$id}", TRUE);
+            $metaLink = CommonUtility::getBaseUrl("/api/v1/app/meta/{$id}", TRUE);
             return "itms-services://?action=download-manifest&amp;url={$metaLink}";
         }
 
-        return CommonUtility::getBaseUrl("/api/v1/download/{$id}", TRUE);
+        return CommonUtility::getBaseUrl("/api/v1/app/{$id}", TRUE);
     }
 
-    public static function addFiles($build, $files) {
+    public static function addFiles($app, $build, $files) {
 
         foreach($files as $file) {
 
@@ -68,17 +90,44 @@ final class DistributionManager {
             $name = $file->getClientFilename();
             $type = $file->getClientMediaType();
 
-            $result = DistributionManager::sendBuild('PUT', $build->getUid(), $build->getVersion(), $build->getPlatform(), $binary);
+            $result = DistributionManager::sendBuild('PUT', $build->getUid(), $build->getVersion(), $build->getPlatform(), $binary, $app->getRegion(), $app->getContainer());
 
-            self::addDistribution($build);
+            self::addBuild($build);
         }
     }
 
-    public static function addDistribution($build) {
-        return db::insert("INSERT INTO `build` (`name`, `display`, `uid`, `platform`, `region`, `container`, `version`) VALUES (?,?,?,?,?,?,?);", 
-            array($build->getName(), $build->getDisplay(), $build->getUid(), $build->getPlatform(), $build->getRegion(), $build->getContainer(), $build->getVersion())
+    public static function removeFile($app, $build) {
+
+        try{
+            $result = DistributionManager::sendBuild('DELETE', $build->getUid(), $build->getVersion(), $build->getPlatform(), NULL, $app->getRegion(), $app->getContainer());
+        }
+        catch(Exception $ex){
+
+        }
+        self::removeBuild($build);
+    }
+
+    public static function addApp($app) {
+        return db::insert("INSERT INTO `app` (`name`, `region`, `container`) VALUES (?,?,?);", 
+            array($app->getName(), $app->getRegion(), $app->getContainer())
         );
     }
+
+    public static function updateApp($app) {
+        return db::insert("UPDATE `app` SET `name` = ?, `region` = ?, `container` = ? WHERE `id` = ?;", 
+            array($app->getName(), $app->getRegion(), $app->getContainer(), $app->getId())
+        );
+    }
+
+    public static function addBuild($build) {
+        return db::insert("INSERT INTO `build` (`idapp`, `display`, `uid`, `platform`, `version`) VALUES (?,?,?,?,?);", 
+            array($build->getAppId(), $build->getDisplay(), $build->getUid(), $build->getPlatform(), $build->getVersion())
+        );
+    }
+
+    public static function removeBuild($build) {
+        return db::execute("DELETE FROM `build` WHERE `idbuild` = ?", array($build->getBuildId()));
+    } 
 
     private static function send($region) {
 

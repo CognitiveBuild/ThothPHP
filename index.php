@@ -434,6 +434,109 @@ if(SessionManager::validate()) {
     
         return $response->withJson(array('status' => $result));
     });
+
+    $app->get('/apps', function ($request, $response, $args) {
+        
+        $apps = DistributionManager::getApps();
+
+        return $this->view->render($response, 'apps.php', [
+            'apps' => $apps
+        ]);
+    });
+    
+    $app->get('/apps/{id}', function ($request, $response, $args) {
+    
+        $id = isset($args['id']) ? $args['id'] : 0;
+        $app = DistributionManager::getAppById($id);
+        $builds = DistributionManager::getBuildsByAppId($id);
+    
+        return $this->view->render($response, 'app.php', [
+            'app' => $app, 
+            'builds' => $builds
+        ]);
+    });
+    
+    $app->post('/apps/{id}', function ($request, $response, $args) {
+    
+        $isNew = FALSE;
+        $id = isset($args['id']) ? $args['id'] : 0;
+        $post = $request->getParsedBody();
+    
+        $app = new AppModel($id, $post['name'], $post['region'], $post['container']);
+    
+        if($id === AppModel::NEW_ID) {
+            DistributionManager::addApp($app);
+            $isNew = TRUE;
+        }
+        else {
+            DistributionManager::updateApp($app);
+        }
+    
+        if($isNew) {
+            return $response->withStatus(200)->withHeader('Location', "/apps");
+        }
+    
+        return $this->view->render($response, 'app.php', [
+            'app' => $app
+        ]);
+    });
+    
+    $app->get('/apps/{idapp}/builds/{idbuild}', function ($request, $response, $args) {
+    
+        $idapp = isset($args['idapp']) ? $args['idapp'] : 0;
+        $idbuild = isset($args['idbuild']) ? $args['idbuild'] : 0;
+    
+        $app = DistributionManager::getAppById($idapp);
+        $build = DistributionManager::getBuildById($idbuild);
+    
+        return $this->view->render($response, 'app.build.php', [
+            'app' => $app, 
+            'build' => $build, 
+            'idapp' => $idapp, 
+            'idbuild' => $idbuild
+        ]);
+    });
+    
+    // Upload build
+    $app->post('/apps/{idapp}/builds/{idbuild}', function ($request, $response, $args) {
+    
+        $idapp = isset($args['idapp']) ? $args['idapp'] : 0;
+        $idbuild = isset($args['idbuild']) ? $args['idbuild'] : 0;
+    
+        $app = DistributionManager::getAppById($idapp);
+    
+        $post = $request->getParsedBody();
+        $files = $request->getUploadedFiles();
+    
+        $builds = $files['binary'];
+    
+        if($idbuild > 0) {
+            $build = DistributionManager::getBuildById($idbuild);
+        }
+        else {
+            $build = new BuildModel($idbuild, $idapp, $post['uid'], $post['display'], $post['platform'], $post['version'], time());
+        }
+    
+        DistributionManager::addFiles($app, $build, $builds);
+    
+        return $response->withStatus(200)->withHeader('Location', "/apps/{$idapp}");
+    
+        // return $this->view->render($response, 'upload.php', [
+        //     'build' => $build
+        // ]);
+    });
+    
+    $app->delete('/api/v1/apps/{idapp}/builds/{idbuild}', function ($request, $response, $args) {
+        $idapp = isset($args['idapp']) ? $args['idapp'] : 0;
+        $idbuild = isset($args['idbuild']) ? $args['idbuild'] : 0;
+        $app = DistributionManager::getAppById($idapp);
+        $build = DistributionManager::getBuildById($idbuild);
+    
+        DistributionManager::removeFile($app, $build);
+    
+        return $response->withStatus(200)->withJson(array('status' => TRUE));
+    });
+    
 }
 else {
     $app->get('/', function ($request, $response, $args) {
@@ -478,6 +581,7 @@ else {
 
         return $this->view->render($response, $template, $data);
     });
+
 }
 
 
@@ -603,71 +707,19 @@ $app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {
     ]);
 });
 
-$app->get('/upload', function ($request, $response, $args) {
-
-    $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
-
-    return $this->view->render($response, 'upload.php', [
-        'id' => $id, 
-        'url' => $url
-    ]);
-});
-
-$app->get('/download/{id}', function ($request, $response, $args) {
+$app->get('/app/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
-    $build = DistributionManager::getDistributionById($id);
+    $app = DistributionManager::getAppById($id);
+    $builds = DistributionManager::getBuildsByAppId($id);
 
-    return $this->view->render($response, 'download.php', [
-        'build' => $build
-    ]);
-});
-
-$app->get('/builds', function ($request, $response, $args) {
-
-    $builds = DistributionManager::getDistributions();
-
-    return $this->view->render($response, 'downloads.php', [
+    return $this->view->render($response, 'app.download.php', [
+        'app' => $app, 
         'builds' => $builds
     ]);
 });
 
-$app->get('/builds/{id}', function ($request, $response, $args) {
-
-    $id = isset($args['id']) ? $args['id'] : 0;
-    $build = DistributionManager::getDistributionById($id);
-
-    return $this->view->render($response, 'upload.php', [
-        'build' => $build
-    ]);
-});
-
-// Upload build
-$app->post('/builds/{id}', function ($request, $response, $args) {
-
-    $id = isset($args['id']) ? $args['id'] : 0;
-    $post = $request->getParsedBody();
-    $files = $request->getUploadedFiles();
-
-    $builds = $files['binary'];
-
-    if($id > 0) {
-        $build = DistributionManager::getDistributionById($id);
-    }
-    else {
-        $build = new BuildModel($id, $post['uid'], $post['name'], $post['display'], $post['platform'], $post['region'], $post['container'], $post['version'], time());
-    }
-
-    DistributionManager::addFiles($build, $builds);
-
-    return $response->withStatus(200)->withHeader('Location', "/builds");
-
-    // return $this->view->render($response, 'upload.php', [
-    //     'build' => $build
-    // ]);
-});
-
-$app->get('/api/v1/download/code/{id}', function ($request, $response, $args) {
+$app->get('/api/v1/app/code/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
     $qrCode = DistributionManager::getQRCodeById($id);
@@ -679,10 +731,10 @@ $app->get('/api/v1/download/code/{id}', function ($request, $response, $args) {
     // return $qrCode->writeString();
 });
 
-$app->get('/api/v1/download/{id}', function ($request, $response, $args) {
+$app->get('/api/v1/app/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
-    $build = DistributionManager::getDistributionById($id);
+    $build = DistributionManager::getAppById($id);
 
     if($id > 0) {
         try {
@@ -709,11 +761,11 @@ $app->get('/api/v1/download/{id}', function ($request, $response, $args) {
 
 });
 
-$app->get('/api/v1/download/meta/{id}', function ($request, $response, $args) {
+$app->get('/api/v1/app/meta/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
 
-    $build = DistributionManager::getDistributionById($id);
+    $build = DistributionManager::getAppById($id);
 
     $xmlResponse = $response->withHeader('Content-type', 'application/xml');
 

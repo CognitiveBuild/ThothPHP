@@ -383,6 +383,24 @@ $(function(){
         }, 
         download: function() {
             
+        },
+        app: function() {
+            $('.ui-build-delete').on('click', function(evt){
+                var self = $(this);
+                var idbuild = self.data('idbuild');
+                var idapp = self.data('idapp');
+
+                $.ajax({
+                    url: '/api/v1/apps/' + idapp + '/builds/' + idbuild, 
+                    method: 'DELETE', 
+                    success: function(xHR) {
+                        self.parent().remove();
+                    }, 
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            });
         }
     };
     methods.init();
