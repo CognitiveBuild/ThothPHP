@@ -39,7 +39,7 @@ EOT;
             </div>
 
             <div class="form-group ui-form-group-image-container">
-                <a href="/api/v1/app/code/{$build->getBuildId()}"><img src="/api/v1/app/code/{$build->getBuildId()}" class="ui-qr-code" /></a>
+                <a href="/api/v1/app/code/{$app->getId()}"><img src="/api/v1/app/code/{$app->getId()}" class="ui-qr-code" /></a>
             </div>
         </div>
 EOT;

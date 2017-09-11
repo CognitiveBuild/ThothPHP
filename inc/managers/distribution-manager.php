@@ -58,7 +58,7 @@ final class DistributionManager {
 
     public static function getQRCodeById($id) {
 
-        $url = CommonUtility::getBaseUrl("/download/{$id}");
+        $url = CommonUtility::getBaseUrl("/app/{$id}");
         $qrCode = new QrCode($url);
 
         return $qrCode;
