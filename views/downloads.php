@@ -11,11 +11,9 @@ include('inc/header.html');
 foreach($builds as $key => $build) {
     $uid = $build['uid'];
     $platform = $build['platform'];
-    $icon = $platform === 'iOS' ? '<i class="glyphicon glyphicon-apple"></i>' : ''; //todo: android
-    
-    $metaLink = DistributionManager::getMetadataLink($build['id']); // todo: android
-    
-    $url = $platform === 'iOS' ? "itms-services://?action=download-manifest&amp;url={$metaLink}" : ''; //todo: android
+    $icon = $platform === BuildModel::IOS ? '<i class="glyphicon glyphicon-apple"></i>' : ''; //todo: android
+
+    $url = $url = DistributionManager::getDownloadUrl($build['id']);
     
     $version = $build['version'];
     $display = $build['display'];

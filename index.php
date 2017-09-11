@@ -3,9 +3,11 @@ require 'vendor/autoload.php';
 date_default_timezone_set('PRC');
 
 include 'inc/db.php';
-
+// Utilities
+include 'inc/utilities/common-utility.php';
 // Models
-include 'inc/models/user.php';
+include 'inc/models/user-model.php';
+include 'inc/models/build-model.php';
 // Managers
 include 'inc/managers/session-manager.php';
 include 'inc/managers/asset-manager.php';
@@ -24,10 +26,10 @@ define("OPTION_NO", "N");
 if(isset($_ENV["VCAP_SERVICES"]) === FALSE) {
     $env = new Dotenv\Dotenv(__DIR__);
     $env->load();
-    define("IS_LOCAL", TRUE);
+    define("HOST_NAME", 'thoth-assets.mybluemix.net');
 }
 else {
-    define("IS_LOCAL", FALSE);
+    define("HOST_NAME", $_SERVER['HTTP_HOST']);
 }
 
 $app = new Slim\App();
@@ -604,15 +606,9 @@ $app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {
 $app->get('/upload', function ($request, $response, $args) {
 
     $id = $request->getQueryParam('id', 'com.ibm.cio.be.ifundit.platform.mobile');
-    $host = $_SERVER['HTTP_HOST'];
-
-    if(IS_LOCAL) {
-        $host = 'thoth-assets.mybluemix.net';
-    }
 
     return $this->view->render($response, 'upload.php', [
         'id' => $id, 
-        'host' => $host, 
         'url' => $url
     ]);
 });
@@ -639,24 +635,10 @@ $app->get('/builds', function ($request, $response, $args) {
 $app->get('/builds/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
-
-    $build = array(
-        'name' => '', 
-        'display' => '', 
-        'uid' => '', 
-        'platform' => '', 
-        'region' => '',
-        'container' => '', 
-        'version' => ''
-    );
-
-    if($id > 0) {
-        $build = DistributionManager::getDistributionById($id);
-    }
+    $build = DistributionManager::getDistributionById($id);
 
     return $this->view->render($response, 'upload.php', [
-        'build' => $build, 
-        'id' => $id
+        'build' => $build
     ]);
 });
 
@@ -669,41 +651,49 @@ $app->post('/builds/{id}', function ($request, $response, $args) {
 
     $builds = $files['binary'];
 
-    $build = array(
-        'name' => $post['name'], 
-        'display' => $post['display'], 
-        'uid' => $post['uid'], 
-        'platform' => $post['platform'], 
-        'region' => $post['region'], 
-        'container' => $post['container'], 
-        'version' => $post['version']
-    );
+    if($id > 0) {
+        $build = DistributionManager::getDistributionById($id);
+    }
+    else {
+        $build = new BuildModel($id, $post['uid'], $post['name'], $post['display'], $post['platform'], $post['region'], $post['container'], $post['version'], time());
+    }
 
     DistributionManager::addFiles($build, $builds);
 
-    return $this->view->render($response, 'upload.php', [
-        'build' => $build, 
-        'id' => $id
-    ]);
+    return $response->withStatus(200)->withHeader('Location', "/builds");
+
+    // return $this->view->render($response, 'upload.php', [
+    //     'build' => $build
+    // ]);
+});
+
+$app->get('/api/v1/download/code/{id}', function ($request, $response, $args) {
+
+    $id = isset($args['id']) ? $args['id'] : 0;
+    $qrCode = DistributionManager::getQRCodeById($id);
+
+    $imageResponse = $response->withHeader('Content-type', $qrCode->getContentType());;
+    echo $qrCode->writeString();
+    return $imageResponse;
+    // header('Content-Type: '.$qrCode->getContentType());
+    // return $qrCode->writeString();
 });
 
 $app->get('/api/v1/download/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
-    if($id > 0) {
-        $build = DistributionManager::getDistributionById($id);
-        $uid = $build['uid'];
-        $version = $build['version'];
-        $platform = $build['platform'];
+    $build = DistributionManager::getDistributionById($id);
 
+    if($id > 0) {
         try {
-            $result = DistributionManager::sendBuild('GET', $uid, $version, $platform);
+            $result = DistributionManager::sendBuild('GET', $build->getUid(), $build->getVersion(), $build->getPlatform());
 
             $size = $result->getHeader('Content-Length');
+            $ext = ($platform === BuildModel::IOS ? 'ipa' : 'apk');
 
             header("Content-Type: application/octet-stream");
             // header("Content-Length: {$size}");
-            header("Content-Disposition: attachment; filename=\"{$uid}.ipa\"");
+            header("Content-Disposition: attachment; filename=\"{$build->getUid()}.{$ext}\"");
             $stream = $result->getBody();
             $newResponse = $response->withBody($stream);
             return $newResponse;
@@ -725,17 +715,16 @@ $app->get('/api/v1/download/meta/{id}', function ($request, $response, $args) {
 
     $build = DistributionManager::getDistributionById($id);
 
-    $uid = $build['uid'];
-    $version = $build['version'];
-    $display = $build['display'];
-
     $xmlResponse = $response->withHeader('Content-type', 'application/xml');
 
     return $this->view->render($xmlResponse, 'plist.php', [
-        'id' => $id, 
-        'uid' => $uid, 
-        'version' => $version
+        'build' => $build
     ]);
 });
-    
+
+
+$app->get('/api/v1/info', function ($request, $response, $args) {
+    phpinfo();
+});
+
 $app->run();

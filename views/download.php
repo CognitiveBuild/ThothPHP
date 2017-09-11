@@ -1,22 +1,15 @@
 <?php
 include('inc/header.download.html');
-$uid = $build['uid'];
-$platform = $build['platform'];
-$icon = $platform === 'iOS' ? '<i class="glyphicon glyphicon-apple glyphicon-apple-big"></i>' : ''; //todo: android
 
-$metaLink = DistributionManager::getMetadataLink($build['id']); // todo: android
+$icon = $build->getPlatform() === BuildModel::IOS ? '<i class="glyphicon glyphicon-apple glyphicon-apple-big"></i>' : ''; //todo: android
 
-$url = $platform === 'iOS' ? "itms-services://?action=download-manifest&amp;url={$metaLink}" : ''; //todo: android
-
-$version = $build['version'];
-$display = $build['display'];
-$time = $build['time'];
+$url = DistributionManager::getDownloadUrl($build->getId());
 
 echo <<<EOT
 <div id="t-wrapper" class="download">
     <div class="form-group">
-        <h1>{$display} (v{$version})</h1>
-        <p class="ui-note">OTA Install for {$platform}</p>
+        <h1>{$build->getDisplay()} (v{$build->getVersion()})</h1>
+        <p class="ui-note">OTA Install for {$build->getPlatform()}</p>
     </div>
 
     <div class="form-group">
@@ -24,7 +17,7 @@ echo <<<EOT
     </div>
 
     <div class="form-group">
-        <p class="ui-notice">Published on: {$time}</p>
+        <p class="ui-notice">Published on: {$build->getTime()}</p>
     </div>
 
     <div class="form-group">

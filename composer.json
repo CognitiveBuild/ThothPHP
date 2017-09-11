@@ -4,6 +4,7 @@
         "slim/slim": "^3.0",
         "slim/php-view": "^2.2", 
         "vlucas/phpdotenv": "^2.4", 
-        "guzzlehttp/guzzle": "^6.2"
+        "guzzlehttp/guzzle": "^6.2",
+        "endroid/qrcode": "^2.3"
     }
 }

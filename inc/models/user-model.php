@@ -1,5 +1,5 @@
 <?php
-class User {
+class UserModel {
 
 	const NEW_ID = '0';
 

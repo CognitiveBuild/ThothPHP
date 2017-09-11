@@ -14,19 +14,19 @@ echo <<<EOT
                     <key>kind</key>
                     <string>software-package</string>
                     <key>url</key>
-                    <string>https://thoth-assets.mybluemix.net/api/v1/download/{$id}</string>
+                    <string>https://thoth-assets.mybluemix.net/api/v1/download/{$build->getId()}</string>
                 </dict>
             </array>
             <key>metadata</key>
             <dict>
                 <key>bundle-identifier</key>
-                <string>{$uid}</string>
+                <string>{$build->getUid()}</string>
                 <key>bundle-version</key>
-                <string>{$version}</string>
+                <string>{$build->getVersion()}</string>
                 <key>kind</key>
                 <string>software</string>
                 <key>title</key>
-                <string>{$display}</string>
+                <string>{$build->getDisplay()}</string>
             </dict>
         </dict>
     </array>

@@ -2,25 +2,59 @@
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\RequestException;
+use Endroid\QrCode\QrCode;
+
 final class DistributionManager {
 
     public static function getDistributions() {
 
-        return db::query("SELECT * FROM `distribution`;");
+        return db::query("SELECT * FROM `build`;");
     }
 
     public static function getDistributionById($id) {
 
-        return db::queryFirst("SELECT * FROM `distribution` WHERE `id` = ?;", array($id));
+        $build = new BuildModel();
+
+        if($id > BuildModel::NEW_ID) {
+
+            $result = db::queryFirst("SELECT * FROM `build` WHERE `id` = ?;", array($id));
+            if($result != NULL) {
+                $build->setId($result['id']);
+                $build->setUid($result['uid']);
+                $build->setName($result['name']);
+                $build->setDisplay($result['display']);
+                $build->setPlatform($result['platform']);
+                $build->setRegion($result['region']);
+                $build->setContainer($result['container']);
+                $build->setVersion($result['version']);
+                $build->setTime($result['time']);
+            }
+        }
+
+        return $build;
+    }
+
+    public static function getQRCodeById($id) {
+
+        $url = CommonUtility::getBaseUrl("/download/{$id}");
+        $qrCode = new QrCode($url);
+
+        return $qrCode;
     }
 
     public static function getMetadataLink($id) {
 
-        $host = $_SERVER['HTTP_HOST'];
-        if(IS_LOCAL) {
-            $host = 'thoth-assets.mybluemix.net';
+        return CommonUtility::getBaseUrl("/api/v1/download/meta/{$id}", TRUE);
+    }
+
+    public static function getDownloadUrl($id, $platform = BuildModel::IOS) {
+
+        if($platform === BuildModel::IOS) {
+            $metaLink = CommonUtility::getBaseUrl("/api/v1/download/meta/{$id}", TRUE);
+            return "itms-services://?action=download-manifest&amp;url={$metaLink}";
         }
-        return urlencode("https://{$host}/api/v1/download/meta/{$id}");
+
+        return CommonUtility::getBaseUrl("/api/v1/download/{$id}", TRUE);
     }
 
     public static function addFiles($build, $files) {
@@ -34,15 +68,15 @@ final class DistributionManager {
             $name = $file->getClientFilename();
             $type = $file->getClientMediaType();
 
-            $result = DistributionManager::sendBuild('PUT', $build['uid'], $build['version'], $build['platform'], $binary);
+            $result = DistributionManager::sendBuild('PUT', $build->getUid(), $build->getVersion(), $build->getPlatform(), $binary);
 
-            self::addDistribution($build['name'], $build['display'], $build['uid'], $build['platform'], $build['region'], $build['container'], $build['version']);
+            self::addDistribution($build);
         }
     }
 
-    public static function addDistribution($name, $display, $uid, $platform, $region, $container, $version) {
-        return db::insert("INSERT INTO `distribution` (`name`, `display`, `uid`, `platform`, `region`, `container`, `version`) VALUES (?,?,?,?,?,?,?);", 
-            array($name, $display, $uid, $platform, $region, $container, $version)
+    public static function addDistribution($build) {
+        return db::insert("INSERT INTO `build` (`name`, `display`, `uid`, `platform`, `region`, `container`, `version`) VALUES (?,?,?,?,?,?,?);", 
+            array($build->getName(), $build->getDisplay(), $build->getUid(), $build->getPlatform(), $build->getRegion(), $build->getContainer(), $build->getVersion())
         );
     }
 

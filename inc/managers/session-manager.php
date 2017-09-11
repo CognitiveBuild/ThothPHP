@@ -27,7 +27,7 @@ final class SessionManager {
         }
 
         if($succeed) {
-            $user = new User($result['id'], $login, $result['display'], $newToken, $time);
+            $user = new UserModel($result['id'], $login, $result['display'], $newToken, $time);
             Session::init()->setUser($user);
         }
 
@@ -138,14 +138,14 @@ final class Session {
     /**
      * Set user session
      *
-     * @param User $val
+     * @param UserModel $val
      */
-    public function setUser(User $val){ $this->setSession(self::USER_SESSION_KEY, $val); }
+    public function setUser(UserModel $val){ $this->setSession(self::USER_SESSION_KEY, $val); }
 
     /**
      * Get user object
      *
-     * @return User
+     * @return UserModel
      */
     public function getUser() {
 

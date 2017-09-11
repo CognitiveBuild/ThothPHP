@@ -1,22 +1,11 @@
 <?php
 include('inc/header.html');
-?>
-
-<div id="t-wrapper" class="build">
-
-    <div class="panel panel-default ui-build">
-        <div class="panel-heading">Build details</div>
-        <div class="panel-body">
-            <form class="list list-group" method="POST" enctype="multipart/form-data">
-<?php
 $uploadHTML = '';
 $platformHTML = '';
 $regionHTML = '';
-$downloadHTML = <<<EOT
-<a class="btn btn-secondary btn-build-download" href="/api/v1/download/{$id}">Download build</a>
-EOT;
+$downloadHTML = '';
 
-if($id == '0') {
+if($build->getId() === BuildModel::NEW_ID) {
     $platformHTML = '<option value="0">Please choose one</option>';
     $uploadHTML = <<<EOT
 <div class="form-group attachment-group">
@@ -28,16 +17,25 @@ if($id == '0') {
     </div>
 </div>
 EOT;
-    $downloadHTML = '';
+}
+else {
+    $downloadHTML = <<<EOT
+    <a class="btn btn-secondary btn-build-download" href="/api/v1/download/{$build->getId()}">Download build</a>
+EOT;
+    $uploadHTML = <<<EOT
 
+<div class="form-group">
+    <img src="/api/v1/download/code/{$build->getId()}" class="ui-qr-code" />
+</div>
+EOT;
 }
 
-$platforms = array('iOS', 'Android');
+$platforms = array(BuildModel::IOS, BuildModel::ANDROID);
 
 foreach($platforms as $platform) {
 
     $selected = '';
-    if($platform === $build['platform']) {
+    if($platform === $build->getPlatform()) {
         $selected = ' selected="selected"';
     }
 
@@ -50,7 +48,7 @@ $regions = array('Dallas' => 'dallas', 'London' => 'london');
 foreach($regions as $label => $val) {
 
     $selected = '';
-    if($val === $build['region']) {
+    if($val === $build->getRegion()) {
         $selected = ' selected="selected"';
     }
 
@@ -59,21 +57,30 @@ foreach($regions as $label => $val) {
 EOT;
 }
 
+?>
+
+<div id="t-wrapper" class="build">
+
+    <div class="panel panel-default ui-build">
+        <div class="panel-heading">Build details</div>
+        <div class="panel-body">
+            <form class="list list-group" method="POST" enctype="multipart/form-data">
+<?php
 echo <<<EOT
-    <input type="hidden" name="id" value="{$id}" />
+    <input type="hidden" name="id" value="{$build->getId()}" />
     <div class="form-group">
         <label for="name">Name (Prefix)</label>
-        <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="{$build['name']}" />
+        <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="{$build->getName()}" />
     </div>
 
     <div class="form-group">
         <label for="display">Display name</label>
-        <input type="text" class="form-control" id="display" name="display" placeholder="Display name" value="{$build['display']}" />
+        <input type="text" class="form-control" id="display" name="display" placeholder="Display name" value="{$build->getDisplay()}" />
     </div>
 
     <div class="form-group">
         <label for="uid">Bundle ID / Package name</label>
-        <input type="text" class="form-control" id="uid" name="uid" placeholder="Bundle ID / Package name" value="{$build['uid']}" />
+        <input type="text" class="form-control" id="uid" name="uid" placeholder="Bundle ID / Package name" value="{$build->getUid()}" />
     </div>
 
     <div class="form-group">
@@ -92,12 +99,12 @@ echo <<<EOT
 
     <div class="form-group">
         <label for="container">Container</label>
-        <input type="text" class="form-control" id="container" name="container" placeholder="Container" value="{$build['container']}" />
+        <input type="text" class="form-control" id="container" name="container" placeholder="Container" value="{$build->getContainer()}" />
     </div>
 
     <div class="form-group">
         <label for="version">Version</label>
-        <input type="number" class="form-control" id="version" name="version" placeholder="Version" value="{$build['version']}" />
+        <input type="text" class="form-control" id="version" name="version" placeholder="Version" value="{$build->getVersion()}" />
     </div>
 
     {$uploadHTML}

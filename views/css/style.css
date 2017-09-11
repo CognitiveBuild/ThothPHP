@@ -153,3 +153,7 @@ body.download {
   font-size: 96px;
   margin: 30px auto;
 }
+
+.ui-qr-code {
+  width: 200px;
+}
