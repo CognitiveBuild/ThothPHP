@@ -766,9 +766,9 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
             $disposition = "attachment; filename=\"{$build->getUid()}.{$ext}\"";
 
-            header("Content-Disposition: {$disposition}");
-            header("Content-Length: {$size}");
-            header("Content-Type: {$type}");
+            // header("Content-Disposition: {$disposition}");
+            // header("Content-Length: {$size}");
+            // header("Content-Type: {$type}");
 
             $newResponse = $response
             ->withHeader('Content-Disposition', $disposition)
