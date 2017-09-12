@@ -447,11 +447,11 @@ if(SessionManager::validate()) {
     $app->get('/apps/{id}', function ($request, $response, $args) {
     
         $id = isset($args['id']) ? $args['id'] : 0;
-        $app = DistributionManager::getAppById($id);
+        $appx = DistributionManager::getAppById($id);
         $builds = DistributionManager::getBuildsByAppId($id);
     
         return $this->view->render($response, 'app.php', [
-            'app' => $app, 
+            'app' => $appx, 
             'builds' => $builds
         ]);
     });
@@ -463,14 +463,14 @@ if(SessionManager::validate()) {
         $post = $request->getParsedBody();
         $builds = DistributionManager::getBuildsByAppId($id);
     
-        $app = new AppModel($id, $post['name'], $post['region'], $post['container']);
+        $appx = new AppModel($id, $post['name'], $post['region'], $post['container']);
     
         if($id === AppModel::NEW_ID) {
-            DistributionManager::addApp($app);
+            DistributionManager::addApp($appx);
             $isNew = TRUE;
         }
         else {
-            DistributionManager::updateApp($app);
+            DistributionManager::updateApp($appx);
         }
     
         if($isNew) {
@@ -478,7 +478,7 @@ if(SessionManager::validate()) {
         }
     
         return $this->view->render($response, 'app.php', [
-            'app' => $app, 
+            'app' => $appx, 
             'builds' => $builds
         ]);
     });
@@ -488,11 +488,11 @@ if(SessionManager::validate()) {
         $idapp = isset($args['idapp']) ? $args['idapp'] : 0;
         $idbuild = isset($args['idbuild']) ? $args['idbuild'] : 0;
     
-        $app = DistributionManager::getAppById($idapp);
+        $appx = DistributionManager::getAppById($idapp);
         $build = DistributionManager::getBuildById($idbuild);
     
         return $this->view->render($response, 'app.build.php', [
-            'app' => $app, 
+            'app' => $appx, 
             'build' => $build, 
             'idapp' => $idapp, 
             'idbuild' => $idbuild
@@ -505,7 +505,7 @@ if(SessionManager::validate()) {
         $idapp = isset($args['idapp']) ? $args['idapp'] : 0;
         $idbuild = isset($args['idbuild']) ? $args['idbuild'] : 0;
     
-        $app = DistributionManager::getAppById($idapp);
+        $appx = DistributionManager::getAppById($idapp);
     
         $post = $request->getParsedBody();
         $files = $request->getUploadedFiles();
@@ -518,7 +518,7 @@ if(SessionManager::validate()) {
         }
         else {
             
-            DistributionManager::addFiles($app, $build, $builds);
+            DistributionManager::addFiles($appx, $build, $builds);
         }
     
         return $response->withStatus(200)->withHeader('Location', "/apps/{$idapp}");
@@ -531,10 +531,10 @@ if(SessionManager::validate()) {
     $app->delete('/api/v1/apps/{idapp}/builds/{idbuild}', function ($request, $response, $args) {
         $idapp = isset($args['idapp']) ? $args['idapp'] : 0;
         $idbuild = isset($args['idbuild']) ? $args['idbuild'] : 0;
-        $app = DistributionManager::getAppById($idapp);
+        $appx = DistributionManager::getAppById($idapp);
         $build = DistributionManager::getBuildById($idbuild);
     
-        DistributionManager::removeFile($app, $build);
+        DistributionManager::removeFile($appx, $build);
     
         return $response->withStatus(200)->withJson(array('status' => TRUE));
     });
@@ -715,11 +715,11 @@ $app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {
 $app->get('/app/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
-    $app = DistributionManager::getAppById($id);
+    $appx = DistributionManager::getAppById($id);
     $builds = DistributionManager::getBuildsByAppId($id);
 
     return $this->view->render($response, 'app.download.php', [
-        'app' => $app, 
+        'app' => $appx, 
         'builds' => $builds
     ]);
 });
@@ -740,19 +740,21 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
 
     $id = isset($args['idbuild']) ? $args['idbuild'] : 0;
     $build = DistributionManager::getBuildById($id);
+    $appx = DistributionManager::getAppById($build->getAppId());
 
     if($id > 0) {
         try {
-            $result = DistributionManager::sendBuild('GET', $build->getUid(), $build->getVersion(), $build->getPlatform());
+            $result = DistributionManager::sendBuild('GET', $build->getUid(), $build->getVersion(), $build->getPlatform(), NULL, $appx->getRegion(), $appx->getContainer(), TRUE);
 
-            $size = $result->getHeader('Content-Length');
+            // $size = $result->getHeader('Content-Length');
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
 
             header("Content-Type: application/octet-stream");
-            header("Content-Length: {$size}");
+            // header("Content-Length: {$size}");
             header("Content-Disposition: attachment; filename=\"{$build->getUid()}.{$ext}\"");
-            $stream = $result->getBody();
-            $newResponse = $response->withBody($stream);
+            // $stream = $result->getBody();
+            $newResponse = $response->withBody($result);
+            // todo: Close fp
             return $newResponse;
         }
         catch (RequestException $e) {

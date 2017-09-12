@@ -183,7 +183,7 @@ final class DistributionManager {
         );
     }
 
-    public static function sendBuild($method, $uid, $version, $platform, $file = NULL, $region = 'dallas', $container = 'builds') {
+    public static function sendBuild($method, $uid, $version, $platform, $file = NULL, $region = 'dallas', $container = 'builds', $useStream = FALSE) {
 
         $client = new Client();
 
@@ -201,8 +201,15 @@ final class DistributionManager {
             $payload['body'] = $file;
         }
 
-        $result = $client->request($method, $binaryUrl, $payload);
-        return $result;
+        if($useStream) {
+            $context = stream_context_create($payload);
+            $fp = fopen($binaryUrl, 'r', FALSE, $context);
+            // fpassthru($fp);
+            // fclose($fp);
+            return $fp;
+        }
+
+        return $client->request($method, $binaryUrl, $payload);
     }
 
 }
