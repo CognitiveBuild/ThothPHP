@@ -202,6 +202,12 @@ final class DistributionManager {
         }
 
         if($useStream) {
+            $payload = [
+                'https' => [
+                    'method' => $method, 
+                    'header' => "X-Auth-Token: {$send['token']}\r\n"
+                ]
+            ];
             $context = stream_context_create($payload);
             $fp = fopen($binaryUrl, 'r', FALSE, $context);
             // fpassthru($fp);
