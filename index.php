@@ -23,8 +23,6 @@ define("KEY_TECHNOLOGY", "TECHNOLOGY");
 define("OPTION_YES", "Y");
 define("OPTION_NO", "N");
 
-use GuzzleHttp\Psr7\Stream;
-
 if(isset($_ENV["VCAP_SERVICES"]) === FALSE) {
     $env = new Dotenv\Dotenv(__DIR__);
     $env->load();
@@ -746,17 +744,24 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
 
     if($id > 0) {
         try {
-            $result = DistributionManager::sendBuild('GET', $build->getUid(), $build->getVersion(), $build->getPlatform(), NULL, $appx->getRegion(), $appx->getContainer(), TRUE);
+            $resource = DistributionManager::sendBuild('GET', $build->getUid(), $build->getVersion(), $build->getPlatform(), NULL, $appx->getRegion(), $appx->getContainer(), TRUE);
+            $body = CommonUtility::createStream($resource);
 
-            // $size = $result->getHeader('Content-Length');
+            $headers = array();
+            $meta = $body->getMetadata('wrapper_data');
+            foreach($meta as $key => $val) {
+                $haystack = strtolower($val);
+                $needle   = strtolower('Content');
+                if(strpos($haystack, $needle) === FALSE) {
+                    continue;
+                }
+                header($val);
+            }
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
+            $attachment = "Content-Disposition: attachment; filename=\"{$build->getUid()}.{$ext}\"";
+            header($attachment);
 
-            header("Content-Type: application/octet-stream");
-            // header("Content-Length: {$size}");
-            header("Content-Disposition: attachment; filename=\"{$build->getUid()}.{$ext}\"");
-            // $stream = $result->getBody();
-            $resource = new Stream($result);
-            $newResponse = $response->withBody($resource);
+            $newResponse = $response->withBody($body);
             // todo: Close fp
             return $newResponse;
         }
