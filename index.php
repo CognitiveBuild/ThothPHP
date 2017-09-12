@@ -1,7 +1,7 @@
 <?php
-require 'vendor/autoload.php';
 date_default_timezone_set('PRC');
 
+require 'vendor/autoload.php';
 include 'inc/db.php';
 // Utilities
 include 'inc/utilities/common-utility.php';
@@ -22,6 +22,8 @@ define("KEY_TECHNOLOGY", "TECHNOLOGY");
 
 define("OPTION_YES", "Y");
 define("OPTION_NO", "N");
+
+use GuzzleHttp\Psr7\Stream;
 
 if(isset($_ENV["VCAP_SERVICES"]) === FALSE) {
     $env = new Dotenv\Dotenv(__DIR__);
@@ -753,7 +755,8 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             // header("Content-Length: {$size}");
             header("Content-Disposition: attachment; filename=\"{$build->getUid()}.{$ext}\"");
             // $stream = $result->getBody();
-            $newResponse = $response->withBody($result);
+            $resource = new Stream($result);
+            $newResponse = $response->withBody($resource);
             // todo: Close fp
             return $newResponse;
         }
