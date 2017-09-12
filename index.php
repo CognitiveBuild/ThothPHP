@@ -749,7 +749,7 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
 
             header("Content-Type: application/octet-stream");
-            // header("Content-Length: {$size}");
+            header("Content-Length: {$size}");
             header("Content-Disposition: attachment; filename=\"{$build->getUid()}.{$ext}\"");
             $stream = $result->getBody();
             $newResponse = $response->withBody($stream);
