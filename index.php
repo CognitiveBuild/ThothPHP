@@ -747,22 +747,29 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             $resource = DistributionManager::sendBuild('GET', $build->getUid(), $build->getVersion(), $build->getPlatform(), NULL, $appx->getRegion(), $appx->getContainer(), TRUE);
             $body = CommonUtility::createStream($resource);
 
-            $headers = array();
+            $size = NULL;
+            $type = NULL;
             $meta = $body->getMetadata('wrapper_data');
             foreach($meta as $key => $val) {
                 $haystack = strtolower($val);
-                $needle   = strtolower('Content');
-                if(strpos($haystack, $needle) === FALSE) {
-                    continue;
+                $length_key   = 'content-length:';
+                $type_key   = 'content-type:';
+                if(strpos($haystack, $length_key) !== FALSE) {
+                    $size = trim(substr($val, strlen($length_key)));
                 }
-                header($val);
+                if(strpos($haystack, $type_key) !== FALSE) {
+                    $type = trim(substr($val, strlen($type_key)));
+                }
             }
-            $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
-            $attachment = "Content-Disposition: attachment; filename=\"{$build->getUid()}.{$ext}\"";
-            header($attachment);
 
-            $newResponse = $response->withBody($body);
-            // todo: Close fp
+            $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
+
+            $newResponse = $response
+            ->withHeader('Content-Disposition', "attachment; filename=\"{$build->getUid()}.{$ext}\"")
+            ->withHeader('Content-Length', $size)
+            ->withHeader('Content-Type', $type)
+            ->withBody($body);
+
             return $newResponse;
         }
         catch (RequestException $e) {
