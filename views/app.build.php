@@ -24,7 +24,7 @@ EOT;
 
     $uploadHTML = <<<EOT
 <div class="form-group">
-    <a href="/api/v1/app/code/{$build->getBuildId()}"><img src="/api/v1/app/code/{$build->getBuildId()}" class="ui-qr-code" /></a>
+    <a href="/api/v1/build/code/{$build->getBuildId()}"><img src="/api/v1/build/code/{$build->getBuildId()}" class="ui-qr-code" /></a>
 </div>
 EOT;
 }

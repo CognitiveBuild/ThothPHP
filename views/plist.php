@@ -14,7 +14,7 @@ echo <<<EOT
                     <key>kind</key>
                     <string>software-package</string>
                     <key>url</key>
-                    <string>https://thoth-assets.mybluemix.net/api/v1/app/{$build->getId()}</string>
+                    <string>https://thoth-assets.mybluemix.net/api/v1/build/download/{$build->getBuildId()}</string>
                 </dict>
             </array>
             <key>metadata</key>

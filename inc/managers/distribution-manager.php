@@ -66,13 +66,13 @@ final class DistributionManager {
 
     public static function getMetadataLink($id) {
 
-        return CommonUtility::getBaseUrl("/api/v1/app/meta/{$id}", TRUE);
+        return CommonUtility::getBaseUrl("/api/v1/build/meta/{$id}", TRUE);
     }
 
     public static function getDownloadUrl($id, $platform = BuildModel::IOS) {
 
         if($platform === BuildModel::IOS) {
-            $metaLink = CommonUtility::getBaseUrl("/api/v1/app/meta/{$id}", TRUE);
+            $metaLink = CommonUtility::getBaseUrl("/api/v1/build/meta/{$id}", TRUE);
             return "itms-services://?action=download-manifest&amp;url={$metaLink}";
         }
 

@@ -536,7 +536,10 @@ if(SessionManager::validate()) {
     
         return $response->withStatus(200)->withJson(array('status' => TRUE));
     });
-    
+
+    $app->get('/api/v1/info', function ($request, $response, $args) {
+        phpinfo();
+    });
 }
 else {
     $app->get('/', function ($request, $response, $args) {
@@ -719,7 +722,7 @@ $app->get('/app/{id}', function ($request, $response, $args) {
     ]);
 });
 
-$app->get('/api/v1/app/code/{id}', function ($request, $response, $args) {
+$app->get('/api/v1/build/code/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
     $qrCode = DistributionManager::getQRCodeById($id);
@@ -731,10 +734,10 @@ $app->get('/api/v1/app/code/{id}', function ($request, $response, $args) {
     // return $qrCode->writeString();
 });
 
-$app->get('/api/v1/app/{id}', function ($request, $response, $args) {
+$app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $args) {
 
-    $id = isset($args['id']) ? $args['id'] : 0;
-    $build = DistributionManager::getAppById($id);
+    $id = isset($args['idbuild']) ? $args['idbuild'] : 0;
+    $build = DistributionManager::getBuildById($id);
 
     if($id > 0) {
         try {
@@ -761,22 +764,17 @@ $app->get('/api/v1/app/{id}', function ($request, $response, $args) {
 
 });
 
-$app->get('/api/v1/app/meta/{id}', function ($request, $response, $args) {
+$app->get('/api/v1/build/meta/{id}', function ($request, $response, $args) {
 
     $id = isset($args['id']) ? $args['id'] : 0;
 
-    $build = DistributionManager::getAppById($id);
+    $build = DistributionManager::getBuildById($id);
 
     $xmlResponse = $response->withHeader('Content-type', 'application/xml');
 
     return $this->view->render($xmlResponse, 'plist.php', [
         'build' => $build
     ]);
-});
-
-
-$app->get('/api/v1/info', function ($request, $response, $args) {
-    phpinfo();
 });
 
 $app->run();
