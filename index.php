@@ -748,29 +748,31 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             $body = CommonUtility::createStream($resource);
 
             $size = NULL;
-            $type = NULL;
+            // $type = NULL;
             $meta = $body->getMetadata('wrapper_data');
 
             foreach($meta as $key => $val) {
                 $haystack = strtolower($val);
                 $length_key   = 'content-length:';
-                $type_key   = 'content-type:';
+                // $type_key   = 'content-type:';
                 if(strpos($haystack, $length_key) !== FALSE) {
                     $size = trim(substr($val, strlen($length_key)));
+                    break;
                 }
-                if(strpos($haystack, $type_key) !== FALSE) {
-                    $type = trim(substr($val, strlen($type_key)));
-                }
+                // if(strpos($haystack, $type_key) !== FALSE) {
+                //     $type = trim(substr($val, strlen($type_key)));
+                // }
             }
-            echo '<pre>';
-            print_r($meta);die;
+            // echo '<pre>';
+            // print_r($meta);die;
 
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
 
             $newResponse = $response
             ->withHeader('Content-Disposition', "attachment; filename=\"{$build->getUid()}.{$ext}\"")
             ->withHeader('Content-Length', $size)
-            ->withHeader('Content-Type', $type)
+            // ->withHeader('Content-Type', $type)
+            ->withStatus(200)
             ->withBody($body);
 
             return $newResponse;
