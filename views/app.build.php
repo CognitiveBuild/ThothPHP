@@ -9,22 +9,24 @@ if($build->getBuildId() === BuildModel::NEW_ID) {
     $uploadHTML = <<<EOT
 <div class="form-group attachment-group">
     <div class="attachments">
-        <div class="file-group">
-            <label><span class="glyphicon glyphicon-plus"></span></label>
+        <div class="file-group file-group-build">
+            <label><span class="glyphicon glyphicon-plus"></span> <span class="ui-file-label" data-text="Choose your Build"></span></label>
             <input type="file" name="binary[]" class="file-upload-input build-binary-input" />
         </div>
     </div>
 </div>
+<button type="submit" class="btn btn-primary btn-build-save">Upload the Build</button>
 EOT;
 }
 else {
     $downloadHTML = <<<EOT
-    <a class="btn btn-secondary btn-build-download" href="/api/v1/app/{$build->getBuildId()}">Download build</a>
+    <button type="submit" class="btn btn-danger btn-build-delete">Delete this Build</button>
+    <a class="btn btn-secondary btn-build-download" href="/api/v1/build/download/{$build->getBuildId()}">Download build</a>
 EOT;
 
     $uploadHTML = <<<EOT
 <div class="form-group">
-    <a href="/api/v1/build/code/{$build->getBuildId()}"><img src="/api/v1/build/code/{$build->getBuildId()}" class="ui-qr-code" /></a>
+    <a href="/api/v1/build/code/{$build->getBuildId()}"><img src="/api/v1/build/code/{$idapp}" class="ui-qr-code" /></a>
 </div>
 EOT;
 }
@@ -81,9 +83,6 @@ echo <<<EOT
     {$uploadHTML}
 EOT;
 
-?>
-                <button type="submit" class="btn btn-primary btn-build-save">Save changes</button>
-<?php
     echo $downloadHTML;
 ?>
             </form>

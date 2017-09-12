@@ -461,6 +461,7 @@ if(SessionManager::validate()) {
         $isNew = FALSE;
         $id = isset($args['id']) ? $args['id'] : 0;
         $post = $request->getParsedBody();
+        $builds = DistributionManager::getBuildsByAppId($id);
     
         $app = new AppModel($id, $post['name'], $post['region'], $post['container']);
     
@@ -477,7 +478,8 @@ if(SessionManager::validate()) {
         }
     
         return $this->view->render($response, 'app.php', [
-            'app' => $app
+            'app' => $app, 
+            'builds' => $builds
         ]);
     });
     
@@ -509,15 +511,15 @@ if(SessionManager::validate()) {
         $files = $request->getUploadedFiles();
     
         $builds = $files['binary'];
-    
+        $build = new BuildModel($idbuild, $idapp, $post['uid'], $post['display'], $post['platform'], $post['version'], time());
+
         if($idbuild > 0) {
-            $build = DistributionManager::getBuildById($idbuild);
+            DistributionManager::removeBuild($build);
         }
         else {
-            $build = new BuildModel($idbuild, $idapp, $post['uid'], $post['display'], $post['platform'], $post['version'], time());
+            
+            DistributionManager::addFiles($app, $build, $builds);
         }
-    
-        DistributionManager::addFiles($app, $build, $builds);
     
         return $response->withStatus(200)->withHeader('Location', "/apps/{$idapp}");
     
@@ -744,7 +746,7 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             $result = DistributionManager::sendBuild('GET', $build->getUid(), $build->getVersion(), $build->getPlatform());
 
             $size = $result->getHeader('Content-Length');
-            $ext = ($platform === BuildModel::IOS ? 'ipa' : 'apk');
+            $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
 
             header("Content-Type: application/octet-stream");
             // header("Content-Length: {$size}");

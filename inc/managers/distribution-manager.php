@@ -114,7 +114,7 @@ final class DistributionManager {
     }
 
     public static function updateApp($app) {
-        return db::insert("UPDATE `app` SET `name` = ?, `region` = ?, `container` = ? WHERE `id` = ?;", 
+        return db::execute("UPDATE `app` SET `name` = ?, `region` = ?, `container` = ? WHERE `id` = ?;", 
             array($app->getName(), $app->getRegion(), $app->getContainer(), $app->getId())
         );
     }

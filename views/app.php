@@ -28,7 +28,7 @@ EOT;
 echo <<<EOT
     <input type="hidden" name="id" value="{$app->getId()}" />
     <div class="form-group">
-        <label for="name">Name (Prefix)</label>
+        <label for="name">Name</label>
         <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="{$app->getName()}" />
     </div>
 

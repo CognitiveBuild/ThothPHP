@@ -401,6 +401,26 @@ $(function(){
                     }
                 });
             });
+        }, 
+        build: function() {
+            var jGroup = $('.form-group');
+            var label = jGroup.find('.ui-file-label');
+            jGroup.on('change', '.file-upload-input', function(evt) {
+                
+                var files = $(this).get(0).files;
+
+                if(files.length > 0) {
+                    var reader = new FileReader();
+                    var file = files[0];
+                    label.text(file.name);
+                    jGroup.addClass('ready');
+                }
+                else {
+                    jGroup.removeClass('ready');
+                    label.text(label.data('text'));
+                }
+            });
+            label.text(label.data('text'));
         }
     };
     methods.init();
