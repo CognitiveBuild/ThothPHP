@@ -750,6 +750,7 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             $size = NULL;
             $type = NULL;
             $meta = $body->getMetadata('wrapper_data');
+
             foreach($meta as $key => $val) {
                 $haystack = strtolower($val);
                 $length_key   = 'content-length:';
@@ -761,6 +762,8 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
                     $type = trim(substr($val, strlen($type_key)));
                 }
             }
+            echo '<pre>';
+            print_r($meta);die;
 
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
 
