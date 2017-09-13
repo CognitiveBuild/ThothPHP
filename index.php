@@ -787,7 +787,6 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             ->withHeader('Content-Disposition', $disposition)
             ->withHeader('Content-Length', $size)
             ->withHeader('Content-Type', $type)
-            ->withHeader('Content-Transfer-Encoding', 'binary')
             ->withStatus(200)
             ->withBody($body);
 
