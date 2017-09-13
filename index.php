@@ -766,14 +766,16 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
             $disposition = "attachment; filename=\"{$build->getUid()}.{$ext}\"";
 
-            // header("Content-Disposition: {$disposition}");
-            // header("Content-Length: {$size}");
-            // header("Content-Type: {$type}");
+            header("Content-Disposition: {$disposition}");
+            header("Content-Length: {$size}");
+            header("Content-Type: {$type}");
+            ob_clean();
+            flush();
 
             $newResponse = $response
-            ->withHeader('Content-Disposition', $disposition)
-            ->withHeader('Content-Length', $size)
-            ->withHeader('Content-Type', $type)
+            // ->withHeader('Content-Disposition', $disposition)
+            // ->withHeader('Content-Length', $size)
+            // ->withHeader('Content-Type', $type)
             ->withStatus(200)
             ->withBody($body);
 
