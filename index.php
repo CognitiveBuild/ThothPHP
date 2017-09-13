@@ -769,17 +769,27 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             header("Content-Disposition: {$disposition}");
             header("Content-Length: {$size}");
             header("Content-Type: {$type}");
-            ob_clean();
-            flush();
+            // ob_end_clean();
+            // ob_clean();
+            // flush();
 
-            $newResponse = $response
+            while (!feof($resource)) {
+                set_time_limit(0);
+                echo fread($resource, 4096);
+                flush();
+                ob_flush();
+                // echo $contents;
+            }
+            fclose($resource);
+
+            // $newResponse = $response
             // ->withHeader('Content-Disposition', $disposition)
             // ->withHeader('Content-Length', $size)
             // ->withHeader('Content-Type', $type)
-            ->withStatus(200)
-            ->withBody($body);
+            // ->withStatus(200)
+            // ->withBody($body);
 
-            return $newResponse;
+            // return $newResponse;
         }
         catch (RequestException $e) {
             $message = $e->getMessage();
