@@ -765,32 +765,32 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
 
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
             $disposition = "attachment; filename=\"{$build->getUid()}.{$ext}\"";
-            ob_end_clean();
+            // ob_end_clean();
 
-            header("Content-Disposition: {$disposition}");
-            header("Content-Length: {$size}");
-            header("Content-Type: {$type}");
+            // header("Content-Disposition: {$disposition}");
+            // header("Content-Length: {$size}");
+            // header("Content-Type: {$type}");
             //flush();
 
             //$contents = '';
-            set_time_limit(0);
+            // set_time_limit(0);
 
-            while (!feof($resource) && (connection_status()==0)) {
-                $contents = fread($resource, 1024);
-                echo $contents;
-            }
+            // while (!feof($resource) && (connection_status()==0)) {
+            //     $contents = fread($resource, 1024);
+            //     echo $contents;
+            // }
 
-            fclose($resource);
+            // fclose($resource);
             // echo $contents;
 
-            // $newResponse = $response
-            // ->withHeader('Content-Disposition', $disposition)
-            // ->withHeader('Content-Length', $size)
-            // ->withHeader('Content-Type', $type)
-            // ->withStatus(200)
-            // ->withBody($body);
+            $newResponse = $response
+            ->withHeader('Content-Disposition', $disposition)
+            ->withHeader('Content-Length', $size)
+            ->withHeader('Content-Type', $type)
+            ->withStatus(200)
+            ->withBody($body);
 
-            // return $newResponse;
+            return $newResponse;
         }
         catch (RequestException $e) {
             $message = $e->getMessage();
