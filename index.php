@@ -764,26 +764,31 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             }
 
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
-            $disposition = "inline; filename=\"{$build->getUid()}.{$ext}\"";
-
+            $disposition = "attachment; filename=\"{$build->getUid()}.{$ext}\"";
             ob_end_clean();
 
+            header("Accept-Ranges: bytes");
             header("Cache-Control: no-store, no-cache, must-revalidate");
-            header("Cache-Control: post-check=0, pre-check=0", FALSE);
             header("Pragma: no-cache");
-
+            header("Expires: 0");
             header("Content-Disposition: {$disposition}");
             header("Content-Length: {$size}");
             header("Content-Type: {$type}");
+            header("Content-Type: application/force-download");
             header("Content-Transfer-Encoding: binary\n");
-            flush();
+            //flush();
+
+            //$contents = '';
+            set_time_limit(0);
 
             while (!feof($resource) && (connection_status()==0)) {
-                set_time_limit(0);
-                print fread($resource, 4096);
+                $contents = fread($resource, 1024);
+                echo $contents;
                 flush();
             }
+
             fclose($resource);
+            // echo $contents;
 
             // $newResponse = $response
             // ->withHeader('Content-Disposition', $disposition)
