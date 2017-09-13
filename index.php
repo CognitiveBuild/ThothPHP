@@ -765,24 +765,32 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
 
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
             $disposition = "attachment; filename=\"{$build->getUid()}.{$ext}\"";
+            ob_end_clean();
 
-            header("Accept-Ranges: bytes");
-            header("Cache-Control: no-store, no-cache, must-revalidate");
-            header("Pragma: no-cache");
-            header("Expires: 0");
             header("Content-Disposition: {$disposition}");
             header("Content-Length: {$size}");
             header("Content-Type: {$type}");
-            header("Content-Transfer-Encoding: binary\n");
+            //flush();
 
-            $newResponse = $response
-            ->withHeader('Content-Disposition', $disposition)
-            ->withHeader('Content-Length', $size)
-            ->withHeader('Content-Type', $type)
-            ->withStatus(200)
-            ->withBody($body);
+            //$contents = '';
+            set_time_limit(0);
 
-            return $newResponse;
+            while (!feof($resource) && (connection_status()==0)) {
+                $contents = fread($resource, 1024);
+                echo $contents;
+            }
+
+            fclose($resource);
+            // echo $contents;
+
+            // $newResponse = $response
+            // ->withHeader('Content-Disposition', $disposition)
+            // ->withHeader('Content-Length', $size)
+            // ->withHeader('Content-Type', $type)
+            // ->withStatus(200)
+            // ->withBody($body);
+
+            // return $newResponse;
         }
         catch (RequestException $e) {
             $message = $e->getMessage();
