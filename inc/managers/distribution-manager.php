@@ -147,7 +147,7 @@ final class DistributionManager {
     public static function sendEmail($idapp, $idbuild, $iduser, $emails, $message) {
 
         ini_set ( 'sendmail_from', "{$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>" );
-        ini_set ( 'sendmail_path', "/usr/sbin/sendmail -t -i -F{$_ENV['SMTP_SENDER_NAME']} -f{$_ENV['SMTP_SENDER_EMAIL']}");
+        ini_set ( 'sendmail_path', "sendmail -t -i -F{$_ENV['SMTP_SENDER_NAME']} -f{$_ENV['SMTP_SENDER_EMAIL']}");
 
         $build = self::getBuildById($idbuild);
 
@@ -207,6 +207,9 @@ final class DistributionManager {
     .ui-title {
         font-weight: bold;
     }
+    .ui-label {
+        font-weight: bold;
+    }
     label {
         display: block;
         font-weight: bold;
@@ -214,9 +217,7 @@ final class DistributionManager {
     a {
         text-decoration: none;
     }
-    .ui-label {
-        font-weight: bold;
-    }
+    
 </style>
 <body>
     <div class="download">
