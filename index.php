@@ -834,8 +834,8 @@ $app->get('/api/v1/build/meta/{id}', function ($request, $response, $args) {
 
 $app->get('/api/v1/email', function($request, $response, $args) {
 
-    // $smtpServer = '184.173.5.154';
-    // ini_set ( "SMTP", $smtpServer );
+    $smtpServer = '184.173.5.154';
+    ini_set ( "SMTP", $smtpServer );
     ini_set ( 'sendmail_from', 'Thoth Asset Center <noreply@ibm>' );
     $message = "Line 1\r\nLine 2\r\nLine 3";
 
