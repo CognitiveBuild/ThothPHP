@@ -832,4 +832,19 @@ $app->get('/api/v1/build/meta/{id}', function ($request, $response, $args) {
     ]);
 });
 
+$app->get('/api/v1/email', function($request, $response, $args) {
+
+    // $smtpServer = '184.173.5.154';
+    // ini_set ( "SMTP", $smtpServer );
+    ini_set ( 'sendmail_from', 'Thoth Asset Center <noreply@ibm>' );
+    $message = "Line 1\r\nLine 2\r\nLine 3";
+
+    // In case any of our lines are larger than 70 characters, we should use wordwrap()
+    $message = wordwrap($message, 70, "\r\n");
+
+    $result = mail('mihui@cn.ibm.com', 'My Subject', $message);
+    // Send
+    return $response->withJson(array('status' => $result));
+});
+
 $app->run();
