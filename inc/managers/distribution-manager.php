@@ -261,7 +261,7 @@ EOT;
         $headers[] = "To: {$emails}";
         $headers[] = "From: {$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>";
 
-        $result = mail($emails, "[Thoth] New Build of `{$build->getDisplay()}` is available!", $body, implode("\r\n", $headers));
+        $result = mail($emails, "[Thoth] New Build of {$build->getDisplay()} v{$build->getVersion()} is available!", $body, implode("\r\n", $headers));
 
         if($result) {
             return self::addDistribution($idapp, $idbuild, $iduser, $comments);
