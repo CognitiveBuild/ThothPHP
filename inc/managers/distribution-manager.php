@@ -162,7 +162,6 @@ final class DistributionManager {
         $qrCodeUrl = CommonUtility::getBaseUrl("/api/v1/build/code/{$idapp}");
 
         $body = <<<EOT
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
 <title>{$build->getDisplay()}</title>
@@ -259,8 +258,8 @@ EOT;
         $headers[] = 'Content-type: text/html; charset=UTF-8';
 
         // Additional headers
-        // $headers[] = "To: {$emails}";
-        // $headers[] = "From: {$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>";
+        $headers[] = "To: {$emails}";
+        $headers[] = "From: {$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>";
 
         $result = mail($emails, "[Thoth] New Build of `{$build->getDisplay()}` is available!", $body, implode("\r\n", $headers));
 
