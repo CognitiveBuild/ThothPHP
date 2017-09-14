@@ -14,6 +14,7 @@ foreach($apps as $key => $app) {
     echo <<<EOT
     <li class="list-group-item">
         <a href="/apps/{$app['id']}" class="name ui-modal-button">{$name}</a>
+        <a class="badge no-badge badge-dst ui-build-distribute" href="/apps/{$app['id']}/distribute">Distribute</a>
     </li>
 EOT;
 }

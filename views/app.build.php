@@ -20,7 +20,7 @@ EOT;
 }
 else {
     $downloadHTML = <<<EOT
-    <button type="submit" class="btn btn-danger btn-build-delete">Delete this Build</button>
+    <button type="submit" class="btn btn-danger btn-build-delete">Update Release notes</button>
     <a class="btn btn-secondary btn-build-download" href="/api/v1/build/download/{$build->getBuildId()}">Download build</a>
 EOT;
 
@@ -52,7 +52,7 @@ EOT;
     <div class="panel panel-default ui-build">
         <div class="panel-heading">Build details</div>
         <div class="panel-body">
-            <form class="list list-group" method="POST" enctype="multipart/form-data">
+            <form class="list list-group ui-build-form" method="POST" enctype="multipart/form-data">
 <?php
 echo <<<EOT
     <input type="hidden" name="idbuild" value="{$build->getBuildId()}" />
@@ -78,6 +78,11 @@ echo <<<EOT
     <div class="form-group">
         <label for="version">Version</label>
         <input type="text" class="form-control" id="version" name="version" placeholder="Version" value="{$build->getVersion()}" />
+    </div>
+
+    <div class="form-group">
+        <label for="uid">Release notes</label>
+        <textarea class="form-control" name="notes" id="notes">{$build->getNotes()}</textarea>
     </div>
 
     {$uploadHTML}

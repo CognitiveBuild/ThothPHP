@@ -482,7 +482,7 @@ if(SessionManager::validate()) {
             'builds' => $builds
         ]);
     });
-    
+
     $app->get('/apps/{idapp}/builds/{idbuild}', function ($request, $response, $args) {
     
         $idapp = isset($args['idapp']) ? $args['idapp'] : 0;
@@ -508,16 +508,23 @@ if(SessionManager::validate()) {
         $appx = DistributionManager::getAppById($idapp);
     
         $post = $request->getParsedBody();
-        $files = $request->getUploadedFiles();
     
-        $builds = $files['binary'];
-        $build = new BuildModel($idbuild, $idapp, $post['uid'], $post['display'], $post['platform'], $post['version'], time());
+        $build = new BuildModel($idbuild, $idapp, $post['uid'], $post['display'], $post['platform'], $post['version'], $post['notes'], time());
 
         if($idbuild > 0) {
-            DistributionManager::removeBuild($build);
+            DistributionManager::updateBuild($build);
         }
         else {
-            
+            $files = $request->getUploadedFiles();
+            $builds = isset($files['binary']) ? $files['binary'] : NULL;
+            if($builds === NULL) {
+                return $this->view->render($response, 'app.build.php', [
+                    'app' => $appx, 
+                    'build' => $build, 
+                    'idapp' => $idapp, 
+                    'idbuild' => $idbuild
+                ]);
+            }
             DistributionManager::addFiles($appx, $build, $builds);
         }
     
@@ -537,6 +544,54 @@ if(SessionManager::validate()) {
         DistributionManager::removeFile($appx, $build);
     
         return $response->withStatus(200)->withJson(array('status' => TRUE));
+    });
+
+    $app->get('/apps/{idapp}/distribute', function ($request, $response, $args) {
+
+        $idapp = isset($args['idapp']) ? $args['idapp'] : 0;
+        $query = $request->getQueryParams();
+        $idbuild = isset($query['idbuild']) ? $query['idbuild'] : 0;
+        $builds = DistributionManager::getBuildsByAppId($idapp);
+    
+        $appx = DistributionManager::getAppById($idapp);
+    
+        return $this->view->render($response, 'app.distribute.php', [
+            'app' => $appx, 
+            'idbuild' => $idbuild, 
+            'builds' => $builds, 
+            'message' => '', 
+            'emails' => '', 
+            'status' => FALSE
+        ]);
+    });
+
+    $app->post('/apps/{idapp}/distribute', function ($request, $response, $args) {
+
+        $iduser = Session::init()->getUser()->getId();
+
+        $idapp = isset($args['idapp']) ? $args['idapp'] : 0;
+        $query = $request->getQueryParams();
+        $idbuild = isset($query['idbuild']) ? $query['idbuild'] : 0;
+        $builds = DistributionManager::getBuildsByAppId($idapp);
+        $post = $request->getParsedBody();
+
+        $idbuild = $post['idbuild'];
+
+        $appx = DistributionManager::getAppById($idapp);
+
+        $message = $post['message'];
+        $emails = $post['emails'];
+
+        $status = DistributionManager::sendEmail($idapp, $idbuild, $iduser, $emails, $message);
+
+        return $this->view->render($response, 'app.distribute.php', [
+            'app' => $appx, 
+            'idbuild' => $idbuild, 
+            'builds' => $builds, 
+            'message' => $message, 
+            'emails' => $emails, 
+            'status' => $status
+        ]);
     });
 
     $app->get('/api/v1/info', function ($request, $response, $args) {
@@ -834,9 +889,9 @@ $app->get('/api/v1/build/meta/{id}', function ($request, $response, $args) {
 
 $app->get('/api/v1/email', function($request, $response, $args) {
 
-    $smtpServer = '184.173.5.154';
-    ini_set ( "SMTP", $smtpServer );
-    ini_set ( 'sendmail_from', 'Thoth Asset Center <noreply@ibm>' );
+    ini_set ( 'sendmail_from', "{$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>" );
+    ini_set ( 'sendmail_path', "/usr/sbin/sendmail -t -i -F{$_ENV['SMTP_SENDER_NAME']} -f{$_ENV['SMTP_SENDER_EMAIL']}");
+
     $message = "Line 1\r\nLine 2\r\nLine 3";
 
     // In case any of our lines are larger than 70 characters, we should use wordwrap()

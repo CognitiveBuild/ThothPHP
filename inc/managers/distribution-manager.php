@@ -49,6 +49,7 @@ final class DistributionManager {
                 $build->setDisplay($result['display']);
                 $build->setPlatform($result['platform']);
                 $build->setVersion($result['version']);
+                $build->setNotes($result['notes']);
                 $build->setTime($result['time']);
             }
         }
@@ -69,16 +70,21 @@ final class DistributionManager {
         return CommonUtility::getBaseUrl("/api/v1/build/meta/{$id}", TRUE);
     }
 
-    public static function getDownloadUrl($id, $platform = BuildModel::IOS) {
+    public static function getDownloadUrl($id) {
+
+        return CommonUtility::getBaseUrl("/api/v1/build/download/{$id}");
+    }
+
+    public static function getInstallUrl($id, $platform = BuildModel::IOS) {
 
         if($platform === BuildModel::IOS) {
             $metaLink = CommonUtility::getBaseUrl("/api/v1/build/meta/{$id}", TRUE);
             return "itms-services://?action=download-manifest&amp;url={$metaLink}";
         }
 
-        return CommonUtility::getBaseUrl("/api/v1/app/{$id}", TRUE);
+        return self::getDownloadUrl($id);
     }
-
+        
     public static function addFiles($app, $build, $files) {
 
         foreach($files as $file) {
@@ -120,14 +126,150 @@ final class DistributionManager {
     }
 
     public static function addBuild($build) {
-        return db::insert("INSERT INTO `build` (`idapp`, `display`, `uid`, `platform`, `version`) VALUES (?,?,?,?,?);", 
-            array($build->getAppId(), $build->getDisplay(), $build->getUid(), $build->getPlatform(), $build->getVersion())
+        return db::insert("INSERT INTO `build` (`idapp`, `display`, `uid`, `platform`, `notes`, `version`) VALUES (?,?,?,?,?,?);", 
+            array($build->getAppId(), $build->getDisplay(), $build->getUid(), $build->getPlatform(), $build->getNotes(), $build->getVersion())
         );
+    }
+
+    public static function updateBuild($build) {
+        return db::execute("UPDATE `build` SET `notes` = ? WHERE `idbuild` = ?", array($build->getNotes(), $build->getBuildId()));
     }
 
     public static function removeBuild($build) {
         return db::execute("DELETE FROM `build` WHERE `idbuild` = ?", array($build->getBuildId()));
-    } 
+    }
+
+    private static function addDistribution($idapp, $idbuild, $iduser, $message) {
+        return db::insert("INSERT INTO `distribution` (`idapp`, `idbuild`, `iduser`, `message`) VALUES (?,?,?,?);", 
+        array($idapp, $idbuild, $iduser, $message));
+    }
+
+    public static function sendEmail($idapp, $idbuild, $iduser, $emails, $message) {
+
+        ini_set ( 'sendmail_from', "{$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>" );
+        ini_set ( 'sendmail_path', "/usr/sbin/sendmail -t -i -F{$_ENV['SMTP_SENDER_NAME']} -f{$_ENV['SMTP_SENDER_EMAIL']}");
+
+        $build = self::getBuildById($idbuild);
+
+        // In case any of our lines are larger than 70 characters, we should use wordwrap()
+        $comments = str_replace("\n\r", "<br /><br />", $message);
+        $comments = str_replace("\r", "<br />", $comments);
+        $notes = $build->getNotesHTML();
+
+        $downloadUrl = DistributionManager::getDownloadUrl($build->getBuildId());
+        $installUrl = DistributionManager::getInstallUrl($build->getBuildId(), $build->getPlatform());
+
+        $qrCodeUrl = CommonUtility::getBaseUrl("/api/v1/build/code/{$idapp}");
+
+        $body = <<<EOT
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<title>{$build->getDisplay()}</title>
+</head>
+<style type="text/css">
+    .btn {
+        -webkit-appearance: none;
+        display: block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        width: 90%;
+    }
+    .btn-success {
+        color: #fff;
+        background-color: #5cb85c;
+        border-color: #4cae4c;
+        font-weight: bold;
+    }
+    .btn-info {
+        color: #fff;
+        background-color: #5bc0de;
+        border-color: #46b8da;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .ui-title {
+        font-weight: bold;
+    }
+    label {
+        display: block;
+        font-weight: bold;
+    }
+    a {
+        text-decoration: none;
+    }
+    .ui-label {
+        font-weight: bold;
+    }
+</style>
+<body>
+    <div class="download">
+        <div class="form-group">
+        {$comments}
+        </div>
+
+        <div class="form-group">
+            <div class="ui-title">{$build->getDisplay()} (v{$build->getVersion()})</div>
+            <div class="ui-note"><span class="ui-label">Platform</span>: {$build->getPlatform()}</div>
+        </div>
+
+        <div class="form-group">
+            <a class="btn btn-success btn-download btn-install" href="{$installUrl}">Install this Build now</a>
+        </div>
+
+        <div class="form-group">
+            <a class="btn btn-info btn-download" href="{$downloadUrl}">Download from PC</a>
+        </div>
+
+        <div class="form-group ui-release-notes">
+            <div class="ui-label">Release notes:</div>
+            {$build->getNotesHTML()}
+        </div>
+
+        <div class="form-group ui-form-group-image-container">
+            <div class="ui-label">QR Code:</div>
+            <img src="{$qrCodeUrl}" class="ui-qr-code" />
+        </div>
+
+    </div>
+</body>
+</html>
+
+EOT;
+
+        $headers = array();
+        $headers[] = 'MIME-Version: 1.0';
+        $headers[] = 'Content-type: text/html; charset=UTF-8';
+
+        // Additional headers
+        $headers[] = "To: {$emails}";
+        $headers[] = "From: {$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>";
+    
+        $result = mail($emails, "[Thoth] New Build of `{$build->getDisplay()}` is available!", $body, implode("\r\n", $headers));
+
+        if($result) {
+            return self::addDistribution($idapp, $idbuild, $iduser, $comments);
+        }
+
+        return $result;
+    }
 
     private static function send($region) {
 

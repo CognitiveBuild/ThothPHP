@@ -71,7 +71,8 @@ if(count($builds)) {
             {$icon}
             <a href="/apps/{$app->getId()}/builds/{$build['idbuild']}" class="name ui-modal-button">{$display} (v{$build['version']})</a>
 
-            <a class="badge badge-red ui-build-delete" data-idapp="{$app->getId()}" data-idbuild="{$build['idbuild']}" href="#/{$build['idbuild']}">Delete</a>
+            <a class="badge no-badge badge-dst ui-build-distribute" data-idapp="{$app->getId()}" data-idbuild="{$build['idbuild']}" href="/apps/{$app->getId()}/distribute?id={$build['idbuild']}">Distribute</a>
+            <a class="badge no-badge ui-build-delete" data-idapp="{$app->getId()}" data-idbuild="{$build['idbuild']}" href="#/{$build['idbuild']}">Delete</a>
         </li>
 EOT;
     }

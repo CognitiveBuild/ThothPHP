@@ -421,6 +421,16 @@ $(function(){
                 }
             });
             label.text(label.data('text'));
+
+            var jForm = $('.ui-build-form');
+            jForm.on('submit', function(evt) {
+                var isDelete = jForm.find('.btn-build-delete').length > 0;
+                if(isDelete) {
+                    var isOK = window.confirm('Are you sure to update the release notes?');
+                    return isOK;
+                }
+                return true;
+            });
         }
     };
     methods.init();

@@ -18,6 +18,13 @@ body {
   border-radius: 0px;
   background-color: #cc0000;
 }
+.badge-dst {
+  background-color: #59A4E6;
+}
+
+.badge-green {
+  background-color: #00aa00;
+}
 
 .ui-right{
   float: right;
@@ -114,12 +121,6 @@ body {
   background: #fafafa;
 }
 
-.badge-red {
-  background-color: #cc0000;
-}
-.badge-green {
-  background-color: #00aa00;
-}
 .glyphicon-remove-width-input {
   line-height: 34px;
   color: #cc0000;
@@ -143,13 +144,17 @@ body {
 .ui-notice {
   color:#666;
 }
-  .ui-notice-green{
-    color:#009900;
+  .ui-notice-date{
+    color:#555;
+  }
+  .ui-notice-padding {
+    padding: 5px 0px;
   }
 
 .btn-download {
   padding: 10px;
   border: 1px solid #eee;
+  width: 100%;
 }
 
 body.download {
@@ -160,10 +165,19 @@ body.download {
   padding: 15px;
   text-align: center;
 }
+  .download .ui-release-notes {
+    margin: 0px auto;
+    text-align: left;
+    color: #444;
+  }
 
-.glyphicon-apple-big {
-  font-size: 96px;
-  margin: 10px auto;
+.glyphicon-app-big {
+  font-size: 26px;
+  margin: 0px auto;
+  position: absolute;
+  width: 200px;
+  line-height: 200px;
+  color: #5aa5e6;
 }
 
 .ui-qr-code {
@@ -181,4 +195,7 @@ body.download {
 }
 .file-group .build-binary-input {
   width: 100%;
+}
+.ui-form-group-image-container {
+  position: relative;
 }

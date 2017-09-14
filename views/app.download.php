@@ -52,15 +52,16 @@ EOT;
 $isLatest = FALSE;
 $count = count($builds);
 foreach($builds as $key => $val) {
-    $build = new BuildModel($val['idbuild'], $val['idapp'], $val['uid'], $val['display'], $val['platform'], $val['version'], $val['time']);
-    $icon = $build->getPlatform() === BuildModel::IOS ? '<i class="glyphicon glyphicon-apple glyphicon-apple-big"></i>' : '<i class="glyphicon glyphicon-text-color glyphicon-apple-big"></i>';    
-    $url = DistributionManager::getDownloadUrl($build->getBuildId());
+    $build = new BuildModel($val['idbuild'], $val['idapp'], $val['uid'], $val['display'], $val['platform'], $val['version'], $val['notes'], $val['time']);
+    $icon = $build->getPlatform() === BuildModel::IOS ? '<i class="glyphicon glyphicon-apple glyphicon-app-big"></i>' : '<i class="glyphicon glyphicon-text-color glyphicon-app-big"></i>';    
+    $downloadUrl = DistributionManager::getDownloadUrl($build->getBuildId());
+    $installUrl = DistributionManager::getInstallUrl($build->getBuildId(), $build->getPlatform());
 
     if($isLatest) {
 
         echo <<<EOT
         <li class="list-group-item">
-            <a href="{$url}" class="name ui-modal-button">Download v{$build->getVersion()} for {$build->getPlatform()}</a>
+            <a href="{$installUrl}" class="name ui-modal-button">Install v{$build->getVersion()} for {$build->getPlatform()}</a>
         </li>
 EOT;
     }
@@ -71,23 +72,28 @@ EOT;
         <div id="t-wrapper" class="download">
             <div class="form-group">
                 <h1>{$build->getDisplay()} (v{$build->getVersion()})</h1>
-                <p class="ui-note">OTA Install for {$build->getPlatform()}</p>
-            </div>
-        
-            <div class="form-group">
-                {$icon}
-            </div>
-        
-            <div class="form-group">
-                <p class="ui-notice ui-notice-green">{$build->getTime()}</p>
-            </div>
-        
-            <div class="form-group">
-                <a class="btn btn-primary btn-download" href="{$url}">Download this Build now</a>
+                <p class="ui-note">Install for {$build->getPlatform()}</p>
             </div>
 
             <div class="form-group ui-form-group-image-container">
+                {$icon}
                 <a href="/api/v1/build/code/{$app->getId()}"><img src="/api/v1/build/code/{$app->getId()}" class="ui-qr-code" /></a>
+            </div>
+
+            <div class="form-group">
+                <p class="ui-notice ui-notice-date">{$build->getTime()}</p>
+            </div>
+
+            <div class="form-group">
+                <a class="btn btn-success btn-download btn-install" href="{$installUrl}">Install this Build now</a>
+            </div>
+
+            <div class="form-group">
+                <a class="btn btn-info btn-download" href="{$downloadUrl}">Download from PC</a>
+            </div>
+
+            <div class="form-group ui-release-notes">
+                {$build->getNotesHTML()}
             </div>
         </div>
 EOT;

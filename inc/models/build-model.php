@@ -45,8 +45,9 @@ class BuildModel {
 
     private $_version;
     private $_time;
+    private $_notes;
 
-    function __construct($idbuild = self::NEW_ID, $idapp = self::NEW_ID, $uid = '', $display = '', $platform = self::IOS, $version = '1.0.0', $time = 0) {
+    function __construct($idbuild = self::NEW_ID, $idapp = self::NEW_ID, $uid = '', $display = '', $platform = self::IOS, $version = '1.0.0', $notes = '', $time = 0) {
 
         $this->setBuildId($idbuild);
         $this->setAppId($idapp);
@@ -54,6 +55,7 @@ class BuildModel {
         $this->setDisplay($display);
         $this->setPlatform($platform);
         $this->setVersion($version);
+        $this->setNotes($notes);
         $this->setTime($time);
     }
 
@@ -74,6 +76,14 @@ class BuildModel {
 
     public function getVersion() { return $this->_version; }
     public function setVersion($val) { $this->_version = $val; }
+
+    public function getNotes() { return $this->_notes; }
+    public function getNotesHTML() {
+        $text = str_replace("\r\n", "<br /><br />", $this->_notes);
+        $text = str_replace("\r", "<br />", $text);
+        return $text;
+    }
+    public function setNotes($val) { $this->_notes = $val; }
 
     public function getTime() { return $this->_time; }
     public function setTime($val) { $this->_time = $val; }
