@@ -765,32 +765,42 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
 
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
             $disposition = "attachment; filename=\"{$build->getUid()}.{$ext}\"";
-            // ob_end_clean();
 
-            // header("Content-Disposition: {$disposition}");
-            // header("Content-Length: {$size}");
-            // header("Content-Type: {$type}");
-            //flush();
+            ob_start();
+            $isGzipEnabled = stripos($_SERVER['HTTP_ACCEPT_ENCODING'], "gzip") !== FALSE;
 
-            //$contents = '';
-            // set_time_limit(0);
+            if ($isGzipEnabled) {
+                ob_start("ob_gzhandler");
+            }
 
-            // while (!feof($resource) && (connection_status()==0)) {
-            //     $contents = fread($resource, 1024);
-            //     echo $contents;
-            // }
+            $contents = '';
+            set_time_limit(0);
 
-            // fclose($resource);
-            // echo $contents;
+            while (!feof($resource) && (connection_status()==0)) {
+                $contents = fread($resource, 1024);
+                echo $contents;
+            }
 
-            $newResponse = $response
-            ->withHeader('Content-Disposition', $disposition)
-            ->withHeader('Content-Length', $size)
-            ->withHeader('Content-Type', $type)
-            ->withStatus(200)
-            ->withBody($body);
+            if ($isGzipEnabled) {
+                ob_end_flush();
+            }
 
-            return $newResponse;
+            $size = ob_get_length();
+            header("Content-Disposition: {$disposition}");
+            header("Content-Length: {$size}");
+            header("Content-Type: {$type}");
+
+            ob_end_flush();
+            fclose($resource);
+
+            // $newResponse = $response
+            // ->withHeader('Content-Disposition', $disposition)
+            // ->withHeader('Content-Length', $size)
+            // ->withHeader('Content-Type', $type)
+            // ->withStatus(200)
+            // ->withBody($body);
+
+            // return $newResponse;
         }
         catch (RequestException $e) {
             $message = $e->getMessage();

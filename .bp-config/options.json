@@ -1,5 +1,4 @@
 {
-    "WEB_SERVER": "none",
-    
+    "WEB_SERVER": "nginx",
     "PHP_EXTENSIONS": ["bz2", "pdo", "zlib", "curl", "mcrypt", "mbstring", "mysqli", "gd", "zip", "pdo_mysql", "pdo_sqlite" ]
 }
