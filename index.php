@@ -31,8 +31,13 @@ if(isset($_ENV["VCAP_SERVICES"]) === FALSE) {
 else {
     define("HOST_NAME", $_SERVER['HTTP_HOST']);
 }
+$config = [
+    'settings' => [
+        'addContentLengthHeader' => TRUE,
+    ]
+];
 
-$app = new Slim\App();
+$app = new Slim\App($config);
 
 $container = $app->getContainer();
 
@@ -766,42 +771,45 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
             $disposition = "attachment; filename=\"{$build->getUid()}.{$ext}\"";
 
-            ob_start();
-            $isGzipEnabled = stripos($_SERVER['HTTP_ACCEPT_ENCODING'], "gzip") !== FALSE;
+            // ob_start();
+            // $isGzipEnabled = stripos($_SERVER['HTTP_ACCEPT_ENCODING'], "gzip") !== FALSE;
 
-            if ($isGzipEnabled) {
-                ob_start("ob_gzhandler");
-            }
+            // if ($isGzipEnabled) {
+            //     ob_start("ob_gzhandler");
+            // }
 
-            $contents = '';
-            set_time_limit(0);
+            // $contents = '';
+            // set_time_limit(0);
 
-            while (!feof($resource) && (connection_status()==0)) {
-                $contents .= fread($resource, 1024);
-            }
+            // while (!feof($resource) && (connection_status()==0)) {
+            //     $contents .= fread($resource, 1024);
+            // }
 
-            echo $contents;
+            // echo $contents;
 
-            if ($isGzipEnabled) {
-                ob_end_flush();
-            }
+            // if ($isGzipEnabled) {
+            //     ob_end_flush();
+            // }
 
-            $size = ob_get_length();
-            header("Content-Disposition: {$disposition}");
-            header("Content-Length: {$size}");
-            header("Content-Type: {$type}");
+            // $size = ob_get_length();
+            // header("Content-Disposition: {$disposition}");
+            header("Content-Length: {$size}", FALSE);
+            // header("Transfer-Encoding: none", FALSE);
+            // header("Content-Type: {$type}");
 
-            ob_end_flush();
-            fclose($resource);
+            // ob_end_flush();
 
-            // $newResponse = $response
-            // ->withHeader('Content-Disposition', $disposition)
-            // ->withHeader('Content-Length', $size)
-            // ->withHeader('Content-Type', $type)
-            // ->withStatus(200)
-            // ->withBody($body);
+            // fclose($resource);
 
-            // return $newResponse;
+            $newResponse = $response
+            ->withoutHeader('Transfer-Encoding')
+            ->withHeader('Content-Disposition', $disposition)
+            ->withHeader('Content-Length', $size)
+            ->withHeader('Content-Type', $type)
+            ->withStatus(200)
+            ->withBody($body);
+
+            return $newResponse;
         }
         catch (RequestException $e) {
             $message = $e->getMessage();
