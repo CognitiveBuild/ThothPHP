@@ -256,7 +256,6 @@ EOT;
         $headers = array();
         $headers[] = 'MIME-Version: 1.0';
         $headers[] = 'Content-type: text/html; charset=UTF-8';
-
         // Additional headers
         $headers[] = "To: {$emails}";
         $headers[] = "From: {$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>";
