@@ -259,9 +259,9 @@ EOT;
         $headers[] = 'Content-type: text/html; charset=UTF-8';
 
         // Additional headers
-        $headers[] = "To: {$emails}";
-        $headers[] = "From: {$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>";
-    
+        // $headers[] = "To: {$emails}";
+        // $headers[] = "From: {$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>";
+
         $result = mail($emails, "[Thoth] New Build of `{$build->getDisplay()}` is available!", $body, implode("\r\n", $headers));
 
         if($result) {
