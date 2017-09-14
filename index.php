@@ -31,13 +31,8 @@ if(isset($_ENV["VCAP_SERVICES"]) === FALSE) {
 else {
     define("HOST_NAME", $_SERVER['HTTP_HOST']);
 }
-$config = [
-    'settings' => [
-        'addContentLengthHeader' => TRUE,
-    ]
-];
 
-$app = new Slim\App($config);
+$app = new Slim\App();
 
 $container = $app->getContainer();
 
@@ -793,8 +788,9 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
 
             // $size = ob_get_length();
             // header("Content-Disposition: {$disposition}");
-            header("Content-Length: {$size}", FALSE);
+            // header("Content-Length: {$size}", FALSE);
             // header("Transfer-Encoding: none", FALSE);
+            // header('X-Accel-Buffering: no');
             // header("Content-Type: {$type}");
 
             // ob_end_flush();
@@ -806,6 +802,7 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             ->withHeader('Content-Disposition', $disposition)
             ->withHeader('Content-Length', $size)
             ->withHeader('Content-Type', $type)
+            ->withHeader('X-Accel-Buffering', 'no')
             ->withStatus(200)
             ->withBody($body);
 
