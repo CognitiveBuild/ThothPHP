@@ -777,9 +777,10 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             set_time_limit(0);
 
             while (!feof($resource) && (connection_status()==0)) {
-                $contents = fread($resource, 1024);
-                echo $contents;
+                $contents .= fread($resource, 1024);
             }
+
+            echo $contents;
 
             if ($isGzipEnabled) {
                 ob_end_flush();
