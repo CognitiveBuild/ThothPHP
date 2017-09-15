@@ -18,4 +18,15 @@ final class CommonUtility {
 
         return new Stream($resource);
     }
+
+    public static function getServerVar($key = NULL, $default = NULL) {
+
+        if($key === NULL) {
+            return $_SERVER;
+        }
+        if(isset($_SERVER[$key])) {
+            return $_SERVER[$key];
+        }
+        return $default;
+    }
 }

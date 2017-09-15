@@ -20,7 +20,8 @@ EOT;
 }
 else {
     $downloadHTML = <<<EOT
-    <button type="submit" class="btn btn-danger btn-build-delete">Update Release notes</button>
+    <button type="submit" class="btn btn-primary btn-build-delete">Update Release notes</button>
+    <a class="btn btn-info ui-build-distribute" href="/apps/{$idapp}/distribute?id={$build->getBuildId()}">Distribute</a>
     <a class="btn btn-secondary btn-build-download" href="/api/v1/build/download/{$build->getBuildId()}">Download build</a>
 EOT;
 

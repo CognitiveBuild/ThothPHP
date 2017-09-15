@@ -3,6 +3,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\RequestException;
 use Endroid\QrCode\QrCode;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 final class DistributionManager {
 
@@ -144,10 +146,9 @@ final class DistributionManager {
         array($idapp, $idbuild, $iduser, $message));
     }
 
-    public static function sendEmail($idapp, $idbuild, $iduser, $emails, $message) {
+    
 
-        ini_set ( 'sendmail_from', "{$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>" );
-        ini_set ( 'sendmail_path', "/usr/sbin/sendmail -t -i -f {$_ENV['SMTP_SENDER_EMAIL']}");
+    public static function sendBuildEmail($idapp, $idbuild, $iduser, $emails, $message) {
 
         $build = self::getBuildById($idbuild);
 
@@ -254,19 +255,65 @@ final class DistributionManager {
 
 EOT;
 
-        $headers = array();
-        $headers[] = 'MIME-Version: 1.0';
-        $headers[] = 'Content-type: text/html; charset=UTF-8';
-        // Additional headers
-        $headers[] = "To: {$emails}";
-        $headers[] = "From: {$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>";
+        $subject = "[Thoth] New Build of `{$build->getDisplay()}` `v{$build->getVersion()}` is available!";
 
-        $result = mail($emails, "[Thoth] New Build of `{$build->getDisplay()}` v{$build->getVersion()} is available!", $body, implode("\r\n", $headers));
+        // $headers = array();
+        // $headers[] = 'MIME-Version: 1.0';
+        // $headers[] = 'Content-type: text/html; charset=UTF-8';
+        // // Additional headers
+        // $headers[] = "To: {$emails}";
+        // $headers[] = "From: {$_ENV['SMTP_SENDER_NAME']} <{$_ENV['SMTP_SENDER_EMAIL']}>";
+
+        // $result = mail($emails, $subject, $body, implode("\r\n", $headers));
+
+        $list = array_map('trim', explode(",", $emails));
+
+        $result = self::sendEmail($list, $subject, $body);
 
         if($result) {
             return self::addDistribution($idapp, $idbuild, $iduser, $comments);
         }
 
+        return $result;
+    }
+
+
+    public static function sendEmail($emails, $subject, $body) {
+
+        $result = TRUE;
+        $mail = new PHPMailer(TRUE);
+        $sender = $_ENV['SMTP_SENDER_EMAIL'];
+        try {
+            $mail->isSMTP();
+            // $mail->SMTPDebug = 2;
+            $mail->Host = $_ENV['SMTP_HOST'];
+            $mail->SMTPAuth = TRUE;
+            $mail->Port = $_ENV['SMTP_PORT'];
+            $mail->SMTPSecure = $_ENV['SMTP_SECURE']; 
+            $mail->Username = $sender;
+            $mail->Password = $_ENV['SMTP_SENDER_PASSWORD'];
+    
+            $mail->setFrom($sender, $_ENV['SMTP_SENDER_NAME']);
+
+            foreach($emails as $email) {
+
+                if(DEBUG) {
+                    $mail->addAddress($email);
+                }
+                else {
+                    $mail->addBCC($email);
+                }
+            }
+
+            $mail->isHTML(true);
+    
+            $mail->Subject = $subject;
+            $mail->Body    = $body;
+            $mail->send();
+        }
+        catch (Exception $ex) {
+            $result = FALSE;
+        }
         return $result;
     }
 

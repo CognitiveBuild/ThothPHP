@@ -53,12 +53,18 @@
             <div class="col-sm-3 col-md-2 sidebar">
                 <ul class="nav nav-sidebar">
                     <li data-source="Home"><a href="/">Home</a></li>
-                    <li data-source="Assets"><a href="/assets">Assets</a></li>
-                    <li data-source="Technologies"><a href="/catalog/TECHNOLOGY">Technologies</a></li>
-                    <li data-source="Industries"><a href="/catalog/INDUSTRY">Industries</a></li>
-                    <li data-source="Companies"><a href="/companies">Companies</a></li>
-                    <li data-source="Companies"><a href="/visitors">Visitors</a></li>
-                    <li data-source="Companies"><a href="/events">Events</a></li>
+                    <?php
+                    if(Session::init()->getUser()->getLogin() === 'mihui') {
+                      echo <<<EOT
+<li data-source="Assets"><a href="/assets">Assets</a></li>
+<li data-source="Technologies"><a href="/catalog/TECHNOLOGY">Technologies</a></li>
+<li data-source="Industries"><a href="/catalog/INDUSTRY">Industries</a></li>
+<li data-source="Companies"><a href="/companies">Companies</a></li>
+<li data-source="Visitors"><a href="/visitors">Visitors</a></li>
+<li data-source="Events"><a href="/events">Events</a></li>
+EOT;
+                    }
+                    ?>
                     <li data-source="Apps"><a href="/apps">Apps</a></li>
                 </ul>
 
