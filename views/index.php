@@ -1,5 +1,5 @@
 <?php
-include('inc/header.html');
+include('inc/header.php');
 
 echo <<<EOT
 <div id="t-wrapper" class="home">

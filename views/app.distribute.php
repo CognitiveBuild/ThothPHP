@@ -1,5 +1,5 @@
 <?php
-include('inc/header.html');
+include('inc/header.php');
 $buildHTML = '';
 $result = '';
 if($status) {
