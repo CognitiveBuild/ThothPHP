@@ -29,4 +29,18 @@ final class CommonUtility {
         }
         return $default;
     }
+
+    public static function setVar($key, $val) {
+
+        // Apache environment variable exists, overwrite it
+        if (function_exists('apache_getenv') && function_exists('apache_setenv') && apache_getenv($key)) {
+            apache_setenv($key, $val);
+        }
+
+        if (function_exists('putenv')) {
+            putenv("$key=$val");
+        }
+
+        $_ENV[$key] = $val;
+    }
 }
