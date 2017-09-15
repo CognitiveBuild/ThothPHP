@@ -30,7 +30,7 @@ final class CommonUtility {
         return $default;
     }
 
-    public static function setVar($key, $val) {
+    public static function setEnvVar($key, $val) {
 
         // Apache environment variable exists, overwrite it
         if (function_exists('apache_getenv') && function_exists('apache_setenv') && apache_getenv($key)) {

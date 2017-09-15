@@ -146,8 +146,6 @@ final class DistributionManager {
         array($idapp, $idbuild, $iduser, $message));
     }
 
-    
-
     public static function sendBuildEmail($idapp, $idbuild, $iduser, $emails, $message) {
 
         $build = self::getBuildById($idbuild);
