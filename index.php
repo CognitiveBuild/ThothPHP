@@ -834,6 +834,14 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
 
     if($id > 0) {
         try {
+            if ($_SERVER['downgrade-1_0']) {
+                apache_setenv('downgrade-1.0','true');
+            }
+
+            if ($_SERVER['force-response-1_0']) {
+                apache_setenv('force-response-1.0','true');
+            }
+
             $resource = DistributionManager::sendBuild('GET', $build->getUid(), $build->getVersion(), $build->getPlatform(), NULL, $appx->getRegion(), $appx->getContainer(), TRUE);
             $body = CommonUtility::createStream($resource);
 
