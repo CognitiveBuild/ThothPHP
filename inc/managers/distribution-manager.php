@@ -141,9 +141,9 @@ final class DistributionManager {
         return db::execute("DELETE FROM `build` WHERE `idbuild` = ?", array($build->getBuildId()));
     }
 
-    private static function addDistribution($idapp, $idbuild, $iduser, $message) {
-        return db::insert("INSERT INTO `distribution` (`idapp`, `idbuild`, `iduser`, `message`) VALUES (?,?,?,?);", 
-        array($idapp, $idbuild, $iduser, $message));
+    private static function addDistribution($idapp, $idbuild, $iduser, $message, $list) {
+        return db::insert("INSERT INTO `distribution` (`idapp`, `idbuild`, `iduser`, `message`, 'list') VALUES (?,?,?,?,?);", 
+        array($idapp, $idbuild, $iduser, $message, $list));
     }
 
     public static function sendBuildEmail($idapp, $idbuild, $iduser, $emails, $message) {
@@ -269,7 +269,7 @@ EOT;
         $result = self::sendEmail($list, $subject, $body);
 
         if($result) {
-            return self::addDistribution($idapp, $idbuild, $iduser, $comments);
+            return self::addDistribution($idapp, $idbuild, $iduser, $comments, $emails);
         }
 
         return $result;
