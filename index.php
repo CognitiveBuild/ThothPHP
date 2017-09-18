@@ -834,8 +834,9 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
 
     if($id > 0) {
         try {
-
             ini_set('zlib.output_compression', 'Off');
+            ini_set('output_buffering', 'Off');
+            ini_set('output_handler', '');
 
             $resource = DistributionManager::sendBuild('GET', $build->getUid(), $build->getVersion(), $build->getPlatform(), NULL, $appx->getRegion(), $appx->getContainer(), TRUE);
             $body = CommonUtility::createStream($resource);
@@ -889,6 +890,9 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             // fclose($resource);
 
             $newResponse = $response
+            ->withHeader('Content-Transfer-Encoding', 'Binary')
+            ->withHeader('Content-Encoding', 'identity')
+            ->withHeader('Connection', 'close')
             ->withHeader('Content-Disposition', $disposition)
             ->withHeader('Content-Length', $size)
             ->withHeader('Content-Type', $type)
