@@ -835,7 +835,7 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
     if($id > 0) {
         try {
 
-            set_time_limit(0);
+            ini_set('zlib.output_compression', 'Off');
 
             $resource = DistributionManager::sendBuild('GET', $build->getUid(), $build->getVersion(), $build->getPlatform(), NULL, $appx->getRegion(), $appx->getContainer(), TRUE);
             $body = CommonUtility::createStream($resource);
@@ -858,27 +858,44 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
 
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
             $disposition = "attachment; filename=\"{$build->getUid()}.{$ext}\"";
-            header("Content-Disposition: {$disposition}");
 
-            if($size !== NULL) {
-                header("Content-Length: {$size}", FALSE);
-            }
-            if($type !== NULL) {
-                header("Content-Type: {$type}");
-            }
+            // ob_start();
+            // $isGzipEnabled = stripos($_SERVER['HTTP_ACCEPT_ENCODING'], "gzip") !== FALSE;
 
-            $contents = fread($resource, $size);
-            fclose($resource);
-            echo $contents;
+            // if ($isGzipEnabled) {
+            //     ob_start("ob_gzhandler");
+            // }
 
-            // $newResponse = $response
-            // ->withHeader('Content-Disposition', $disposition)
-            // ->withHeader('Content-Length', $size)
-            // ->withHeader('Content-Type', $type)
-            // ->withStatus(200)
-            // ->withBody($body);
+            // $contents = '';
+            // set_time_limit(0);
 
-            // return $newResponse;
+            // while (!feof($resource) && (connection_status()==0)) {
+            //     $contents .= fread($resource, 1024);
+            // }
+
+            // echo $contents;
+
+            // if ($isGzipEnabled) {
+            //     ob_end_flush();
+            // }
+
+            // $size = ob_get_length();
+            // header("Content-Disposition: {$disposition}");
+            // header("Content-Length: {$size}", FALSE);
+            // header("Content-Type: {$type}");
+
+            // ob_end_flush();
+
+            // fclose($resource);
+
+            $newResponse = $response
+            ->withHeader('Content-Disposition', $disposition)
+            ->withHeader('Content-Length', $size)
+            ->withHeader('Content-Type', $type)
+            ->withStatus(200)
+            ->withBody($body);
+
+            return $newResponse;
         }
         catch (RequestException $e) {
             $message = $e->getMessage();
