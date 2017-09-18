@@ -890,9 +890,7 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             // fclose($resource);
 
             $newResponse = $response
-            ->withHeader('Content-Transfer-Encoding', 'Binary')
-            ->withHeader('Content-Encoding', 'identity')
-            ->withHeader('Connection', 'close')
+            ->withHeader('Content-Encoding', 'none')
             ->withHeader('Content-Disposition', $disposition)
             ->withHeader('Content-Length', $size)
             ->withHeader('Content-Type', $type)
