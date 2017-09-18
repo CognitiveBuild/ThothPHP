@@ -209,6 +209,10 @@ final class DistributionManager {
     .ui-label {
         font-weight: bold;
     }
+    .ui-qr-code {
+        padding: 10px;
+        width: 90%;
+    }
     label {
         display: block;
         font-weight: bold;
@@ -220,9 +224,6 @@ final class DistributionManager {
 </style>
 <body>
     <div class="download">
-        <div class="form-group">
-        {$comments}
-        </div>
 
         <div class="form-group">
             <div class="ui-title">{$build->getDisplay()} (v{$build->getVersion()})</div>
@@ -247,13 +248,17 @@ final class DistributionManager {
             <img src="{$qrCodeUrl}" class="ui-qr-code" />
         </div>
 
+        <div class="form-group">
+        {$comments}
+        </div>
+
     </div>
 </body>
 </html>
 
 EOT;
 
-        $subject = "[Thoth] New Build of `{$build->getDisplay()}` `v{$build->getVersion()}` is available!";
+        $subject = "[New Build] {$build->getDisplay()} `v{$build->getVersion()}` is available!";
 
         // $headers = array();
         // $headers[] = 'MIME-Version: 1.0';
