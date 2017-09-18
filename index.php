@@ -834,13 +834,6 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
 
     if($id > 0) {
         try {
-            if ($_SERVER['downgrade-1_0']) {
-                CommonUtility::setEnvVar('downgrade-1.0', 'true');
-            }
-
-            if ($_SERVER['force-response-1_0']) {
-                CommonUtility::setEnvVar('force-response-1.0', 'true');
-            }
 
             $resource = DistributionManager::sendBuild('GET', $build->getUid(), $build->getVersion(), $build->getPlatform(), NULL, $appx->getRegion(), $appx->getContainer(), TRUE);
             $body = CommonUtility::createStream($resource);
@@ -887,8 +880,6 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             // $size = ob_get_length();
             // header("Content-Disposition: {$disposition}");
             // header("Content-Length: {$size}", FALSE);
-            // header("Transfer-Encoding: none", FALSE);
-            // header('X-Accel-Buffering: no');
             // header("Content-Type: {$type}");
 
             // ob_end_flush();
@@ -896,11 +887,9 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             // fclose($resource);
 
             $newResponse = $response
-            ->withoutHeader('Transfer-Encoding')
             ->withHeader('Content-Disposition', $disposition)
             ->withHeader('Content-Length', $size)
             ->withHeader('Content-Type', $type)
-            ->withHeader('X-Accel-Buffering', 'no')
             ->withStatus(200)
             ->withBody($body);
 
