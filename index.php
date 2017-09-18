@@ -860,31 +860,38 @@ $app->get('/api/v1/build/download/{idbuild}', function ($request, $response, $ar
             $ext = ($build->getPlatform() === BuildModel::IOS ? 'ipa' : 'apk');
             $disposition = "attachment; filename=\"{$build->getUid()}.{$ext}\"";
 
-            $isGzipEnabled = stripos($_SERVER['HTTP_ACCEPT_ENCODING'], "gzip") !== FALSE;
+            // $isGzipEnabled = stripos($_SERVER['HTTP_ACCEPT_ENCODING'], "gzip") !== FALSE;
 
-            if ($isGzipEnabled) {
-                ob_start("ob_gzhandler");
-            }
+            // if ($isGzipEnabled) {
+            //     ob_start("ob_gzhandler");
+            // }
 
+            ob_start();
             $contents = '';
             set_time_limit(0);
 
-            while (!feof($resource) && (connection_status()==0)) {
-                $contents = fread($resource, 1024);
-                echo $contents;
-            }
-
-            if ($isGzipEnabled) {
-                ob_end_flush();
-            }
-
-            $size = ob_get_length();
             header("Content-Disposition: {$disposition}");
             header("Content-Length: {$size}", FALSE);
             header("Content-Type: {$type}");
+
             ob_end_flush();
 
-            fclose($resource);
+            while (!feof($resource) && (connection_status()==0)) {
+                $contents .= fread($resource, 1024);
+            }
+
+            echo $contents;
+
+            flush();
+
+            // if ($isGzipEnabled) {
+            //     ob_end_flush();
+            // }
+
+            // $size = ob_get_length();
+
+
+            // fclose($resource);
 
             // $newResponse = $response
             // ->withHeader('Content-Disposition', $disposition)
