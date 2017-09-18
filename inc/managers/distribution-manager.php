@@ -142,7 +142,7 @@ final class DistributionManager {
     }
 
     private static function addDistribution($idapp, $idbuild, $iduser, $message, $list) {
-        return db::insert("INSERT INTO `distribution` (`idapp`, `idbuild`, `iduser`, `message`, 'list') VALUES (?,?,?,?,?);", 
+        return db::insert("INSERT INTO `distribution` (`idapp`, `idbuild`, `iduser`, `message`, `list`) VALUES (?,?,?,?,?);", 
         array($idapp, $idbuild, $iduser, $message, $list));
     }
 
