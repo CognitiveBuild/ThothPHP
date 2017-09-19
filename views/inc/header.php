@@ -1,3 +1,7 @@
+<?php
+$translator = new Translator();
+
+echo <<<EOT
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,16 +37,16 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">GBS Asset Center</a>
+          <a class="navbar-brand" href="/">{$translator->translate('Thoth Asset Center')}</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             <li><a><div class="ui-loading">
-                  <span class="indicator">Loading...</span>
+                  <span class="indicator">{$translator->translate('Loading...')}</span>
               </div></a>
             </li>
-            <li data-source="Home"><a href="/">Home</a></li>
-            <li data-source="Companies"><a href="/signout">Sign out</a></li>
+            <li data-source="Home"><a href="/">{$translator->translate('Home')}</a></li>
+            <li data-source="Companies"><a href="/signout">{$translator->translate('Sign out')}</a></li>
           </ul>
 
         </div>
@@ -52,20 +56,25 @@
         <div class="row">
             <div class="col-sm-3 col-md-2 sidebar">
                 <ul class="nav nav-sidebar">
-                    <li data-source="Home"><a href="/">Home</a></li>
+                    <li data-source="Home"><a href="/">{$translator->translate('Home')}</a></li>
+EOT;
+?>
                     <?php
                     if(Session::init()->getUser()->getLogin() === 'mihui') {
                       echo <<<EOT
-<li data-source="Assets"><a href="/assets">Assets</a></li>
-<li data-source="Technologies"><a href="/catalog/TECHNOLOGY">Technologies</a></li>
-<li data-source="Industries"><a href="/catalog/INDUSTRY">Industries</a></li>
-<li data-source="Companies"><a href="/companies">Companies</a></li>
-<li data-source="Visitors"><a href="/visitors">Visitors</a></li>
-<li data-source="Events"><a href="/events">Events</a></li>
+<li data-source="Assets"><a href="/assets">{$translator->translate('Assets')}</a></li>
+<li data-source="Technologies"><a href="/catalog/TECHNOLOGY">{$translator->translate('Technologies')}</a></li>
+<li data-source="Industries"><a href="/catalog/INDUSTRY">{$translator->translate('Industries')}</a></li>
+<li data-source="Companies"><a href="/companies">{$translator->translate('Companies')}</a></li>
+<li data-source="Visitors"><a href="/visitors">{$translator->translate('Visitors')}</a></li>
+<li data-source="Events"><a href="/events">{$translator->translate('Events')}</a></li>
 EOT;
                     }
+                    echo <<<EOT
+                    <li data-source="Apps"><a href="/apps">{$translator->translate('Apps')}</a></li>
+                    <li data-source="Settings"><a href="/settings">{$translator->translate('Settings')}</a></li>
+EOT;
                     ?>
-                    <li data-source="Apps"><a href="/apps">Apps</a></li>
                 </ul>
 
             </div>

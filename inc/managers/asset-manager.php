@@ -6,10 +6,10 @@ class AssetManager {
     public static function getTable($name) {
         return db::query("SELECT * FROM `{$name}`;");
     }
-    public static function getAssets() {
+    public static function getAssets($language = LANGUAGE) {
 
         $asset_columns = self::$asset_columns;
-        return db::query("SELECT {$asset_columns} FROM `asset`;");
+        return db::query("SELECT {$asset_columns} FROM `asset` WHERE `language` = ?;", $language);
     }
 
     public static function getAssetsByCatalogName($key, $name) {
@@ -92,19 +92,19 @@ class AssetManager {
         return $result;      
     }
 
-    public static function addAsset($name, $idindustry, $description, $logourl, $videourl, $linkurl) {
+    public static function addAsset($name, $idindustry, $description, $logourl, $videourl, $linkurl, $language) {
 
         return db::insert(
-            "INSERT INTO `asset` (`name`, `idindustry`, `description`, `logourl`, `videourl`, `linkurl`) VALUES (?,?,?,?,?,?);", 
-            array($name, $idindustry, $description, $logourl, $videourl, $linkurl)
+            "INSERT INTO `asset` (`name`, `idindustry`, `description`, `logourl`, `videourl`, `linkurl`, `language`) VALUES (?,?,?,?,?,?,?);", 
+            array($name, $idindustry, $description, $logourl, $videourl, $linkurl, $language)
         );
     }
 
-    public static function updateAsset($id, $name, $idindustry, $description, $logourl, $videourl, $linkurl) {
+    public static function updateAsset($id, $name, $idindustry, $description, $logourl, $videourl, $linkurl, $language) {
 
         return db::update(
-            "UPDATE `asset` SET `name` = ?, `idindustry` = ?, `description` = ?, `logourl` = ?, `videourl` = ?, `linkurl` = ? WHERE `id` = ?;", 
-            array($name, $idindustry, $description, $logourl, $videourl, $linkurl, $id)
+            "UPDATE `asset` SET `name` = ?, `idindustry` = ?, `description` = ?, `logourl` = ?, `videourl` = ?, `linkurl` = ?, `language` = ? WHERE `id` = ?;", 
+            array($name, $idindustry, $description, $logourl, $videourl, $linkurl, $language, $id)
         );
     }
 

@@ -1,5 +1,6 @@
 <?php
 date_default_timezone_set('PRC');
+define('INSTANCE', '_INST_DEFAULT');
 
 define("KEY_INDUSTRY", "INDUSTRY");
 define("KEY_TECHNOLOGY", "TECHNOLOGY");
@@ -8,8 +9,14 @@ define("OPTION_YES", "Y");
 define("OPTION_NO", "N");
 
 define('PRODUCTION_HOST', 'thoth-assets.mybluemix.net');
+define('TRANSLATION_DIR', str_replace('\\', DIRECTORY_SEPARATOR, dirname(__FILE__)));
+define('DEFAULT_LANGUAGE', 'en-us');
+define('SUPPORTED_LANGUAGES', [ 'English (United States)' => 'en-us', 'Chinese (Simplified)' => 'zh-cn' ]);
 
 require 'vendor/autoload.php';
+require 'inc/translations/translator.php';
+// Pear
+include 'inc/pear/Pager.php';
 // Utilities
 include 'inc/utilities/common-utility.php';
 // Database
@@ -17,7 +24,6 @@ include 'inc/db.php';
 // Models
 include 'inc/models/user-model.php';
 include 'inc/models/build-model.php';
-
 // Managers
 include 'inc/managers/session-manager.php';
 include 'inc/managers/asset-manager.php';
@@ -37,6 +43,14 @@ else {
     define("HOST_NAME", CommonUtility::getServerVar('HTTP_HOST', PRODUCTION_HOST));
     define('DEBUG', FALSE);
 }
+
+$_language = CommonUtility::getAcceptedLanguage();
+define('LANGUAGE', $_language, FALSE);
+$_language = NULL;
+unset($_language);
+CommonUtility::loadTranslation(LANGUAGE);
+
+function translate($var = '', $args = NULL, $language = LANGUAGE) { return CommonUtility::getTranslation($var, $args, $language); }
 
 $app = new Slim\App();
 
@@ -77,7 +91,14 @@ if(SessionManager::validate()) {
     $app->get('/', function ($request, $response, $args) {
 
         return $this->view->render($response, 'index.php', [
-            'message' => 'This is Thoth Asset Center'
+            'message' => translate('This is Thoth Asset Center')
+        ]);
+    });
+
+    $app->get('/settings', function ($request, $response, $args) {
+
+        return $this->view->render($response, 'settings.php', [
+            'message' => translate('This is Thoth Asset Center')
         ]);
     });
 
@@ -86,10 +107,13 @@ if(SessionManager::validate()) {
         // Assets
         $app->get('/assets', function ($request, $response, $args) {
 
-            $list = AssetManager::getAssets();
+            $p = $request->getQueryParams();
+            $language = isset($p['language']) ? $p['language'] : LANGUAGE;
+            $list = AssetManager::getAssets($language);
 
             return $this->view->render($response, 'assets.php', [
-                'assets' => $list
+                'assets' => $list, 
+                'language' => $language
             ]);
         });
 
@@ -107,7 +131,9 @@ if(SessionManager::validate()) {
         $app->get('/companies/{id}', function ($request, $response, $args) {
 
             $id = isset($args['id']) ? $args['id'] : 0;
-            $industries = CatalogManager::getCatalog(KEY_INDUSTRY);
+            $p = $request->getQueryParams();
+            $l = isset($p['language']) ? $p['language'] : LANGUAGE;
+            $industries = CatalogManager::getCatalog(KEY_INDUSTRY, $l);
 
             $result = array(
                 'id' => 0, 
@@ -165,15 +191,18 @@ if(SessionManager::validate()) {
         // Catalogs
         $app->get('/catalog/{name}', function ($request, $response, $args) {
 
-            $result = array();
+            $result = [];
 
             $name = isset($args['name']) ? $args['name'] : KEY_INDUSTRY;
+            $p = $request->getQueryParams();
+            $language = isset($p['language']) ? $p['language'] : LANGUAGE;
 
-            $result = CatalogManager::getCatalogWithAssetCount($name);
+            $result = CatalogManager::getCatalogWithAssetCount($name, $language);
 
             return $this->view->render($response, 'catalog.php', [
                 'catalogs' => $result, 
-                'type' => $name
+                'type' => $name, 
+                'language' => $language
             ]);
         });
 
@@ -190,7 +219,7 @@ if(SessionManager::validate()) {
 
             if($id > 0) {
                 // update asset
-                $result = AssetManager::updateAsset($id, $post['name'], $post['idindustry'], $post['description'], $post['logourl'], $post['videourl'], $post['linkurl']);
+                $result = AssetManager::updateAsset($id, $post['name'], $post['idindustry'], $post['description'], $post['logourl'], $post['videourl'], $post['linkurl'], $post['language']);
 
                 AssetManager::deleteCatalogToAsset($id);
                 foreach($technologies as $idcatalog) {
@@ -203,7 +232,7 @@ if(SessionManager::validate()) {
                 return $response->withStatus(200)->withHeader('Location', "/assets/{$id}");
             }
             // insert asset
-            $id = AssetManager::addAsset($post['name'], $post['idindustry'], $post['description'], $post['logourl'], $post['videourl'], $post['linkurl']);
+            $id = AssetManager::addAsset($post['name'], $post['idindustry'], $post['description'], $post['logourl'], $post['videourl'], $post['linkurl'], $post['language']);
 
             if($id > 0) {
                 AssetManager::deleteCatalogToAsset($id);
@@ -222,6 +251,8 @@ if(SessionManager::validate()) {
         $app->get('/assets/{id}', function ($request, $response, $args) {
 
             $id = isset($args['id']) ? $args['id'] : 0;
+            $p = $request->getQueryParams();
+            $l = isset($p['language']) ? $p['language'] : LANGUAGE;
 
             $result = [
                 'id' => 0, 
@@ -230,11 +261,12 @@ if(SessionManager::validate()) {
                 'idindustry' => 0, 
                 'logourl' => '',
                 'linkurl' => '',
-                'videourl' => ''
+                'videourl' => '', 
+                'language' => $l
             ];
 
-            $industries = CatalogManager::getCatalog(KEY_INDUSTRY);
-            $technologies = CatalogManager::getCatalog(KEY_TECHNOLOGY);
+            $industries = CatalogManager::getCatalog(KEY_INDUSTRY, $l);
+            $technologies = CatalogManager::getCatalog(KEY_TECHNOLOGY, $l);
             $technologies_applied = array();
             $attachments = array();
 
@@ -250,7 +282,8 @@ if(SessionManager::validate()) {
                 'industries' => $industries, 
                 'technologies' => $technologies, 
                 'technologies_applied' => $technologies_applied, 
-                'attachments' => $attachments
+                'attachments' => $attachments, 
+                'language' => $l
             ]);
         })->setName('asset-details');
 
@@ -625,7 +658,7 @@ if(SessionManager::validate()) {
         return $this->view->render($response, 'signin.php', [
             'login' => $login, 
             'passcode' => $passcode, 
-            'message' => 'Hi '.$display.', you have signed out.'
+            'message' => translate('Hi %s, you have signed out.', [ $display ])
         ]);
     });
 
@@ -660,7 +693,7 @@ else {
         $passcode = $post['passcode'];
 
         $data = [
-            'message' => 'Sign in failed, please use different credentials and try again.',
+            'message' => translate('Sign in failed, please use different credentials and try again.'),
             'login' => $login, 
             'passcode' => $passcode
         ];
@@ -669,7 +702,7 @@ else {
 
         if(SessionManager::signIn($login, $passcode)) {
             $data = [
-                'message' => 'Welcome back, '.Session::init()->getUser()->getDisplay() 
+                'message' => translate('Welcome back %s.', [ Session::init()->getUser()->getDisplay() ])
             ];
             $template = 'index.php';
         }
@@ -686,7 +719,10 @@ else {
 $app->get('/api/v1/catalog/{q}', function ($request, $response, $args) {
     
     $q = isset($args['q']) ? $args['q'] : KEY_INDUSTRY;
-    $list = CatalogManager::getCatalog($q);
+    $p = $request->getQueryParams();
+    $l = isset($p['language']) ? $p['language'] : LANGUAGE;
+
+    $list = CatalogManager::getCatalog($q, $l);
     return $response->withJson($list);
 });
 // Catalogs
@@ -696,16 +732,17 @@ $app->post('/api/v1/catalog', function ($request, $response, $args) {
     $id = isset($post['id']) ? $post['id'] : 0;
     $key = isset($post['type']) ? $post['type'] : KEY_INDUSTRY;
     $name = isset($post['name']) ? $post['name'] : '';
+    $language = isset($post['language']) ? $post['language'] : '';
 
-    if($name === '') {
+    if($name === '' || $language === '') {
         return $response->withStatus(400)->withJson(array('status' => 400, 'id' => $id));
     }
 
     if($id === 0 || $id === '0') {
-        $id = CatalogManager::addCatalog($name, $key);
+        $id = CatalogManager::addCatalog($name, $key, $language);
     }
     else {
-        CatalogManager::updateCatalog($key, $id, $name);
+        CatalogManager::updateCatalog($key, $id, $name, $language);
     }
 
     return $response->withStatus(200)->withJson(array('status' => 200, 'id' => $id));

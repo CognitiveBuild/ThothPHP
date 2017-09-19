@@ -1,6 +1,5 @@
 <?php
 include('inc/header.php');
-
 ?>
 
 <div id="t-wrapper" class="catalog">
@@ -9,18 +8,35 @@ include('inc/header.php');
         <div class="panel-heading">Catalog 
 <?php
 echo <<<EOT
-<a href="#" class="ui-right ui-modal-button-catalog" data-toggle="modal" data-target=".modal-catalog" data-type="{$type}" data-id="0" data-name="">Add a new Catalog</a>
+<a href="#" class="ui-right ui-modal-button-catalog" data-toggle="modal" data-target=".modal-catalog" data-type="{$type}" data-id="0" data-name="" data-language="zh-cn">Add a new Catalog</a>
 EOT;
 ?>
         </div>
         <div class="panel-body">
+            <div class="btn-group btn-group-justified btn-group-language" role="group" aria-label="">
+<?php
+                foreach(SUPPORTED_LANGUAGES as $label => $val) {
+
+                    $active = '';
+                    if($val === $language) {
+                        $active = ' active';
+                    }
+
+                    echo <<<EOT
+<a href="?language={$val}" class="btn btn-default{$active}" role="button">{$label}</a>
+EOT;
+                }
+?>
+            </div>
+
             <ul class="list list-group">
 <?php
     foreach($catalogs as $key => $val) {
 echo <<<EOT
 
 <li class="list-group-item">
-    <a href="#" class="ui-modal-button-catalog" data-target=".modal-catalog" data-toggle="modal" data-id="{$val['id']}" data-type="{$type}" data-name="{$val['name']}">{$val['name']}</a>
+    <a href="#" class="ui-modal-button-catalog" data-target=".modal-catalog" data-toggle="modal" data-id="{$val['id']}" data-language="{$val['language']}" data-type="{$type}" data-name="{$val['name']}">{$val['name']}</a>
+    <span class="badge badge-dst" ref="data-id">{$val['language']}</span>
     <span class="badge" ref="data-id">{$val['count']}</span>
 </li>
 
@@ -54,6 +70,18 @@ EOT;
         <div class="form-group form-group-id">
             <label for="_id">ID</label>
             <input type="number" readonly="readonly" class="form-control" id="_id" placeholder="ID" />
+        </div>
+        <div class="form-group">
+            <label for="_language">Language</label>
+            <select id="_language" name="_language" class="form-control">
+<?php
+foreach(SUPPORTED_LANGUAGES as $label => $language) {
+    echo <<<EOT
+<option value="{$language}">{$label}</option>
+EOT;
+}
+?>
+            </select>
         </div>
         <div class="form-group">
             <label for="_name">Name</label>

@@ -337,21 +337,25 @@ $(function(){
                 var jButton = $(this);
                 var target = jButton.data('target');
                 var id = jButton.data('id');
+                var language = jButton.data('language');
                 var name = jButton.data('name');
                 $('#_name').val(name);
                 $('#_id').val(id);
+                $('#_language').val(language);
             });
 
             // Catalog
             $('.btn-catalog-save').on('click', function(evt) {
 
                 var jName = $('#_name');
+                var jLanguage = $('#_language');
                 var jId = $('#_id');
                 var jType = $('#_type');
 
                 var name = jName.val();
                 var id = jId.val();
                 var type = jType.val();
+                var language = jLanguage.val();
 
                 if(name.length === 0) {
                     jName.focus();
@@ -366,7 +370,8 @@ $(function(){
                     data: {
                         name: name, 
                         id: id, 
-                        type: type
+                        type: type, 
+                        language: language
                     }, 
                     success: function(result){
                         console.log('### success ###');

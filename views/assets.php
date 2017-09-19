@@ -1,14 +1,33 @@
 <?php
 include('inc/header.php');
-?>
+$languageOptions = '';
 
+foreach(SUPPORTED_LANGUAGES as $label => $val) {
+
+    $active = '';
+    if($val === $language) {
+        $active = ' active';
+    }
+
+    $languageOptions .= <<<EOT
+<a href="?language={$val}" class="btn btn-default{$active}" role="button">{$label}</a>
+EOT;
+}
+
+echo <<<EOT
 <div id="t-wrapper" class="asset">
 
     <div class="panel panel-default ui-asset">
-        <div class="panel-heading">Assets <a href="/assets/0" class="ui-right ui-modal-button" data-id="0">Add a new Asset</a></div>
+        <div class="panel-heading">{$translator->translate('Assets')} <a href="/assets/0?language={$language}" class="ui-right ui-modal-button" data-id="0">{$translator->translate('Add a new Asset')}</a></div>
         <div class="panel-body">
+
+            <div class="btn-group btn-group-justified btn-group-language" role="group" aria-label="">
+                {$languageOptions}
+            </div>
+
             <ul class="list list-group list-group-highlight">
-<?php
+EOT;
+
 foreach($assets as $asset) {
     $logo_icon = '';
     $file_icon = '';

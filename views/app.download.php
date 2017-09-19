@@ -1,4 +1,6 @@
 <?php
+$instance = INSTANCE;
+$language = LANGUAGE;
 echo <<<EOT
 <!DOCTYPE html>
 <html>
@@ -38,7 +40,7 @@ echo <<<EOT
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li data-source="Home"><a href="/">Home</a></li>            
+            <li data-source="Home"><a href="/">{$_ENV[$instance]['TRANSLATION'][$language]['Home']}</a></li>          
           </ul>
 
         </div>

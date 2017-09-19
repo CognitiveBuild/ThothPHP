@@ -1,7 +1,11 @@
+<?php
+$translator = new Translator();
+
+echo <<<EOT
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Sign in</title>
+	<title>{$translator->translate('Sign In')}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="keywords" content="Watson, Thoth" />
 	<meta name="description" content="A system that as a component of data source for the conversational application, as well as an independent asset center application for any organizations." />
@@ -40,7 +44,7 @@
                   <span class="indicator">Loading...</span>
               </div></a>
             </li>
-            <li data-source="Home" class="active"><a href="/">Sign In</a></li>
+            <li data-source="Home" class="active"><a href="/">{$translator->translate('Sign In')}</a></li>
             
           </ul>
 
@@ -51,9 +55,10 @@
         <div class="row">
             <div class="col-sm-3 col-md-2 sidebar">
                 <ul class="nav nav-sidebar">
-                    <li data-source="Home" class="active"><a href="/">Sign In</a></li>
+                    <li data-source="Home" class="active"><a href="/">{$translator->translate('Sign In')}</a></li>
                     
                 </ul>
 
             </div>
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+EOT;

@@ -1,18 +1,20 @@
 <?php
 include('inc/header.php');
-?>
 
+echo <<<EOT
 <div id="t-wrapper" class="asset">
 
     <div class="panel panel-default ui-asset">
-        <div class="panel-heading">Asset details</div>
+        <div class="panel-heading">{$translator->translate('Asset details')} - {$language}</div>
         <div class="panel-body">
             <form class="list list-group" method="POST" enctype="multipart/form-data">
 
-<?php
+EOT;
 $industryHTML = '';
 if($id == '0') {
-    $industryHTML = '<option value="0">Please choose one</option>';
+    $industryHTML = <<<EOT
+<option value="0">{$translator->translate('Please choose one')}</option>
+EOT;
 }
 
 foreach($industries  as $industry) {
@@ -60,6 +62,7 @@ EOT;
 
 echo <<<EOT
     <input type="hidden" name="id" value="{$id}" />
+    <input type="hidden" name="language" value="{$language}" />
     <div class="form-group">
         <label for="name">Name</label>
         <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="{$asset['name']}" />

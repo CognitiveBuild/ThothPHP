@@ -199,3 +199,6 @@ body.download {
 .ui-form-group-image-container {
   position: relative;
 }
+.btn-group-language {
+  margin: 0px 0px 15px;
+}
