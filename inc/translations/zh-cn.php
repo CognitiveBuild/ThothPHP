@@ -1,6 +1,7 @@
 <?php
 $lang = array(
-    'This is Thoth Asset Center' => '欢迎来到托特资产中心！', 
+    'Asset Center' => '资产中心', 
+    'Welcome' => '欢迎来到资产中心！', 
     'Home' => '首页', 
     'Assets' => '资产', 
     'Sign In' => '登录', 

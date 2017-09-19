@@ -1,6 +1,7 @@
 <?php
 $lang = array(
-    'This is Thoth Asset Center' => 'This is Thoth Asset Center', 
+    'Asset Center' => 'Asset Center', 
+    'Welcome' => 'Welcome to the Asset Center.', 
     'Home' => 'Home', 
     'Assets' => 'Assets', 
     'Sign In' => 'Sign In', 

@@ -308,8 +308,8 @@ EOT;
                 }
             }
 
-            $mail->isHTML(true);
-    
+            $mail->isHTML(TRUE);
+
             $mail->Subject = $subject;
             $mail->Body    = $body;
             $mail->send();

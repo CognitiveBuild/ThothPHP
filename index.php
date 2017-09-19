@@ -91,14 +91,14 @@ if(SessionManager::validate()) {
     $app->get('/', function ($request, $response, $args) {
 
         return $this->view->render($response, 'index.php', [
-            'message' => translate('This is Thoth Asset Center')
+            'message' => translate('Welcome')
         ]);
     });
 
     $app->get('/settings', function ($request, $response, $args) {
 
         return $this->view->render($response, 'settings.php', [
-            'message' => translate('This is Thoth Asset Center')
+            'message' => translate('Welcome')
         ]);
     });
 

@@ -3,7 +3,7 @@ include('inc/header.php');
 $buildHTML = '';
 $result = '';
 if($status) {
-    $result = "You have sucessfully distributed the Build to {$emails}";
+    $result = "You have sucessfully distributed the Build to: <br /><br /><strong>{$emails}</strong>";
 }
 
 foreach($builds as $key => $build) {

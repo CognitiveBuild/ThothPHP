@@ -5,7 +5,7 @@ echo <<<EOT
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Thoth Asset Center</title>
+	<title>{$translator->translate('Asset Center')}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="keywords" content="Watson, Thoth" />
 	<meta name="description" content="A system that as a component of data source for the conversational application, as well as an independent asset center application for any organizations." />
@@ -37,7 +37,7 @@ echo <<<EOT
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">{$translator->translate('Thoth Asset Center')}</a>
+          <a class="navbar-brand" href="/">{$translator->translate('Asset Center')}</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
