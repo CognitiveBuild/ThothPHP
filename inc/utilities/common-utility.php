@@ -114,18 +114,21 @@ final class CommonUtility {
 		$ret = 'en-us';
 
 		$languages = '';
-		$acceptLanguage = '';
+        $acceptLanguage = '';
+        
+        $user = Session::init()->getUser();
 
-		if(isset($_COOKIE['LANGUAGE'])) {
+        if($user !== NULL && $user instanceof UserModel) {
+            $ret = $user->getLanguage();
+        }
+		elseif(isset($_COOKIE['LANGUAGE'])) {
             $language = $_COOKIE['LANGUAGE'];
 
-            foreach(SUPPORTED_LANGUAGES as $label => $val) {
-                if($val === $language) {
-                    $ret = $val;
-                    break;
-                }
-            }
+            $result = array_search($language, SUPPORTED_LANGUAGES);
 
+            if($result !== NULL) {
+                $ret = SUPPORTED_LANGUAGES[$result];
+            }
 		}
 		else {
 
@@ -143,7 +146,7 @@ final class CommonUtility {
         }
 
         $ret = strtolower($ret);
-        setcookie('LANGUAGE', $ret);
+        setcookie('LANGUAGE', $ret, 0, '/');
 
 		return $ret;
 	}

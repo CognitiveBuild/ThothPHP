@@ -112,6 +112,9 @@ body {
   .file-group.ready .visitor-avatar-remove {
     color: #cc0000;
   }
+  .file-group.ready .glyphicon-plus {
+    display: none;
+  }
 
 .glyphicon-icon-right { 
   margin-left: 5px;
@@ -201,4 +204,7 @@ body.download {
 }
 .btn-group-language {
   margin: 0px 0px 15px;
+}
+.ui-label-block {
+  display: block;
 }

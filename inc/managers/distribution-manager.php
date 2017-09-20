@@ -159,106 +159,50 @@ final class DistributionManager {
         $installUrl = DistributionManager::getInstallUrl($build->getBuildId(), $build->getPlatform());
 
         $qrCodeUrl = CommonUtility::getBaseUrl("/api/v1/build/code/{$idapp}");
+        $bodyPath = TRANSLATION_DIR.'/inc/email/template.html';
+        $body = file_get_contents($bodyPath);
 
-        $body = <<<EOT
-<html>
-<head>
-<title>{$build->getDisplay()}</title>
-</head>
-<style type="text/css">
-    .btn {
-        -webkit-appearance: none;
-        display: block;
-        padding: 6px 12px;
-        margin-bottom: 0;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 1.42857143;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: middle;
-        -ms-touch-action: manipulation;
-        touch-action: manipulation;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        background-image: none;
-        border: 1px solid transparent;
-        border-radius: 4px;
-        width: 90%;
-    }
-    .btn-success {
-        color: #fff;
-        background-color: #5cb85c;
-        border-color: #4cae4c;
-        font-weight: bold;
-    }
-    .btn-info {
-        color: #fff;
-        background-color: #5bc0de;
-        border-color: #46b8da;
-    }
-    .form-group {
-        margin-bottom: 15px;
-    }
-    .ui-title {
-        font-weight: bold;
-    }
-    .ui-label {
-        font-weight: bold;
-    }
-    .ui-qr-code {
-        padding: 10px;
-        width: 90%;
-    }
-    label {
-        display: block;
-        font-weight: bold;
-    }
-    a {
-        text-decoration: none;
-    }
-    
-</style>
-<body>
-    <div class="download">
+        $viewData = [
+            '%asset-center' => translate('Studio Asset Center'), 
+            '%message' => translate('%s invited you to try out the latest version of %s (%s)', [ Session::init()->getUser()->getDisplay(), $build->getDisplay(), $build->getVersion() ]), 
+            '%install-tips' => translate('Open this email on your <strong>%s</strong> device and tap below to continue.', [ $build->getPlatform() ]),
+            '%download-tips' => translate('On Desktop?'),
+            '%display' => $build->getDisplay(), 
+            '%version' => $build->getVersion(), 
+            '%platform-label' => translate('Platform'), 
+            '%platform-value' => $build->getPlatform(), 
+            '%install-label' => translate('Install this Build now'), 
+            '%install-url' => $installUrl, 
+            '%download-label' => translate('Download from PC'), 
+            '%download-url' => $downloadUrl, 
+            '%notes-label' => translate('Release notes'), 
+            '%notes-value' => $build->getNotesHTML(), 
+            '%qrcode-label' => translate('QR Code'), 
+            '%qrcode-url' => $qrCodeUrl, 
+            '%comments' => $comments
+        ];
+        $body = str_replace(array_keys($viewData), array_values($viewData), $body);
+        // echo $body;die;
 
-        <div class="form-group">
-            <div class="ui-title">{$build->getDisplay()} (v{$build->getVersion()})</div>
-            <div class="ui-note"><span class="ui-label">Platform</span>: {$build->getPlatform()}</div>
-        </div>
+        $title = ("[New Build] {$build->getDisplay()} (v{$build->getVersion()}) is available!");
+        // $subject = "=?utf-8?B?{$title}?=";
+        $subject = $title;
 
-        <div class="form-group">
-            <a class="btn btn-success btn-download btn-install" href="{$installUrl}">Install this Build now</a>
-        </div>
+        $altBody = <<<EOT
+{$build->getDisplay()} (v{$build->getVersion()}) on {$build->getPlatform()}.
 
-        <div class="form-group">
-            <a class="btn btn-info btn-download" href="{$downloadUrl}">Download from PC</a>
-        </div>
+Go to {$downloadUrl} on mobile to download the build, you can also scan the QR Code.
 
-        <div class="form-group ui-release-notes">
-            <div class="ui-label">Release notes:</div>
-            {$build->getNotesHTML()}
-        </div>
+Release notes: 
 
-        <div class="form-group ui-form-group-image-container">
-            <div class="ui-label">QR Code:</div>
-            <img src="{$qrCodeUrl}" class="ui-qr-code" />
-        </div>
+--------------
 
-        <div class="form-group">
-        {$comments}
-        </div>
+{$build->getNotesHTML()}
 
-    </div>
-</body>
-</html>
+--------------
 
+{$comments}
 EOT;
-
-        $subject = "[New Build] {$build->getDisplay()} `v{$build->getVersion()}` is available!";
 
         // $headers = array();
         // $headers[] = 'MIME-Version: 1.0';
@@ -271,7 +215,7 @@ EOT;
 
         $list = array_map('trim', explode(",", $emails));
 
-        $result = self::sendEmail($list, $subject, $body);
+        $result = self::sendEmail($list, $subject, $body, $altBody);
 
         if($result) {
             return self::addDistribution($idapp, $idbuild, $iduser, $comments, $emails);
@@ -281,21 +225,23 @@ EOT;
     }
 
 
-    public static function sendEmail($emails, $subject, $body) {
+    public static function sendEmail($emails, $subject, $body, $altBody = NULL) {
 
         $result = TRUE;
         $mail = new PHPMailer(TRUE);
         $sender = $_ENV['SMTP_SENDER_EMAIL'];
+
         try {
             $mail->isSMTP();
             // $mail->SMTPDebug = 2;
+            $mail->CharSet = "utf-8";
             $mail->Host = $_ENV['SMTP_HOST'];
             $mail->SMTPAuth = TRUE;
             $mail->Port = $_ENV['SMTP_PORT'];
             $mail->SMTPSecure = $_ENV['SMTP_SECURE']; 
             $mail->Username = $sender;
             $mail->Password = $_ENV['SMTP_SENDER_PASSWORD'];
-    
+
             $mail->setFrom($sender, $_ENV['SMTP_SENDER_NAME']);
 
             foreach($emails as $email) {
@@ -311,7 +257,8 @@ EOT;
             $mail->isHTML(TRUE);
 
             $mail->Subject = $subject;
-            $mail->Body    = $body;
+            $mail->MsgHTML($body);
+            // $mail->AltBody = $altBody;
             $mail->send();
         }
         catch (Exception $ex) {

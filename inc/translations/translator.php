@@ -1,7 +1,8 @@
 <?php
 final class Translator {
 
-    public function translate($key) {
-        return translate($key);
+    public function translate($var = '', $args = NULL, $language = LANGUAGE) {
+
+        return translate($var, $args, $language);
     }
 }

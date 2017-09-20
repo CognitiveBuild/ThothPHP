@@ -44,14 +44,14 @@ else {
     define('DEBUG', FALSE);
 }
 
-$_language = CommonUtility::getAcceptedLanguage();
-define('LANGUAGE', $_language, FALSE);
-$_language = NULL;
-unset($_language);
-CommonUtility::loadTranslation(LANGUAGE);
+function loadTranslation() {
+    $_language = CommonUtility::getAcceptedLanguage();
+    CommonUtility::loadTranslation($_language);
+    return $_language;
+}
 
 function translate($var = '', $args = NULL, $language = LANGUAGE) { return CommonUtility::getTranslation($var, $args, $language); }
-
+define('LANGUAGE', loadTranslation(), FALSE);
 $app = new Slim\App();
 
 $container = $app->getContainer();
@@ -98,7 +98,28 @@ if(SessionManager::validate()) {
     $app->get('/settings', function ($request, $response, $args) {
 
         return $this->view->render($response, 'settings.php', [
-            'message' => translate('Welcome')
+            'message' => ''
+        ]);
+    });
+
+    $app->post('/settings', function ($request, $response, $args) {
+        $post = $request->getParsedBody();
+
+        $language = $post['language'];
+
+        $user = Session::init()->getUser();
+
+        $login = $user->getLogin();
+        $result = UserManager::updateSettings($language, $login);
+
+        if($result) {
+            $user->setLanguage($language);
+            Session::init()->setUser($user);
+        }
+
+        return $this->view->render($response, 'settings.php', [
+            'language' => $language, 
+            'message' => translate('You have successfully updated the settings, please re-visit the page to see the differences.')
         ]);
     });
 
@@ -701,6 +722,7 @@ else {
         $template = 'signin.php';
 
         if(SessionManager::signIn($login, $passcode)) {
+            loadTranslation();
             $data = [
                 'message' => translate('Welcome back %s.', [ Session::init()->getUser()->getDisplay() ])
             ];
@@ -931,9 +953,13 @@ $app->get('/api/v1/email', function($request, $response, $args) {
 
     $result = TRUE;
 
-    $result = array_map('trim',explode(",", 'mihui@cn.ibm.com, mihui.net@outlook.com,abc@test.com'));
+    // $result = array_map('trim',explode(",", 'mihui@cn.ibm.com, mihui.net@outlook.com,abc@test.com'));
 
-    // $result = explode(', ', 'mihui@cn.ibm.com, mihui.net@outlook.com,abc@test.com');
+    $result = explode(', ', 'mihui@cn.ibm.com, mihui.net@outlook.com,abc@test.com');
+    $str = translate('You have sucessfully distributed the Build to: <br /><br /><strong>%s</strong>', [ 'test' ]);
+    echo $str;die;
+
+    $result = vsprintf($str, [ 'Test', 'Test' ]);
     
     return $response->withJson(array('status' => $result));
 });

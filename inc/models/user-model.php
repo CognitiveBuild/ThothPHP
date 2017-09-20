@@ -9,8 +9,9 @@ class UserModel {
 	private $_passcode;
 	private $_token;
 	private $_activetime;
+	private $_language;
 
-	function __construct($id = self::NEW_ID, $login = '', $display = '', $token = '', $activeTime = 0) {
+	function __construct($id = self::NEW_ID, $login = '', $display = '', $token = '', $language = DEFAULT_LANGUAGE, $activeTime = 0) {
 
         $this->_id = $id;
         $this->_login = $login;
@@ -18,6 +19,7 @@ class UserModel {
         $this->_token = $token;
         $this->_activetime = $activeTime;
 		$this->_passcode = '';
+		$this->_language = $language;
 	}
 
 	function __destruct() {
@@ -27,12 +29,13 @@ class UserModel {
 		unset($this->_login);
 		unset($this->_passcode);
 		unset($this->_token);
+		unset($this->_language);
 		unset($this->_activetime);
 	}
 
     public function __sleep() {
 
-        return array('_id', '_login', '_token', '_display', '_activetime');
+        return array('_id', '_login', '_token', '_display', '_language', '_activetime');
     }
 
 	public function getId() { return $this->_id; }
@@ -48,4 +51,6 @@ class UserModel {
 	public function getLogin() { return $this->_login; }
 	public function setLogin($val) { $this->_login = $val; }
 
+	public function getLanguage() { return $this->_language; }
+	public function setLanguage($val) { $this->_language = $val; }
 }

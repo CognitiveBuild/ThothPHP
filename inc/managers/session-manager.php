@@ -15,7 +15,7 @@ final class SessionManager {
         }
 
         // Special case for first login user
-        // @todo: Remove
+        // @todo: Remove & SSO
         if($result['passcode'] === '') {
             db::update("UPDATE `user` SET `passcode` = ?, `token` = ?, `activetime` = ? WHERE `login` = ?", array($encryptedPasscode, $newToken, $time, $login));
             $succeed = TRUE;
@@ -27,7 +27,7 @@ final class SessionManager {
         }
 
         if($succeed) {
-            $user = new UserModel($result['id'], $login, $result['display'], $newToken, $time);
+            $user = new UserModel($result['id'], $login, $result['display'], $newToken, $result['language'], $time);
             Session::init()->setUser($user);
         }
 
@@ -175,4 +175,12 @@ final class Session {
         return TRUE;
     }
 
+}
+
+final class UserManager {
+    
+    public static function updateSettings($language, $id) {
+
+        return db::execute("UPDATE `user` SET `language` = ? WHERE `login` = ?", array($language, $id));
+    }
 }
