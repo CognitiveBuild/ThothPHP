@@ -116,10 +116,8 @@ final class CommonUtility {
 		$languages = '';
         $acceptLanguage = '';
         
-        $user = Session::init()->getUser();
-
-        if($user !== NULL && $user instanceof UserModel) {
-            $ret = $user->getLanguage();
+        if(Session::init()->getUser() !== NULL) {
+            $ret = Session::init()->getUser()->getLanguage();
         }
 		elseif(isset($_COOKIE['LANGUAGE'])) {
             $language = $_COOKIE['LANGUAGE'];

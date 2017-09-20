@@ -81,7 +81,7 @@ final class Session {
     }
 
     function __destruct() {
-        // session_write_close();
+        session_write_close();
     }
 
     /**
