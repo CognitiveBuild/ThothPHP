@@ -32,7 +32,7 @@ echo <<<EOT
 
                 <div class="form-group">
                     <div class="ui-notice ui-notice-padding ui-notice-small">
-                    {$message}
+{$message}
                     </div>
                 </div>
             </form>
