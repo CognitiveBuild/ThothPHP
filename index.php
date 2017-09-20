@@ -44,14 +44,11 @@ else {
     define('DEBUG', FALSE);
 }
 
-function loadTranslation() {
-    $_language = CommonUtility::getAcceptedLanguage();
-    CommonUtility::loadTranslation($_language);
-    return $_language;
-}
+$_language = CommonUtility::getAcceptedLanguage();
+CommonUtility::loadTranslation($_language);
 
 function translate($var = '', $args = NULL, $language = LANGUAGE) { return CommonUtility::getTranslation($var, $args, $language); }
-define('LANGUAGE', loadTranslation(), FALSE);
+define('LANGUAGE', $_language, FALSE);
 $app = new Slim\App();
 
 $container = $app->getContainer();
@@ -722,7 +719,6 @@ else {
         $template = 'signin.php';
 
         if(SessionManager::signIn($login, $passcode)) {
-            loadTranslation();
             $data = [
                 'message' => translate('Welcome back %s.', [ Session::init()->getUser()->getDisplay() ])
             ];
