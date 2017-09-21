@@ -104,14 +104,12 @@ if(SessionManager::validate()) {
 
         $language = $post['language'];
 
-        $user = Session::init()->getUser();
-
-        $login = $user->getLogin();
+        $login = Session::init()->getUser()->getLogin();
         $result = UserManager::updateSettings($language, $login);
 
         if($result) {
-            $user->setLanguage($language);
-            Session::init()->setUser($user);
+            Session::init()->getUser()->setLanguage($language);
+            Session::init()->setUser(Session::init()->getUser());
         }
 
         return $this->view->render($response, 'settings.php', [

@@ -27,8 +27,10 @@ final class SessionManager {
         }
 
         if($succeed) {
+            
             $user = new UserModel($result['id'], $login, $result['display'], $newToken, $result['language'], $time);
             Session::init()->setUser($user);
+            
         }
 
         return $succeed;
@@ -168,9 +170,8 @@ final class Session {
      */
     public function isActive() {
 
-        $user = $this->getUser();
-        if($user === NULL) return FALSE;
-        $token = $user->getToken();
+        if($this->getUser() === NULL) return FALSE;
+        $token = $this->getUser()->getToken();
         if($token == NULL) return FALSE;
         return TRUE;
     }
