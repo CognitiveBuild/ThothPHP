@@ -4,6 +4,8 @@ use GuzzleHttp\Psr7\Stream;
 final class CommonUtility {
 
     const PAGER_PER_PAGE = 30;
+    public static $SUPPORTED_LANGUAGES = [ 'English (United States)' => 'en-us', 'Chinese (Simplified)' => 'zh-cn' ];
+    
 
     public static function getBaseUrl($path = '', $encode = FALSE) {
 
@@ -119,13 +121,13 @@ final class CommonUtility {
         if(Session::init()->getUser() !== NULL) {
             $ret = Session::init()->getUser()->getLanguage();
         }
-		elseif(isset($_COOKIE['LANGUAGE'])) {
+		else if(isset($_COOKIE['LANGUAGE'])) {
             $language = $_COOKIE['LANGUAGE'];
 
-            $result = array_search($language, SUPPORTED_LANGUAGES);
+            $result = array_search($language, CommonUtility::$SUPPORTED_LANGUAGES);
 
             if($result !== NULL) {
-                $ret = SUPPORTED_LANGUAGES[$result];
+                $ret = CommonUtility::$SUPPORTED_LANGUAGES[$result];
             }
 		}
 		else {

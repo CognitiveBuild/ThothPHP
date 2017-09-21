@@ -83,6 +83,7 @@ final class Session {
     }
 
     function __destruct() {
+
         session_write_close();
     }
 
@@ -151,8 +152,7 @@ final class Session {
      */
     public function getUser() {
 
-        $user = $this->getSession(self::USER_SESSION_KEY);
-        return $user;
+        return $this->getSession(self::USER_SESSION_KEY);
     }
 
     /**

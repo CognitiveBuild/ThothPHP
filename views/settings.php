@@ -3,7 +3,7 @@ include('inc/header.php');
 $languageOptions = '';
 $language = Session::init()->getUser()->getLanguage();
 
-foreach(SUPPORTED_LANGUAGES as $label => $val) {
+foreach(CommonUtility::$SUPPORTED_LANGUAGES as $label => $val) {
 
     $active = '';
     if($val === $language) {

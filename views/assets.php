@@ -2,7 +2,7 @@
 include('inc/header.php');
 $languageOptions = '';
 
-foreach(SUPPORTED_LANGUAGES as $label => $val) {
+foreach(CommonUtility::$SUPPORTED_LANGUAGES as $label => $val) {
 
     $active = '';
     if($val === $language) {

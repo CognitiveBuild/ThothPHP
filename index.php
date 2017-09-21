@@ -11,7 +11,7 @@ define("OPTION_NO", "N");
 define('PRODUCTION_HOST', 'thoth-assets.mybluemix.net');
 define('TRANSLATION_DIR', str_replace('\\', DIRECTORY_SEPARATOR, dirname(__FILE__)));
 define('DEFAULT_LANGUAGE', 'en-us');
-define('SUPPORTED_LANGUAGES', [ 'English (United States)' => 'en-us', 'Chinese (Simplified)' => 'zh-cn' ]);
+// define('SUPPORTED_LANGUAGES', [ 'English (United States)' => 'en-us', 'Chinese (Simplified)' => 'zh-cn' ]);
 
 require 'vendor/autoload.php';
 require 'inc/translations/translator.php';
@@ -957,5 +957,4 @@ $app->get('/api/v1/email', function($request, $response, $args) {
     
     return $response->withJson(array('status' => $result));
 });
-
 $app->run();

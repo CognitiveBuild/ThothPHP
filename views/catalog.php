@@ -15,7 +15,7 @@ EOT;
         <div class="panel-body">
             <div class="btn-group btn-group-justified btn-group-language" role="group" aria-label="">
 <?php
-                foreach(SUPPORTED_LANGUAGES as $label => $val) {
+                foreach(CommonUtility::$SUPPORTED_LANGUAGES as $label => $val) {
 
                     $active = '';
                     if($val === $language) {
@@ -75,7 +75,7 @@ EOT;
             <label for="_language">Language</label>
             <select id="_language" name="_language" class="form-control">
 <?php
-foreach(SUPPORTED_LANGUAGES as $label => $language) {
+foreach(CommonUtility::$SUPPORTED_LANGUAGES as $label => $language) {
     echo <<<EOT
 <option value="{$language}">{$label}</option>
 EOT;
