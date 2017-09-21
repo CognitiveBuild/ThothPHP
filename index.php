@@ -16,7 +16,7 @@ define('DEFAULT_LANGUAGE', 'en-us');
 require 'vendor/autoload.php';
 require 'inc/translations/translator.php';
 // Pear
-include 'inc/pear/Pager.php';
+// include 'inc/pear/Pager.php';
 // Utilities
 include 'inc/utilities/common-utility.php';
 // Database
