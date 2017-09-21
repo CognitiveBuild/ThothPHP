@@ -30,7 +30,7 @@ final class SessionManager {
             
             $user = new UserModel($result['id'], $login, $result['display'], $newToken, $result['language'], $time);
             Session::init()->setUser($user);
-            
+            CommonUtility::setLanguage($result['language']);
         }
 
         return $succeed;

@@ -1,5 +1,6 @@
 <?php
 date_default_timezone_set('PRC');
+
 define('INSTANCE', '_INST_DEFAULT');
 
 define("KEY_INDUSTRY", "INDUSTRY");
@@ -11,18 +12,21 @@ define("OPTION_NO", "N");
 define('PRODUCTION_HOST', 'thoth-assets.mybluemix.net');
 define('TRANSLATION_DIR', str_replace('\\', DIRECTORY_SEPARATOR, dirname(__FILE__)));
 define('DEFAULT_LANGUAGE', 'en-us');
-// define('SUPPORTED_LANGUAGES', [ 'English (United States)' => 'en-us', 'Chinese (Simplified)' => 'zh-cn' ]);
 
 require 'vendor/autoload.php';
 require 'inc/translations/translator.php';
-// Pear
-// include 'inc/pear/Pager.php';
-// Utilities
+/// Pear
+// Pager
+include 'inc/pear/Pager.php';
+/// Utilities
+// Common
 include 'inc/utilities/common-utility.php';
 // Database
 include 'inc/db.php';
 // Models
+// User model
 include 'inc/models/user-model.php';
+// Build model
 include 'inc/models/build-model.php';
 // Managers
 include 'inc/managers/session-manager.php';
@@ -48,7 +52,9 @@ $_language = CommonUtility::getAcceptedLanguage();
 CommonUtility::loadTranslation($_language);
 
 function translate($var = '', $args = NULL, $language = LANGUAGE) { return CommonUtility::getTranslation($var, $args, $language); }
+
 define('LANGUAGE', $_language, FALSE);
+
 $app = new Slim\App();
 
 $container = $app->getContainer();
@@ -100,6 +106,7 @@ if(SessionManager::validate()) {
     });
 
     $app->post('/settings', function ($request, $response, $args) {
+
         $post = $request->getParsedBody();
 
         $language = $post['language'];

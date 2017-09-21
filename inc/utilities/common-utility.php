@@ -110,17 +110,19 @@ final class CommonUtility {
         unset($lang);
     }
 
+    public static function setLanguage($language = LANGUAGE) {
+
+        setcookie('LANGUAGE', $language, 0, '/');
+    }
+
     public static function getAcceptedLanguage() {
 
 		$ret = 'en-us';
 
 		$languages = '';
         $acceptLanguage = '';
-        
-        if(Session::init()->getUser() !== NULL) {
-            $ret = Session::init()->getUser()->getLanguage();
-        }
-		else if(isset($_COOKIE['LANGUAGE'])) {
+
+        if(isset($_COOKIE['LANGUAGE'])) {
             $language = $_COOKIE['LANGUAGE'];
 
             $result = array_search($language, CommonUtility::$SUPPORTED_LANGUAGES);
@@ -145,7 +147,7 @@ final class CommonUtility {
         }
 
         $ret = strtolower($ret);
-        setcookie('LANGUAGE', $ret, 0, '/');
+        self::setLanguage($ret);
 
 		return $ret;
 	}

@@ -35,7 +35,7 @@ class UserModel {
 
     public function __sleep() {
 
-        return array('_id', '_login', '_token', '_display', '_language', '_activetime');
+        return array('_id', '_login', '_token', '_display', '_activetime');
     }
 
 	public function getId() { return $this->_id; }
