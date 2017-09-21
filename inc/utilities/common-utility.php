@@ -4,8 +4,7 @@ use GuzzleHttp\Psr7\Stream;
 final class CommonUtility {
 
     const PAGER_PER_PAGE = 30;
-    public static $SUPPORTED_LANGUAGES = [ 'English (United States)' => 'en-us', 'Chinese (Simplified)' => 'zh-cn' ];
-    
+    public static $SUPPORTED_LANGUAGES = [ 'English (United States)' => 'en-us', '中文 (简体)' => 'zh-cn' ];
 
     public static function getBaseUrl($path = '', $encode = FALSE) {
 

@@ -18,8 +18,8 @@ class UserModel {
         $this->_display = $display;
         $this->_token = $token;
         $this->_activetime = $activeTime;
-		$this->_passcode = '';
 		$this->_language = $language;
+		$this->_passcode = '';
 	}
 
 	function __destruct() {
@@ -35,7 +35,7 @@ class UserModel {
 
     public function __sleep() {
 
-        return array('_id', '_login', '_token', '_display', '_language', '_activetime');
+        return array('_id', '_login', '_token', '_display', '_language');
     }
 
 	public function getId() { return $this->_id; }
