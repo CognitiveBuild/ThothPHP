@@ -12,7 +12,7 @@ final class DistributionManager {
 
     public static function getApps() {
 
-        return db::query("SELECT * FROM `app` ORDER BY `name` ASC");
+        return db::query("SELECT *, (SELECT COUNT(*) FROM `build` WHERE `idapp` = `app`.`id`) AS `count` FROM `app` ORDER BY `name` ASC");
     }
 
     public static function getAppById($id) {

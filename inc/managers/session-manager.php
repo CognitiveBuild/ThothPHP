@@ -46,7 +46,6 @@ final class SessionManager {
         return Session::init()->isActive();
     }
 
-
 	/**
 	 * Generate token string
 	 *

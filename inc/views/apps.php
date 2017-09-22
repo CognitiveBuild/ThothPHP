@@ -2,13 +2,24 @@
 include('inc/header.php');
 
 $listHTML = '';
+
 foreach($apps as $key => $app) {    
     $name = $app['name'];
+
+    $distributeHTML = '';
+
+    $count = $app['count'];
+    if($count > 0) {
+        $distributeHTML = <<<EOT
+<a class="badge no-badge badge-dst ui-build-distribute" href="/apps/{$app['id']}/distribute">{$translator->translate('Distribute')}</a>
+EOT;
+    }
 
     $listHTML .= <<<EOT
     <li class="list-group-item">
         <a href="/apps/{$app['id']}" class="name ui-modal-button">{$name}</a>
-        <a class="badge no-badge badge-dst ui-build-distribute" href="/apps/{$app['id']}/distribute">{$translator->translate('Distribute')}</a>
+{$distributeHTML}
+        <a class="badge">{$app['count']}</a>
     </li>
 EOT;
 }

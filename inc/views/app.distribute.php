@@ -1,21 +1,35 @@
 <?php
 include('inc/header.php');
 $buildHTML = '';
+$submitHTML = '';
 $result = '';
+$count = count($builds);
 
 if($status) {
     $result = $translator->translate('You have sucessfully distributed the Build to: <br /><br /><strong>%s</strong>', [ $emails ]);
 }
 
-foreach($builds as $key => $build) {
-    $selected = '';
-    if($idbuild === $build['idbuild']) {
-        $selected = ' selected="selected"';
+if($count > 0) {
+    foreach($builds as $key => $build) {
+        $selected = '';
+        if($idbuild === $build['idbuild']) {
+            $selected = ' selected="selected"';
+        }
+        $buildHTML .= <<<EOT
+    <option value="{$build['idbuild']}"{$selected}>[{$build['platform']}] {$build['display']} - v{$build['version']}</option>
+EOT;
     }
-    $buildHTML .= <<<EOT
-<option value="{$build['idbuild']}"{$selected}>[{$build['platform']}] {$build['display']} - v{$build['version']}</option>
+
+    $submitHTML = <<<EOT
+    <button type="submit" class="btn btn-primary">{$translator->translate('Distribute')}</button>
 EOT;
 }
+else {
+    $buildHTML = <<<EOT
+    <option>No builds available.</option>
+EOT;
+}
+
 
 echo <<<EOT
 
@@ -48,7 +62,7 @@ echo <<<EOT
                     <textarea class="form-control" name="message" id="message">{$message}</textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary">{$translator->translate('Distribute')}</button>
+{$submitHTML}
 
                 <div class="ui-notice ui-notice-padding ui-notice-small">
 {$result}
