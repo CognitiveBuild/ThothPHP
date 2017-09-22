@@ -40,6 +40,9 @@ include 'inc/managers/distribution-manager.php';
 include 'inc/controllers/abstract-controller.php';
 include 'inc/controllers/common-controller.php';
 include 'inc/controllers/api-controller.php';
+include 'inc/controllers/app-controller.php';
+include 'inc/controllers/event-controller.php';
+include 'inc/controllers/asset-controller.php';
 
 if(isset($_ENV["VCAP_SERVICES"]) === FALSE) {
     $env = new Dotenv\Dotenv(__DIR__);
@@ -94,382 +97,119 @@ $container['notFoundHandler'] = function ($cf) {
 };
 
 // Sign in post
-$app->post('/', \CommonController::class . ':postHome');
+$app->post('/', CommonController::get('postHome'));
+$app->get('/api/v1/test/image', CommonController::get('getImage'));
+
 // App download entry
-$app->get('/app/{id}', \CommonController::class . ':getApp');
+$app->get('/app/{id}', CommonController::get('getApp'));
 // QR Code API
-$app->get('/api/v1/build/code/{id}', \CommonController::class . ':getQRCode');
+$app->get('/api/v1/build/code/{id}', CommonController::get('getQRCode'));
 // Get meta data of build (iOS .plist)
-$app->get('/api/v1/build/meta/{id}', \CommonController::class . ':getMeta');
+$app->get('/api/v1/build/meta/{id}', CommonController::get('getMeta'));
 // Download build
-$app->get('/api/v1/build/download/{idbuild}', \CommonController::class . ':getBuild');
+$app->get('/api/v1/build/download/{idbuild}', CommonController::get('getBuild'));
 
 if(SessionManager::validate()) {
-
-    $app->get('/', \CommonController::class . ':getHome');
-
+    // Home
+    $app->get('/', CommonController::get('getHome'));
     // View or update Settings
-    $app->get('/settings', \CommonController::class . ':getSettings');
-    $app->post('/settings', \CommonController::class . ':postSettings');
+    $app->get('/settings', CommonController::get('getSettings'));
+    $app->post('/settings', CommonController::get('postSettings'));
 
     // Visitors selected by event
-    $app->get('/api/v1/visitors/company/{idcompany}/event/{id}', \APIController::class . ':getVisitorsByEvent');
+    $app->get('/api/v1/visitors/company/{idcompany}/event/{id}', APIController::get('getVisitorsByEvent'));
 
     if(Session::init()->getUser()->getLogin() === 'mihui') {
-
         // Add or Catalogs
-        $app->post('/api/v1/catalog', \APIController::class . ':postCatalog');
+        $app->post('/api/v1/catalog', APIController::get('postCatalog'));
         // Assets
-        $app->get('/assets', function ($request, $response, $args) {
-
-            $p = $request->getQueryParams();
-            $language = isset($p['language']) ? $p['language'] : LANGUAGE;
-            $list = AssetManager::getAssets($language);
-
-            return $this->view->render($response, 'assets.php', [
-                'assets' => $list, 
-                'language' => $language
-            ]);
-        });
-
-        // Companies
-        $app->get('/companies', function ($request, $response, $args) {
-
-            $list = CompanyManager::getCompanies();
-
-            return $this->view->render($response, 'companies.php', [
-                'companies' => $list
-            ]);
-        });
-
-        // Company details
-        $app->get('/companies/{id}', function ($request, $response, $args) {
-
-            $id = isset($args['id']) ? $args['id'] : 0;
-            $p = $request->getQueryParams();
-            $l = isset($p['language']) ? $p['language'] : LANGUAGE;
-            $industries = CatalogManager::getCatalog(KEY_INDUSTRY, $l);
-
-            $result = array(
-                'id' => 0, 
-                'name' => '', 
-                'description' => '', 
-                'logo' => NULL, 
-                'idindustry' => 0
-            );
-
-            if($id > 0) {
-                $result = CompanyManager::getCompany($id);
-            }
-
-            return $this->view->render($response, 'company.php', [
-                'id' => $id, 
-                'company' => $result, 
-                'industries' => $industries
-            ]);
-        });
-
-        // Company update
-        $app->post('/companies/{id}', function ($request, $response, $args) {
-
-            $id = isset($args['id']) ? $args['id'] : 0;
-            $post = $request->getParsedBody();
-            $files = $request->getUploadedFiles();
-
-            $logo = NULL;
-            if(isset($files['logo']) && count($files['logo']) === 1) {
-                $size = $files['logo'][0]->getSize();
-                if($size > 0) {
-                    $logo = file_get_contents($files['logo'][0]->file);
-                }
-            }
-            $isNew = TRUE;
-            if($id > 0) {
-                CompanyManager::updateCompany($id, $post['name'], $post['idindustry'], $post['description']);
-                $isNew = FALSE;
-            }
-            else {
-                $id = CompanyManager::addCompany($post['name'], $post['idindustry'], $post['description']);
-            }
-
-            if($id > 0 && $logo !== NULL) {
-                CompanyManager::updateLogo($id, $logo);
-            }
-
-            if($isNew) {
-                return $response->withStatus(200)->withHeader('Location', "/companies");
-            }
-
-            return $response->withStatus(200)->withHeader('Location', "/companies/{$id}");
-        });
-
+        $app->get('/assets', AssetController::get('getAssets'));
         // Catalogs
-        $app->get('/catalog/{name}', function ($request, $response, $args) {
-
-            $result = [];
-
-            $name = isset($args['name']) ? $args['name'] : KEY_INDUSTRY;
-            $p = $request->getQueryParams();
-            $language = isset($p['language']) ? $p['language'] : LANGUAGE;
-
-            $result = CatalogManager::getCatalogWithAssetCount($name, $language);
-
-            return $this->view->render($response, 'catalog.php', [
-                'catalogs' => $result, 
-                'type' => $name, 
-                'language' => $language
-            ]);
-        });
-
+        $app->get('/catalog/{name}', AssetController::get('getCatalog'));
         // Asset update
-        $app->post('/assets/{id}', function ($request, $response, $args) {
-
-            $id = isset($args['id']) ? $args['id'] : 0;
-
-            $post = $request->getParsedBody();
-            $files = $request->getUploadedFiles();
-
-            $images = $files['binary'];
-            $technologies = $post['technology'];
-
-            if($id > 0) {
-                // update asset
-                $result = AssetManager::updateAsset($id, $post['name'], $post['idindustry'], $post['description'], $post['logourl'], $post['videourl'], $post['linkurl'], $post['language']);
-
-                AssetManager::deleteCatalogToAsset($id);
-                foreach($technologies as $idcatalog) {
-                    AssetManager::addCatalogToAsset(KEY_TECHNOLOGY, $id, $idcatalog);
-                }
-
-                AssetManager::addFiles($id, $images);
-                AssetManager::updateFileIds($id);
-
-                return $response->withStatus(200)->withHeader('Location', "/assets/{$id}");
-            }
-            // insert asset
-            $id = AssetManager::addAsset($post['name'], $post['idindustry'], $post['description'], $post['logourl'], $post['videourl'], $post['linkurl'], $post['language']);
-
-            if($id > 0) {
-                AssetManager::deleteCatalogToAsset($id);
-                foreach($technologies as $idcatalog) {
-                    AssetManager::addCatalogToAsset(KEY_TECHNOLOGY, $id, $idcatalog);
-                }
-
-                AssetManager::addFiles($id, $images);
-                AssetManager::updateFileIds($id);
-            }
-
-            return $response->withStatus(200)->withHeader('Location', "/assets");
-        });
-
+        $app->post('/assets/{id}', AssetController::get('postAsset'));
         // Asset details
-        $app->get('/assets/{id}', function ($request, $response, $args) {
+        $app->get('/assets/{id}', AssetController::get('getAsset'))->setName('asset-details');
 
-            $id = isset($args['id']) ? $args['id'] : 0;
-            $p = $request->getQueryParams();
-            $l = isset($p['language']) ? $p['language'] : LANGUAGE;
-
-            $result = [
-                'id' => 0, 
-                'name' => '', 
-                'description' => '', 
-                'idindustry' => 0, 
-                'logourl' => '',
-                'linkurl' => '',
-                'videourl' => '', 
-                'language' => $l
-            ];
-
-            $industries = CatalogManager::getCatalog(KEY_INDUSTRY, $l);
-            $technologies = CatalogManager::getCatalog(KEY_TECHNOLOGY, $l);
-            $technologies_applied = array();
-            $attachments = array();
-
-            if($id > 0) {
-                $result = db::queryFirst('SELECT `*` FROM `asset` WHERE `id` = ? ORDER BY `id` DESC;', $id);
-                $technologies_applied = db::query('SELECT `idcatalog` FROM `catalog_to_asset` WHERE `key` = "'.KEY_TECHNOLOGY.'" AND `idasset` = ?;', $id);
-                $attachments = db::query('SELECT `*` FROM `asset_to_file` WHERE `idasset` = ?;', $id);
-            }
-
-            return $this->view->render($response, 'asset.php', [
-                'id' => $id, 
-                'asset' => $result, 
-                'industries' => $industries, 
-                'technologies' => $technologies, 
-                'technologies_applied' => $technologies_applied, 
-                'attachments' => $attachments, 
-                'language' => $l
-            ]);
-        })->setName('asset-details');
-
+        /// Events
+        // Companies
+        $app->get('/companies', EventController::get('getCompanies'));
+        // Company details
+        $app->get('/companies/{id}', EventController::get('getCompany'));
+        // Company update
+        $app->post('/companies/{id}', EventController::get('postCompany'));
         // Visitors
-        $app->get('/visitors', function ($request, $response, $args) {
-
-            $list = VisitorManager::getVisitors();
-
-            return $this->view->render($response, 'visitors.php', [
-                'visitors' => $list
-            ]);
-        });
-
+        $app->get('/visitors', EventController::get('getVisitors'));
         // Visitor details
-        $app->get('/visitors/{id}', function ($request, $response, $args) {
-
-            $id = isset($args['id']) ? $args['id'] : 0;
-
-            $result = [
-                'id' => 0, 
-                'firstname' => '', 
-                'lastname' => '', 
-                'idcompany' => 0, 
-                'website' => '', 
-                'linkedin' => '', 
-                'facebook' => '',
-                'twitter' => ''
-            ];
-
-            $visitor = VisitorManager::getVisitor($id);
-            $companies = CompanyManager::getCompanies();
-
-            return $this->view->render($response, 'visitor.php', [
-                'id' => $id, 
-                'visitor' => $visitor, 
-                'companies' => $companies
-            ]);
-        });
-
+        $app->get('/visitors/{id}', EventController::get('getVisitor'));
         // Visitor update
-        $app->post('/visitors/{id}', function ($request, $response, $args) {
-
-            $id = isset($args['id']) ? $args['id'] : 0;
-            $post = $request->getParsedBody();
-            $files = $request->getUploadedFiles();
-
-            $avatar = NULL;
-            if(isset($files['avatar']) && count($files['avatar']) === 1) {
-                $size = $files['avatar'][0]->getSize();
-                if($size > 0) {
-                    $avatar = file_get_contents($files['avatar'][0]->file);
-                }
-            }
-            $isNew = TRUE;
-            if($id > 0) {
-                $isNew = FALSE;
-                VisitorManager::updateVisitor($id, $post['firstname'], $post['lastname'], $post['idcompany'], $post['website'], $post['linkedin'], $post['facebook'], $post['twitter'], $post['order']);
-            }
-            else {
-                $id = VisitorManager::addVisitor($post['firstname'], $post['lastname'], $post['idcompany'], $post['website'], $post['linkedin'], $post['facebook'], $post['twitter'], $post['order']);
-            }
-
-            if($id > 0 && $avatar !== NULL) {
-                VisitorManager::updateAvatar($id, $avatar);
-            }
-
-            if($isNew) {
-                return $response->withStatus(200)->withHeader('Location', "/visitors");
-            }
-
-            return $response->withStatus(200)->withHeader('Location', "/visitors/{$id}");
-        });
-
+        $app->post('/visitors/{id}', EventController::get('postVisitor'));
         // Events
-        $app->get('/events', function ($request, $response, $args) {
-
-            $list = EventManager::getEvents();
-
-            return $this->view->render($response, 'events.php', [
-                'events' => $list
-            ]);
-        });
-
+        $app->get('/events', EventController::get('getEvents'));
         // Event details
-        $app->get('/events/{id}', function ($request, $response, $args) {
-
-            $id = isset($args['id']) ? $args['id'] : 0;
-            $today = date("Y-m-d");
-            $result = [
-                'id' => 0, 
-                'visitdate' => $today, 
-                'idcompany' => 0, 
-                'isactive' => 'Y', 
-                'displayas' => ''
-            ];
-
-            $companies = CompanyManager::getCompanies();
-
-            $timelines = EventManager::getTimelinesByEventId($id);
-
-            if($id > 0) {
-                $result = EventManager::getEvent($id);
-            }
-
-            return $this->view->render($response, 'event.php', [
-                'id' => $id, 
-                'event' => $result, 
-                'companies' => $companies, 
-                'timelines' => $timelines
-            ]);
-        });
-
+        $app->get('/events/{id}', EventController::get('getEvent'));
         // Add or update Event
-        $app->post('/events/{id}', \APIController::class . ':postEvent');
+        $app->post('/events/{id}', EventController::get('postEvent'));
 
         /// Private APIs
         // Delete attachment
-        $app->delete('/api/v1/assets/attachment/{id}', \APIController::class . ':deleteAssetAttachment');
+        $app->delete('/api/v1/assets/attachment/{id}', APIController::get('deleteAssetAttachment'));
         // Delete logo
-        $app->delete('/api/v1/companies/logo/{id}', \APIController::class . ':deleteCompanyLogo');
+        $app->delete('/api/v1/companies/logo/{id}', APIController::get('deleteCompanyLogo'));
         // Visitor avatar delete
-        $app->delete('/api/v1/visitors/avatar/{id}', \APIController::class . ':deleteVisitorAvatar');
+        $app->delete('/api/v1/visitors/avatar/{id}', APIController::get('deleteVisitorAvatar'));
         // Timeline delete
-        $app->delete('/api/v1/timelines/{id}', \APIController::class . ':deleteTimeline');
+        $app->delete('/api/v1/timelines/{id}', APIController::get('deleteTimeline'));
     }
 
-    $app->get('/apps', \APIController::class . ':getApps');
-    $app->get('/apps/{id}', \APIController::class . ':getApp');
+    // App list
+    $app->get('/apps', AppController::get('getApps'));
+    // App details
+    $app->get('/apps/{id}', AppController::get('getApp'));
     // Add or Update app
-    $app->post('/apps/{id}', \APIController::class . ':postApp');
+    $app->post('/apps/{id}', AppController::get('postApp'));
+    // Distribution list
+    $app->get('/apps/{idapp}/distribute', AppController::get('getDistribute'));
+    // Add or update distribution
+    $app->post('/apps/{idapp}/distribute', AppController::get('postDistribute'));
     // Build information
-    $app->get('/apps/{idapp}/builds/{idbuild}', \APIController::class . ':getAppBuild');
+    $app->get('/apps/{idapp}/builds/{idbuild}', AppController::get('getAppBuild'));
     // Add or Upload build
-    $app->post('/apps/{idapp}/builds/{idbuild}', \APIController::class . ':postAppBuild');
-    // 
-    $app->delete('/api/v1/apps/{idapp}/builds/{idbuild}', \APIController::class . ':deleteAppBuild');
-    $app->get('/apps/{idapp}/distribute', \APIController::class . ':getDistribute');
-
-    $app->post('/apps/{idapp}/distribute', \APIController::class . ':postDistribute');
+    $app->post('/apps/{idapp}/builds/{idbuild}', AppController::get('postAppBuild'));
+    // Delete a build
+    $app->delete('/api/v1/apps/{idapp}/builds/{idbuild}', APIController::get('deleteAppBuild'));
 
     // Sign out
-    $app->get('/signout', \APIController::class . ':getSignedOut');
+    $app->get('/signout', APIController::get('getSignedOut'));
 
     $app->get('/api/v1/info', function ($request, $response, $args) {
         phpinfo();
     });
 }
 else {
-    $app->get('/', \APIController::class . ':getUnAuthorizedHome');
-    $app->get('/signout', \APIController::class . ':getSignOut');
+    $app->get('/', APIController::get('getUnAuthorizedHome'));
+    $app->get('/signout', APIController::get('getSignOut'));
 }
 
 /// Public APIs
 // Catalogs by catalog keyword
-$app->get('/api/v1/catalog/{q}', \APIController::class . ':getCatalogs');
+$app->get('/api/v1/catalog/{q}', APIController::get('getCatalogs'));
 // Attachment render
-$app->get('/api/v1/assets/attachment/{id}', \APIController::class . ':getAttachment');
+$app->get('/api/v1/assets/attachment/{id}', APIController::get('getAttachment'));
 // Query assets by catalog, INDUSTRY | TECHNOLOGY
-$app->get('/api/v1/assets/catalog/{catalog}/name/{name}', \APIController::class . ':getAssetsByCatalogName');
+$app->get('/api/v1/assets/catalog/{catalog}/name/{name}', APIController::get('getAssetsByCatalogName'));
 // Query assets by company
-$app->get('/api/v1/assets/company/id/{id}', \APIController::class . ':getAssetsByCompanyId');
+$app->get('/api/v1/assets/company/id/{id}', APIController::get('getAssetsByCompanyId'));
 // Query assets by catalog id
-$app->get('/api/v1/assets/catalog/{catalog}/id/{id}', \APIController::class . ':getAssetsByCatalogId');
+$app->get('/api/v1/assets/catalog/{catalog}/id/{id}', APIController::get('getAssetsByCatalogId'));
 
 /// Company
 // Get logo image
-$app->get('/api/v1/companies/logo/{id}', \APIController::class . ':getCompanyLogo');
+$app->get('/api/v1/companies/logo/{id}', APIController::get('getCompanyLogo'));
 // Event of today, Watson uses it
-$app->get('/api/v1/event/today', \APIController::class . ':getEventToday');
+$app->get('/api/v1/event/today', APIController::get('getEventToday'));
 // Visitor avatar
-$app->get('/api/v1/visitor/avatar/{id}', \APIController::class . ':getVisitorAvatar');
+$app->get('/api/v1/visitor/avatar/{id}', APIController::get('getVisitorAvatar'));
 
 // unused
 // $app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {

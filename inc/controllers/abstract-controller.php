@@ -4,7 +4,7 @@ abstract class AbstractController {
     protected $container;
     protected $view;
 
-    public abstract function get($method);
+    public abstract static function get($method);
 
     function __construct($container) {
 

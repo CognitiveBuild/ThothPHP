@@ -1,15 +1,23 @@
 <?php
 final class CommonController extends AbstractController {
 
-    public function get($method) {
+    public static function get($method) {
 
-        return CommonController::class . $method;
+        return CommonController::class . ":{$method}";
     }
 
     public function getHome($request, $response, $args){
 
         return $this->view->render($response, 'index.php', [
             'message' => translate('Welcome')
+        ]);
+    }
+
+    // TEST ONLY
+    public function getImage($request, $response, $args) {
+
+        return $this->view->render($response, 'test.php', [
+            
         ]);
     }
 
