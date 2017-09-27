@@ -163,8 +163,9 @@ $(function(){
                         url: '/api/v1/visitors/company/' + idcompany + '/event/' + id + '', 
                         method: 'GET', 
                         success: function(response) {
+                            var translations = response.translations;
                             var jGroup = $('.form-group-visitors');
-                            var jLabel = $('<label for="_company">Visitors</label>');
+                            var jLabel = $('<label for="_company">'+translations.visitors+'</label>');
                             var jContainer = $('<div class="form-control form-control-auto-height" id="_company"></div>');
                             //
                             var all = response.all;

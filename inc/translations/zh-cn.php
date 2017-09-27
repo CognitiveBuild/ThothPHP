@@ -30,6 +30,11 @@ $lang = [
     'Visitor' => '访客',
     'Visitor details' => '访客详情',
     'Add a new Visitor' => '添加新访客',
+    'Visit date' => '来访日期',
+    'Display as' => '显示为',
+    'No timelines' => '没有时间安排',
+    'Timeline' => '时间安排',
+    'Is active' => '是否有效',
     'First name' => '名',
     'Last name' => '姓',
     'Website' => '网站',
@@ -112,5 +117,4 @@ $lang = [
     <div>格式必须与 <a href="http://www.faqs.org/rfcs/rfc2822" target="_blank">» RFC 2822</a> 中定义的保持一致（多个邮件用英文逗号隔开）。 以下是一些例子:</div>
     user@example.com<br />
     user@example.com, anotheruser@example.com<br />', 
-    
 ];

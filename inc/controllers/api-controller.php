@@ -72,7 +72,11 @@ final class APIController extends AbstractController {
         $all = VisitorManager::getVisitorsForEvent();
         $selected = EventManager::getVisitorsByEventId($id);
 
-        return $response->withJson([ 'all' => $all, 'selected' => $selected ]);
+        return $response->withJson([ 
+            'all' => $all, 
+            'selected' => $selected, 
+            'translations' => [ 'visitors' => translate('Visitors') ] 
+        ]);
     }
 
     public function getCompanyLogo($request, $response, $args) {

@@ -91,10 +91,10 @@ echo <<<EOT
 
     <div class="form-group form-group-timeline">
         <div class="form-control form-control-auto-height">
-            <label for="timeline">Timeline</label>
+            <label for="timeline">{$translator->translate('Timeline')}</label>
             <div class="timeline-container">
 {$timelineHTML}
-                <div class="form-group form-group-no-data">{$translator->translate('No timlines')}</div>
+                <div class="form-group form-group-no-data">{$translator->translate('No timelines')}</div>
             </div>
         </div>
     </div>
