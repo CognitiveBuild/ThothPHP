@@ -55,12 +55,12 @@ final class APIController extends AbstractController {
         $event = EventManager::getEventOfToday();
         $visitors = VisitorManager::getVisitorsOfToday();
         if($visitors === FALSE) {
-            $visitors = array();
+            $visitors = [];
         }
         if($event === FALSE) {
             $event = new stdClass();
         }
-        return $response->withJson(array( 'event' => $event, 'visitors' => $visitors ));
+        return $response->withJson([ 'event' => $event, 'visitors' => $visitors ]);
     }
 
     public function getVisitorsByEvent($request, $response, $args) {
@@ -72,7 +72,7 @@ final class APIController extends AbstractController {
         $all = VisitorManager::getVisitorsForEvent();
         $selected = EventManager::getVisitorsByEventId($id);
 
-        return $response->withJson(array('all' => $all, 'selected' => $selected));
+        return $response->withJson([ 'all' => $all, 'selected' => $selected ]);
     }
 
     public function getCompanyLogo($request, $response, $args) {

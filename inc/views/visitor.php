@@ -1,18 +1,11 @@
 <?php
 include('inc/header.php');
-?>
 
-<div id="t-wrapper" class="visitor">
-
-    <div class="panel panel-default ui-visitor">
-        <div class="panel-heading">Visitor details</div>
-        <div class="panel-body">
-            <form class="list list-group" method="POST" enctype="multipart/form-data">
-
-<?php
 $companyHTML = '';
 if($id == '0') {
-    $companyHTML = '<option value="0">Please choose one</option>';
+    $companyHTML = <<<EOT
+<option value="0">{$translator->translate('Please choose one')}</option>
+EOT;
 }
 
 foreach($companies as $company) {
@@ -38,51 +31,58 @@ else {
 
 
 echo <<<EOT
+<div id="t-wrapper" class="visitor">
+
+    <div class="panel panel-default ui-visitor">
+        <div class="panel-heading">{$translator->translate('Visitor details')}</div>
+        <div class="panel-body">
+            <form class="list list-group" method="POST" enctype="multipart/form-data">
+
     <input type="hidden" name="id" value="{$id}" />
     <div class="form-group">
-        <label for="firstname">First name</label>
-        <input type="text" class="form-control" id="firstname" name="firstname" placeholder="First name" value="{$visitor['firstname']}" />
+        <label for="firstname">{$translator->translate('First name')}</label>
+        <input type="text" class="form-control" id="firstname" name="firstname" placeholder="{$translator->translate('First name')}" value="{$visitor['firstname']}" />
     </div>
 
     <div class="form-group">
-        <label for="lastname">Last name</label>
-        <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Last name" value="{$visitor['lastname']}" />
+        <label for="lastname">{$translator->translate('Last name')}</label>
+        <input type="text" class="form-control" id="lastname" name="lastname" placeholder="{$translator->translate('Last name')}" value="{$visitor['lastname']}" />
     </div>
 
     <div class="form-group">
-        <label for="company">Company</label>
+        <label for="company">{$translator->translate('Company')}</label>
         <select class="form-control" id="company" name="idcompany">
 {$companyHTML}
         </select>
     </div>
 
     <div class="form-group">
-        <label for="website">Website</label>
-        <input type="text" class="form-control" id="website" name="website" placeholder="Website URL" value="{$visitor['website']}" />
+        <label for="website">{$translator->translate('Website')}</label>
+        <input type="text" class="form-control" id="website" name="website" placeholder="{$translator->translate('Website URL')}" value="{$visitor['website']}" />
     </div>
 
     <div class="form-group">
-        <label for="linkedin">Linked-In</label>
-        <input type="text" class="form-control" id="linkedin" name="linkedin" placeholder="Linked-In URL" value="{$visitor['linkedin']}" />
+        <label for="linkedin">{$translator->translate('Linked-In')}</label>
+        <input type="text" class="form-control" id="linkedin" name="linkedin" placeholder="{$translator->translate('Linked-In URL')}" value="{$visitor['linkedin']}" />
     </div>
 
     <div class="form-group">
-        <label for="facebook">Facebook</label>
-        <input type="text" class="form-control" id="facebook" name="facebook" placeholder="Facebook URL" value="{$visitor['facebook']}" />
+        <label for="facebook">{$translator->translate('Facebook')}</label>
+        <input type="text" class="form-control" id="facebook" name="facebook" placeholder="{$translator->translate('Facebook URL')}" value="{$visitor['facebook']}" />
     </div>
 
     <div class="form-group">
-        <label for="twitter">Twitter</label>
-        <input type="text" class="form-control" id="twitter" name="twitter" placeholder="Twitter URL" value="{$visitor['twitter']}" />
+        <label for="twitter">{$translator->translate('Twitter')}</label>
+        <input type="text" class="form-control" id="twitter" name="twitter" placeholder="{$translator->translate('Twitter URL')}" value="{$visitor['twitter']}" />
     </div>
 
     <div class="form-group">
-        <label for="order">Order</label>
+        <label for="order">{$translator->translate('Order')}</label>
         <input type="number" class="form-control" id="order" name="order" placeholder="Order" value="{$visitor['order']}" />
     </div>
 
     <div class="form-group attachment-group">
-            <label for="description">Avatar</label>
+            <label for="description">{$translator->translate('Avatar')}</label>
             <div class="attachments">
                 <div class="file-group{$avatarReadyState}" style="background-image: url(/api/v1/visitor/avatar/{$visitor['id']})" data-id="{$visitor['id']}">
                     <div class="visitor-avatar-remove glyphicon glyphicon-remove"></div>
@@ -91,17 +91,14 @@ echo <<<EOT
                 </div>
             </div>
     </div>
-EOT;
-
-?>
-                <button type="submit" class="btn btn-primary btn-visitor-save">Save changes</button>
-            </form>
-        </div>
-    </div>
-
-    
+    <button type="submit" class="btn btn-primary btn-visitor-save">{$translator->translate('Save changes')}</button>
+    </form>
+</div>
 </div>
 
-<?php
+
+</div>
+EOT;
+
 include('inc/footer.html');
 ?>

@@ -24,19 +24,20 @@ final class VisitorManager {
     public static function addVisitor($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $order = 0) {
 
         return db::insert("INSERT INTO `visitor` (`firstname`, `lastname`, `idcompany`, `website`, `linkedin`, `facebook`, `twitter`, `order`) VALUES (?,?,?,?,?,?,?,?);", 
-        array($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $order));
+            [$firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $order]
+        );
     }
 
     public static function updateVisitor($id, $firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $order = 0) {
 
         return db::execute("UPDATE `visitor` SET `firstname` = ?, `lastname` = ?, `idcompany` = ?, `website` = ?, `linkedin` = ?, `facebook` = ?, `twitter` = ?, `order` = ? WHERE `id` = ?;", 
-            array($firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $order, $id)
+            [$firstname, $lastname, $idcompany, $website, $linkedin, $facebook, $twitter, $order, $id]
         );
     }
 
     public static function updateAvatar($id, $avatar) {
 
-        return db::execute("UPDATE `visitor` SET `avatar` = ? WHERE `id` = ?;", array($avatar, $id));
+        return db::execute("UPDATE `visitor` SET `avatar` = ? WHERE `id` = ?;", [$avatar, $id]);
     }
 
     public static function getVisitorsOfToday() {

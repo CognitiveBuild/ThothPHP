@@ -1,15 +1,6 @@
 <?php
 include('inc/header.php');
-?>
 
-<div id="t-wrapper" class="event details">
-
-    <div class="panel panel-default ui-event">
-        <div class="panel-heading">Event details</div>
-        <div class="panel-body">
-            <form class="list list-group" method="POST">
-
-<?php
 $companyHTML = '';
 if($id == '0') {
     $companyHTML = '<option value="0">Please choose one</option>';
@@ -39,15 +30,15 @@ if($id > 0) {
                 <div class="form-group">
                     <div class="row">
                         <div class="col-md-5">
-                            <input type="text" class="form-control form-control-inline" name="timeline_timestart[{$i}]" placeholder="Start time" maxlength="5" value="{$timeline['timestart']}" />
+                            <input type="text" class="form-control form-control-inline" name="timeline_timestart[{$i}]" placeholder="{$translator->translate('Start time')}" maxlength="5" value="{$timeline['timestart']}" />
                         </div>
 
                         <div class="col-md-1">
-                            <span class="glyphicon-remove-width-input">to</span>
+                            <span class="glyphicon-remove-width-input">{$translator->translate('To')}</span>
                         </div>
 
                         <div class="col-md-5">
-                            <input type="text" class="form-control form-control-inline" name="timeline_timeend[{$i}]" placeholder="End time" maxlength="5" value="{$timeline['timeend']}" />
+                            <input type="text" class="form-control form-control-inline" name="timeline_timeend[{$i}]" placeholder="{$translator->translate('End time')}" maxlength="5" value="{$timeline['timeend']}" />
                         </div>
 
                         <div class="col-md-1">
@@ -67,81 +58,86 @@ EOT;
 }
 
 echo <<<EOT
+
+<div id="t-wrapper" class="event details">
+
+    <div class="panel panel-default ui-event">
+        <div class="panel-heading">{$translator->translate('Event details')}</div>
+        <div class="panel-body">
+            <form class="list list-group" method="POST">
+
     <input type="hidden" name="id" id="id" value="{$id}" />
     <div class="form-group">
-        <label for="visitdate">Visit date</label>
-        <input type="text" class="form-control datepicker" id="visitdate" name="visitdate" placeholder="Visit date" value="{$event['visitdate']}" />
+        <label for="visitdate">{$translator->translate('Visit date')}</label>
+        <input type="text" class="form-control datepicker" id="visitdate" name="visitdate" placeholder="{$translator->translate('Visit date')}" value="{$event['visitdate']}" />
     </div>
 
     <div class="form-group">
-        <label for="lastname">Display as</label>
-        <input type="text" class="form-control" id="displayas" name="displayas" placeholder="Display as" value="{$event['displayas']}" />
+        <label for="lastname">{$translator->translate('Display as')}</label>
+        <input type="text" class="form-control" id="displayas" name="displayas" placeholder="{$translator->translate('Display as')}" value="{$event['displayas']}" />
     </div>
 
     <div class="form-group">
-        <label for="company">Company</label>
+        <label for="company">{$translator->translate('Company')}</label>
         <select class="form-control" id="company" name="idcompany">
 {$companyHTML}
         </select>
     </div>
 
     <div class="form-group">
-        <label for="isactive">Is active</label>
-        <input type="text" class="form-control" id="isactive" name="isactive" placeholder="Is active" value="{$event['isactive']}" />
+        <label for="isactive">{$translator->translate('Is active')}</label>
+        <input type="text" class="form-control" id="isactive" name="isactive" placeholder="{$translator->translate('Is active')}" value="{$event['isactive']}" />
     </div>
 
     <div class="form-group form-group-timeline">
         <div class="form-control form-control-auto-height">
             <label for="timeline">Timeline</label>
             <div class="timeline-container">
-                {$timelineHTML}
-                <div class="form-group form-group-no-data">No timlines.</div>
+{$timelineHTML}
+                <div class="form-group form-group-no-data">{$translator->translate('No timlines')}</div>
             </div>
         </div>
     </div>
 
     <div class="form-group form-group-visitors">
     </div>
-
-EOT;
-
-?>
-                <button type="submit" class="btn btn-primary btn-event-save">Save changes</button>
-
-                <button type="button" class="btn btn-secondary btn-event-timeline-add timeline-add">Add timeline</button>
-            </form>
+    <button type="submit" class="btn btn-primary btn-event-save">{$translator->translate('Save changes')}</button>
+    
+                    <button type="button" class="btn btn-secondary btn-event-timeline-add timeline-add">{$translator->translate('Add timeline')}</button>
+                </form>
+            </div>
         </div>
-    </div>
-
-    <div class="ui-template ui-template-timeline">
-        <div class="form-group-container">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-5">
-                        <input type="text" class="form-control form-control-inline timeline-timestart" data-name="timeline_timestart" placeholder="Start time" maxlength="5" value="" />
-                    </div>
-
-                    <div class="col-md-1">
-                        <span class="glyphicon-remove-width-input">to</span>
-                    </div>
-
-                    <div class="col-md-5">
-                        <input type="text" class="form-control form-control-inline timeline-timeend" data-name="timeline_timeend" placeholder="End time" maxlength="5" value="" />
-                    </div>
-
-                    <div class="col-md-1">
-                        <span class="glyphicon glyphicon-remove glyphicon-remove-width-input timeline-remove" data-id="0"></span>
+    
+        <div class="ui-template ui-template-timeline">
+            <div class="form-group-container">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <input type="text" class="form-control form-control-inline timeline-timestart" data-name="timeline_timestart" placeholder="{$translator->translate('Start time')}" maxlength="5" value="" />
+                        </div>
+    
+                        <div class="col-md-1">
+                            <span class="glyphicon-remove-width-input">{$translator->translate('To')}</span>
+                        </div>
+    
+                        <div class="col-md-5">
+                            <input type="text" class="form-control form-control-inline timeline-timeend" data-name="timeline_timeend" placeholder="{$translator->translate('End time')}" maxlength="5" value="" />
+                        </div>
+    
+                        <div class="col-md-1">
+                            <span class="glyphicon glyphicon-remove glyphicon-remove-width-input timeline-remove" data-id="0"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <textarea class="form-control timeline-activity" data-name="timeline_activity" placeholder="Activity"></textarea>
+    
+                <div class="form-group">
+                    <textarea class="form-control timeline-activity" data-name="timeline_activity" placeholder="{$translator->translate('Activity')}"></textarea>
+                </div>
             </div>
         </div>
     </div>
-</div>
+    
+EOT;
 
-<?php
 include('inc/footer.html');
 ?>

@@ -1,9 +1,61 @@
 <?php
-$lang = array(
+$lang = [
     'Asset Center' => '资产中心', 
     'Welcome' => '欢迎来到资产中心！', 
     'Home' => '首页', 
     'Assets' => '资产', 
+    'Asset details' => '资产详情',
+    'Add a new Asset' => '添加新资产',
+    'Logo URL' => '标示链接地址',
+    'Video URL' => '视频链接地址',
+    'Link URL' => '网页链接地址',
+    'Attachments' => '附件',
+    'Save changes' => '保存更改',
+    'Catalog' => '类别',
+    'Type' => '类型',
+    'ID' => '编号',
+    'Close' => '关闭',
+    'Company' => '公司',
+    'Company details' => '公司详情',
+    'Add a new Company' => '添加新公司',
+    'Logo' => '标识',
+    'Language' => '语言', 
+    'Add a new Catalog' => '添加新类别',
+    'Technology' => '技术',
+    'Technologies' => '技术',
+    'Industry' => '行业',
+    'Industries' => '行业',
+    'Companies' => '公司',
+    'Visitors' => '访客',
+    'Visitor' => '访客',
+    'Visitor details' => '访客详情',
+    'Add a new Visitor' => '添加新访客',
+    'First name' => '名',
+    'Last name' => '姓',
+    'Website' => '网站',
+    'Website URL' => '网站地址',
+    'Linked-In' => '英领',
+    'Linked-In URL' => '英领链接地址',
+    'Facebook' => '脸书',
+    'Facebook URL' => '脸书链接地址',
+    'Twitter' => '推特',
+    'Twitter URL' => '推特链接地址',
+    'Order' => '显示顺序',
+    'Avatar' => '头像',
+    'Login name' => '登录名',
+    'Token' => '令牌',
+    'Active time' => '活跃时间',
+    'User details' => '用户详情',
+
+    'Role' => '角色',
+    'Roles' => '角色',
+    'Add a new Role' => '添加新角色',
+    'Role details' => '角色详情',
+    'ACLs' => '访问控制',
+    'Events' => '事件',
+    'Event details' => '事件详情',
+    'Add a new Event' => '添加新事件', 
+    'Completed' => '已完成',
     'Settings' => '设置',
     'Sign In' => '登录', 
     'Sign out' => '退出',
@@ -18,6 +70,7 @@ $lang = array(
     'No builds' => 'No builds', //
     'Delete' => '删除',
     'Distribute' => '分发',
+    'Description' => '描述', 
 
     'Add a new App' => '添加新应用',
     'App details' => '应用详细信息', 
@@ -25,6 +78,7 @@ $lang = array(
     'Choose your Build' => 'Choose your Build', //
     'Download build' => 'Download build', //
     'Build details' => 'Build details', //
+    'No builds available' => '没有可用的 build', //
     'Display name' => '显示名称',
     'Bundle ID / Package name' => 'Bundle ID / Package 名称',
     'Platform' => '平台',
@@ -43,6 +97,9 @@ $lang = array(
     '%s invited you to try out the latest version of %s (%s)' => '%s 邀请您试用 %s 最新版本（%s）',
     'Open this email on your <strong>%s</strong> device and tap below to continue.' => '在 <strong>%s</strong> 设备上打开邮件，并点击下面的按钮继续。', 
     'On Desktop?' => '在笔记本或台式机上，可以点击下面的链接按钮直接下载。',
+    'Users' => '用户',
+    'No users' => '没有用户，<a href="/users/0">添加一个新用户</a>？',
+    'Add a new User' => '添加新用户',
 
     'First page'=>'First page',
     'Previous page'=>'Previous page',
@@ -55,4 +112,5 @@ $lang = array(
     <div>格式必须与 <a href="http://www.faqs.org/rfcs/rfc2822" target="_blank">» RFC 2822</a> 中定义的保持一致（多个邮件用英文逗号隔开）。 以下是一些例子:</div>
     user@example.com<br />
     user@example.com, anotheruser@example.com<br />', 
-);
+    
+];

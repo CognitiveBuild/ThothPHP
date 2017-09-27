@@ -26,7 +26,7 @@ EOT;
 }
 else {
     $buildHTML = <<<EOT
-    <option>No builds available.</option>
+    <option>{$translator->translate('No builds available')}</option>
 EOT;
 }
 

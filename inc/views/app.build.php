@@ -36,7 +36,7 @@ EOT;
 EOT;
 }
 
-$platforms = array(BuildModel::IOS, BuildModel::ANDROID);
+$platforms = [BuildModel::IOS, BuildModel::ANDROID];
 
 foreach($platforms as $platform) {
 

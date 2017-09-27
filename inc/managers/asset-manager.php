@@ -14,13 +14,13 @@ class AssetManager {
 
     public static function getAssetsByCatalogName($key, $name) {
 
-        $result = array();
+        $result = [];
         $asset_columns = self::$asset_columns;
         if($key === KEY_INDUSTRY) {
             $result = db::query("SELECT {$asset_columns} FROM `asset` 
                 JOIN `catalog` ON `catalog`.`id` = `asset`.`idindustry`
                 WHERE `catalog`.`key` = ? AND `catalog`.`name` LIKE ?;", 
-                array($key, $name)
+                [$key, $name]
             );
         }
         else {
@@ -28,7 +28,7 @@ class AssetManager {
                 JOIN `catalog_to_asset` ON `catalog_to_asset`.`idasset` = `asset`.`id` 
                 JOIN `catalog` ON `catalog`.`id` = `catalog_to_asset`.`idcatalog` 
                 WHERE `catalog`.`key` = ? AND `catalog`.`name` LIKE ?;", 
-                array($key, $name)
+                [$key, $name]
             );
         }
 
@@ -42,7 +42,7 @@ class AssetManager {
         if(count($result) > 0) {
             foreach($result as $key => $val) {
 
-                $list = array();
+                $list = [];
                 $query = json_decode($val['attachments'], TRUE);
 
                 if(is_array($query)) {
@@ -60,7 +60,7 @@ class AssetManager {
 
     public static function getAssetsByCatalogId($key, $id) {
 
-        $result = array();
+        $result = [];
         $asset_columns = self::$asset_columns;
         if($key === KEY_INDUSTRY) {
             $result = db::query("SELECT {$asset_columns} FROM `asset` WHERE `asset`.`idindustry` = ?", array($id));
@@ -70,7 +70,7 @@ class AssetManager {
                 JOIN `catalog_to_asset` ON `catalog_to_asset`.`idasset` = `asset`.`id` 
                 JOIN `catalog` ON `catalog`.`id` = `catalog_to_asset`.`idcatalog` 
                 WHERE `catalog`.`key` = ? AND `catalog`.`id` = ?;", 
-                array($key, $id)
+                [$key, $id]
             );
         }
 
@@ -82,7 +82,7 @@ class AssetManager {
 
     public static function getAssetsByCompanyId($id) {
 
-        $result = array();
+        $result = [];
         $asset_columns = self::$asset_columns;
 
         $result = db::query("SELECT {$asset_columns} FROM `asset` WHERE `videourl` != '' ORDER BY RAND() LIMIT 10 ;"); //, array($id)
@@ -96,7 +96,7 @@ class AssetManager {
 
         return db::insert(
             "INSERT INTO `asset` (`name`, `idindustry`, `description`, `logourl`, `videourl`, `linkurl`, `language`) VALUES (?,?,?,?,?,?,?);", 
-            array($name, $idindustry, $description, $logourl, $videourl, $linkurl, $language)
+            [$name, $idindustry, $description, $logourl, $videourl, $linkurl, $language]
         );
     }
 
@@ -104,7 +104,7 @@ class AssetManager {
 
         return db::update(
             "UPDATE `asset` SET `name` = ?, `idindustry` = ?, `description` = ?, `logourl` = ?, `videourl` = ?, `linkurl` = ?, `language` = ? WHERE `id` = ?;", 
-            array($name, $idindustry, $description, $logourl, $videourl, $linkurl, $language, $id)
+            [$name, $idindustry, $description, $logourl, $videourl, $linkurl, $language, $id]
         );
     }
 
@@ -122,7 +122,7 @@ class AssetManager {
 
         return db::insert(
             "INSERT INTO `catalog_to_asset` (`key`, `idasset`, `idcatalog`) VALUES (?,?,?);", 
-            array($key, $idasset, $idcatalog)
+            [$key, $idasset, $idcatalog]
         );
     }
 
@@ -148,7 +148,7 @@ class AssetManager {
 
             db::insert(
                 "INSERT INTO `asset_to_file` (`idasset`, `binary`, `name`, `size`, `type`) VALUES (?,?,?,?,?);", 
-                array($id, $binary, $name, $size, $type)
+                [$id, $binary, $name, $size, $type]
             );
 
         }

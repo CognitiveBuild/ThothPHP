@@ -1,14 +1,15 @@
 <?php
 include('inc/header.php');
-?>
+$html = <<<EOT
 
 <div id="t-wrapper" class="event">
 
     <div class="panel panel-default">
-        <div class="panel-heading">Events <a href="/events/0" class="ui-right ui-modal-button" data-id="0">Add a new Event</a></div>
+        <div class="panel-heading">{$translator->translate('Events')} <a href="/events/0" class="ui-right ui-modal-button" data-id="0">{$translator->translate('Add a new Event')}</a></div>
         <div class="panel-body">
             <ul class="list list-group list-group-highlight">
-<?php
+EOT;
+
 foreach($events as $event) {
     $visit_date_string = $event['visitdate'];
     $is_active = (isset($event['isactive']) && ($event['isactive'] === OPTION_YES));
@@ -27,18 +28,18 @@ foreach($events as $event) {
 
     if($visit_date_string == $now_string) {
         $extra_display = <<<EOT
-<span class="badge badge-red">Today</span>
+<span class="badge badge-red">{$translator->translate('Today')}</span>
 EOT;
     }
     else {
         if($count > 0) {
-            $extra_display = "<span class=\"badge\">{$count} days</span>";
+            $extra_display = "<span class=\"badge\">{$count} {$translator->translate('days')}</span>";
         }
         else {
-            $extra_display = "<span class=\"badge badge-green\">Completed</span>";
+            $extra_display = "<span class=\"badge badge-green\">{$translator->translate('Completed')}</span>";
         }
     }
-    echo <<<EOT
+    $html .= <<<EOT
 <li class="list-group-item">
     {$status}
     <a href="/events/{$event['id']}" class="name ui-modal-button">[{$visit_date_string}] {$event['displayas']}</a>
@@ -46,14 +47,14 @@ EOT;
 </li>
 EOT;
 }
-?>
-            </ul>
-        </div>
-    </div>
-
-    
+$html .= <<<EOT
+</ul>
 </div>
+</div>
+</div>
+EOT;
 
-<?php
+echo $html;
+
 include('inc/footer.html');
 ?>

@@ -48,11 +48,11 @@ final class EventController extends AbstractController {
         $id = isset($args['id']) ? $args['id'] : 0;
         $post = $request->getParsedBody();
 
-        $visitors = isset($post['idvisitor']) ? $post['idvisitor'] : array();
+        $visitors = isset($post['idvisitor']) ? $post['idvisitor'] : [];
 
-        $timestarts = isset($post['timeline_timestart']) ? $post['timeline_timestart'] : array();
-        $timeends = isset($post['timeline_timeend']) ? $post['timeline_timeend'] : array(); 
-        $activitis = isset($post['timeline_activity']) ? $post['timeline_activity'] : array();
+        $timestarts = isset($post['timeline_timestart']) ? $post['timeline_timestart'] : [];
+        $timeends = isset($post['timeline_timeend']) ? $post['timeline_timeend'] : []; 
+        $activitis = isset($post['timeline_activity']) ? $post['timeline_activity'] : [];
         $isactive = isset($post['isactive']) ? $post['isactive'] : OPTION_NO;
 
         $isNew = TRUE;
@@ -175,13 +175,13 @@ final class EventController extends AbstractController {
         $l = isset($p['language']) ? $p['language'] : LANGUAGE;
         $industries = CatalogManager::getCatalog(KEY_INDUSTRY, $l);
 
-        $result = array(
+        $result = [
             'id' => 0, 
             'name' => '', 
             'description' => '', 
             'logo' => NULL, 
             'idindustry' => 0
-        );
+        ];
 
         if($id > 0) {
             $result = CompanyManager::getCompany($id);

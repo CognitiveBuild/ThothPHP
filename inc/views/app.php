@@ -3,7 +3,7 @@ include('inc/header.php');
 
 $regionHTML = '';
 
-$regions = array('Dallas' => 'dallas', 'London' => 'london');
+$regions = ['Dallas' => 'dallas', 'London' => 'london'];
 foreach($regions as $label => $val) {
 
     $selected = '';

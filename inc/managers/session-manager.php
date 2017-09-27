@@ -8,7 +8,7 @@ final class SessionManager {
         $newToken = self::generateToken($login, $passcode, $time);
         $encryptedPasscode = self::generateToken($login, $passcode);
 
-        $result = db::queryFirst("SELECT * FROM `user` WHERE `login` = ?;", array($login));
+        $result = UserManager::getUserByLogin($login);
 
         if($result === NULL) {
             return $succeed;
@@ -16,21 +16,29 @@ final class SessionManager {
 
         // Special case for first login user
         // @todo: Remove & SSO
-        if($result['passcode'] === '') {
-            db::update("UPDATE `user` SET `passcode` = ?, `token` = ?, `activetime` = ? WHERE `login` = ?", array($encryptedPasscode, $newToken, $time, $login));
+        if((isset($result['passcode']) && $result['passcode'] === '') || isset($result['passcode']) === FALSE) {
+            UserManager::generatePasscode($encryptedPasscode, $newToken, $time, $login);
             $succeed = TRUE;
         }
 
         if($result['passcode'] === $encryptedPasscode) {
-            db::update("UPDATE `user` SET `token` = ?, `activetime` = ? WHERE `login` = ?", array($newToken, $time, $login));
+            UserManager::updateToken($newToken, $time, $login);
             $succeed = TRUE;
         }
 
         if($succeed) {
-            
-            $user = new UserModel($result['id'], $login, $result['display'], $newToken, $result['language'], $time);
+
+            $user = new UserModel($result['id'], $result['idrole'], $login, $result['display'], $newToken, $result['language'], $time);
             Session::init()->setUser($user);
             CommonUtility::setLanguage($result['language']);
+
+            $acllist = UserManager::getACLsByRoleId($result['idrole']);
+            $acls = [];
+            foreach($acllist as $key => $val) {
+                $acls[$val['key']] = TRUE;
+            }
+ 
+            Session::init()->setACLs($acls);
         }
 
         return $succeed;
@@ -61,6 +69,8 @@ final class SessionManager {
 final class Session {
 
     const USER_SESSION_KEY = 'usr';
+    const ACLS_SESSION_KEY = 'acl';
+
     private static $__instance = null;
 
     /**
@@ -155,6 +165,48 @@ final class Session {
     }
 
     /**
+     * Set user session of ACL
+     *
+     * @param array $val
+     */
+    public function setACLs($val){ $this->setSession(self::ACLS_SESSION_KEY, $val); }
+
+    /**
+     * Evaluate if the user has the access
+     *
+     * @return boolean
+     */
+    public function hasAccess($key) {
+
+        $s = $this->getSession(self::ACLS_SESSION_KEY);
+        if($s === NULL) { return FALSE; }
+        return isset($s[$key]);
+    }
+
+    /**
+     * Evaluate if the user has the access, then return input as output
+     *
+     * @return boolean
+     */
+     public function whatIf($key, $out, $default = '') {
+        if($this->hasAccess($key)) {
+            return $out;
+        }
+        return $default;
+    }
+
+    /**
+     * Evaluate if the user has the access, then invoke input as function
+     *
+     * @return boolean
+     */
+     public function whatIfThen($key, $callback) {
+        if($this->hasAccess($key)) {
+            $callback();
+        }
+    }
+
+    /**
      * Destroy user instance from session
      */
     public function unsetUser() {
@@ -175,12 +227,4 @@ final class Session {
         return TRUE;
     }
 
-}
-
-final class UserManager {
-    
-    public static function updateSettings($language, $id) {
-
-        return db::execute("UPDATE `user` SET `language` = ? WHERE `login` = ?", array($language, $id));
-    }
 }

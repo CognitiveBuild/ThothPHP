@@ -1,18 +1,11 @@
 <?php
 include('inc/header.php');
-?>
 
-<div id="t-wrapper" class="company">
-
-    <div class="panel panel-default ui-company">
-        <div class="panel-heading">Company details</div>
-        <div class="panel-body">
-            <form class="list list-group" method="POST" enctype="multipart/form-data">
-
-<?php
 $industryHTML = '';
 if($id == '0') {
-    $industryHTML = '<option value="0">Please choose one</option>';
+    $industryHTML = <<<EOT
+<option value="0">{$translator->translate('Please choose one')}</option>
+EOT;
 }
 
 foreach($industries  as $industry) {
@@ -36,27 +29,34 @@ else {
     $logoReadyState = ' ready';
 }
 
-echo <<<EOT
+$html = <<<EOT
+<div id="t-wrapper" class="company">
+
+    <div class="panel panel-default ui-company">
+        <div class="panel-heading">{$translator->translate('Company details')}</div>
+        <div class="panel-body">
+            <form class="list list-group" method="POST" enctype="multipart/form-data">
+
     <input type="hidden" name="id" value="{$id}" />
     <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="{$company['name']}" />
+        <label for="name">{$translator->translate('Name')}</label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="{$translator->translate('Name')}" value="{$company['name']}" />
     </div>
 
     <div class="form-group">
-        <label for="industry">Industry</label>
+        <label for="industry">{$translator->translate('Industry')}</label>
         <select class="form-control" id="industry" name="idindustry">
 {$industryHTML}
         </select>
     </div>
 
     <div class="form-group">
-        <label for="description">Description</label>
-        <textarea type="text" class="form-control" id="description" name="description" placeholder="Description">{$company['description']}</textarea>
+        <label for="description">{$translator->translate('Description')}</label>
+        <textarea type="text" class="form-control" id="description" name="description" placeholder="{$translator->translate('Description')}">{$company['description']}</textarea>
     </div>
 
     <div class="form-group attachment-group">
-            <label for="description">Logo</label>
+            <label for="description">{$translator->translate('Logo')}</label>
             <div class="attachments">
                 <div class="file-group{$logoReadyState}" style="background-image: url(/api/v1/companies/logo/{$company['id']})" data-id="{$company['id']}">
                     <div class="company-logo-remove glyphicon glyphicon-remove"></div>
@@ -65,16 +65,16 @@ echo <<<EOT
                 </div>
             </div>
     </div>
-EOT;
-
-?>
-                <button type="submit" class="btn btn-primary btn-company-save">Save changes</button>
-            </form>
-        </div>
-    </div>
+    <button type="submit" class="btn btn-primary btn-company-save">{$translator->translate('Save changes')}</button>
+    </form>
+</div>
+</div>
 
 </div>
 
-<?php
+EOT;
+
+echo $html;
+
 include('inc/footer.html');
 ?>

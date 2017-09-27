@@ -9,11 +9,11 @@ echo <<<EOT
 <form method="post" action="/">
     <div class="form-group">
         <label for="login">{$translator->translate('Username')}</label>
-        <input type="text" class="form-control" id="login" name="login" placeholder="Username" value="{$login}" />
+        <input type="text" class="form-control" id="login" name="login" placeholder="{$translator->translate('Username')}" value="{$login}" />
     </div>
     <div class="form-group">
-        <label for="description">{$translator->translate('Passcode')}</label>
-        <input type="password" class="form-control" id="passcode" name="passcode" placeholder="Passcode" value="{$passcode}" />
+        <label for="passcode">{$translator->translate('Passcode')}</label>
+        <input type="password" class="form-control" id="passcode" name="passcode" placeholder="{$translator->translate('Passcode')}" value="{$passcode}" />
     </div>
 
     <div class="form-group">

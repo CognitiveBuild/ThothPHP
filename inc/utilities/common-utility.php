@@ -55,7 +55,7 @@ final class CommonUtility {
 	 */
 	public function getPager($data, $page = self::PAGER_PER_PAGE, $urlvar = 'p') {
 
-		$params = array(
+		$params = [
 		    'perPage'    => $page,
 		    'urlVar'     => $urlvar,
 			'curPageLinkClassName'=>'current',
@@ -72,7 +72,7 @@ final class CommonUtility {
 			'nextLinkTitle' => self::getTranslation('Next page'),
 			'prevLinkTitle' => self::getTranslation('Previous page'),
 			'lastLinkTitle' => self::getTranslation('Last page'),
-		);
+        ];
 
 		unset($data);
 
@@ -86,7 +86,7 @@ final class CommonUtility {
         $list = $_ENV[INSTANCE]['TRANSLATION'][$language];
         if(empty($var))
             return $list;
-        return isset($list[$var]) ? vsprintf($list[$var], $args) : vsprintf($var, $args);
+        return isset($list[$var]) ? vsprintf($list[$var], $args) : '*'.vsprintf($var, $args).'*';
     }
 
     public static function loadTranslation($language) {

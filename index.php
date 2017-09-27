@@ -28,6 +28,8 @@ include 'inc/db.php';
 include 'inc/models/user-model.php';
 // Build model
 include 'inc/models/build-model.php';
+// Role model
+include 'inc/models/role-model.php';
 // Managers
 include 'inc/managers/session-manager.php';
 include 'inc/managers/asset-manager.php';
@@ -36,6 +38,7 @@ include 'inc/managers/company-manager.php';
 include 'inc/managers/visitor-manager.php';
 include 'inc/managers/event-manager.php';
 include 'inc/managers/distribution-manager.php';
+include 'inc/managers/user-manager.php';
 // Controllers
 include 'inc/controllers/abstract-controller.php';
 include 'inc/controllers/common-controller.php';
@@ -98,7 +101,6 @@ $container['notFoundHandler'] = function ($cf) {
 
 // Sign in post
 $app->post('/', CommonController::get('postHome'));
-$app->get('/api/v1/test/image', CommonController::get('getImage'));
 
 // App download entry
 $app->get('/app/{id}', CommonController::get('getApp'));
@@ -110,27 +112,31 @@ $app->get('/api/v1/build/meta/{id}', CommonController::get('getMeta'));
 $app->get('/api/v1/build/download/{idbuild}', CommonController::get('getBuild'));
 
 if(SessionManager::validate()) {
+
     // Home
     $app->get('/', CommonController::get('getHome'));
-    // View or update Settings
-    $app->get('/settings', CommonController::get('getSettings'));
-    $app->post('/settings', CommonController::get('postSettings'));
-
     // Visitors selected by event
     $app->get('/api/v1/visitors/company/{idcompany}/event/{id}', APIController::get('getVisitorsByEvent'));
 
-    if(Session::init()->getUser()->getLogin() === 'mihui') {
+    Session::init()->whatIfThen('VIEW_CATALOG', function() use($app) {
         // Add or Catalogs
         $app->post('/api/v1/catalog', APIController::get('postCatalog'));
-        // Assets
-        $app->get('/assets', AssetController::get('getAssets'));
         // Catalogs
         $app->get('/catalog/{name}', AssetController::get('getCatalog'));
+    });
+
+    Session::init()->whatIfThen('VIEW_ASSETS', function() use($app) {
+        // Assets
+        $app->get('/assets', AssetController::get('getAssets'));
         // Asset update
         $app->post('/assets/{id}', AssetController::get('postAsset'));
         // Asset details
-        $app->get('/assets/{id}', AssetController::get('getAsset'))->setName('asset-details');
+        $app->get('/assets/{id}', AssetController::get('getAsset'));
+        // Delete attachment
+        $app->delete('/api/v1/assets/attachment/{id}', APIController::get('deleteAssetAttachment'));
+    });
 
+    Session::init()->whatIfThen('VIEW_COMPANIES', function() use($app) {
         /// Events
         // Companies
         $app->get('/companies', EventController::get('getCompanies'));
@@ -138,53 +144,75 @@ if(SessionManager::validate()) {
         $app->get('/companies/{id}', EventController::get('getCompany'));
         // Company update
         $app->post('/companies/{id}', EventController::get('postCompany'));
+        // Delete logo
+        $app->delete('/api/v1/companies/logo/{id}', APIController::get('deleteCompanyLogo'));
+    });
+
+    Session::init()->whatIfThen('VIEW_VISITORS', function() use($app) {
         // Visitors
         $app->get('/visitors', EventController::get('getVisitors'));
         // Visitor details
         $app->get('/visitors/{id}', EventController::get('getVisitor'));
         // Visitor update
         $app->post('/visitors/{id}', EventController::get('postVisitor'));
+        // Visitor avatar delete
+        $app->delete('/api/v1/visitors/avatar/{id}', APIController::get('deleteVisitorAvatar'));
+    });
+
+    Session::init()->whatIfThen('VIEW_EVENTS', function() use($app) {
         // Events
         $app->get('/events', EventController::get('getEvents'));
         // Event details
         $app->get('/events/{id}', EventController::get('getEvent'));
         // Add or update Event
         $app->post('/events/{id}', EventController::get('postEvent'));
-
-        /// Private APIs
-        // Delete attachment
-        $app->delete('/api/v1/assets/attachment/{id}', APIController::get('deleteAssetAttachment'));
-        // Delete logo
-        $app->delete('/api/v1/companies/logo/{id}', APIController::get('deleteCompanyLogo'));
-        // Visitor avatar delete
-        $app->delete('/api/v1/visitors/avatar/{id}', APIController::get('deleteVisitorAvatar'));
         // Timeline delete
         $app->delete('/api/v1/timelines/{id}', APIController::get('deleteTimeline'));
-    }
+    });
 
-    // App list
-    $app->get('/apps', AppController::get('getApps'));
-    // App details
-    $app->get('/apps/{id}', AppController::get('getApp'));
-    // Add or Update app
-    $app->post('/apps/{id}', AppController::get('postApp'));
-    // Distribution list
-    $app->get('/apps/{idapp}/distribute', AppController::get('getDistribute'));
-    // Add or update distribution
-    $app->post('/apps/{idapp}/distribute', AppController::get('postDistribute'));
-    // Build information
-    $app->get('/apps/{idapp}/builds/{idbuild}', AppController::get('getAppBuild'));
-    // Add or Upload build
-    $app->post('/apps/{idapp}/builds/{idbuild}', AppController::get('postAppBuild'));
-    // Delete a build
-    $app->delete('/api/v1/apps/{idapp}/builds/{idbuild}', APIController::get('deleteAppBuild'));
+    Session::init()->whatIfThen('VIEW_USERS', function() use($app) {
+        // Users
+        $app->get('/users', CommonController::get('getUsers'));
+        // User details
+        $app->get('/users/{id}', CommonController::get('getUser'));
+        $app->post('/users/{id}', CommonController::get('postUser'));
+    });
+
+    Session::init()->whatIfThen('VIEW_ROLES', function() use($app) {
+        // Roles
+        $app->get('/roles', CommonController::get('getRoles'));
+        // Role details
+        $app->get('/roles/{id}', CommonController::get('getRole'));
+        $app->post('/roles/{id}', CommonController::get('postRole'));
+    });
+
+    Session::init()->whatIfThen('VIEW_APPS', function() use($app) {
+        // App list
+        $app->get('/apps', AppController::get('getApps'));
+        // App details
+        $app->get('/apps/{id}', AppController::get('getApp'));
+        // Add or Update app
+        $app->post('/apps/{id}', AppController::get('postApp'));
+        // Distribution list
+        $app->get('/apps/{idapp}/distribute', AppController::get('getDistribute'));
+        // Add or update distribution
+        $app->post('/apps/{idapp}/distribute', AppController::get('postDistribute'));
+        // Build information
+        $app->get('/apps/{idapp}/builds/{idbuild}', AppController::get('getAppBuild'));
+        // Add or Upload build
+        $app->post('/apps/{idapp}/builds/{idbuild}', AppController::get('postAppBuild'));
+        // Delete a build
+        $app->delete('/api/v1/apps/{idapp}/builds/{idbuild}', APIController::get('deleteAppBuild'));
+    });
+
+    Session::init()->whatIfThen('VIEW_SETTINGS', function() use($app) {
+        // View or update Settings
+        $app->get('/settings', CommonController::get('getSettings'));
+        $app->post('/settings', CommonController::get('postSettings'));
+    });
 
     // Sign out
     $app->get('/signout', APIController::get('getSignedOut'));
-
-    $app->get('/api/v1/info', function ($request, $response, $args) {
-        phpinfo();
-    });
 }
 else {
     $app->get('/', APIController::get('getUnAuthorizedHome'));
@@ -210,6 +238,11 @@ $app->get('/api/v1/companies/logo/{id}', APIController::get('getCompanyLogo'));
 $app->get('/api/v1/event/today', APIController::get('getEventToday'));
 // Visitor avatar
 $app->get('/api/v1/visitor/avatar/{id}', APIController::get('getVisitorAvatar'));
+
+/// Debug
+// PHP info
+$app->get('/api/v1/info', CommonController::get('getPHPInfo'));
+$app->get('/api/v1/test/image', CommonController::get('getImage'));
 
 // unused
 // $app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {

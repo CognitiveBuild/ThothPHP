@@ -37,8 +37,8 @@ final class AssetController extends AbstractController {
 
         $industries = CatalogManager::getCatalog(KEY_INDUSTRY, $l);
         $technologies = CatalogManager::getCatalog(KEY_TECHNOLOGY, $l);
-        $technologies_applied = array();
-        $attachments = array();
+        $technologies_applied = [];
+        $attachments = [];
 
         if($id > 0) {
             $result = db::queryFirst('SELECT `*` FROM `asset` WHERE `id` = ? ORDER BY `id` DESC;', $id);

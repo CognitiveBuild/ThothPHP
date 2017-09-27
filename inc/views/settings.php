@@ -11,9 +11,10 @@ foreach(CommonUtility::$SUPPORTED_LANGUAGES as $label => $val) {
     }
 
     $languageOptions .= <<<EOT
-<option value="{$val}"{$active}>{$label}</option>
+<option value="{$val}"{$active} {$val} {$language}>{$label}</option>
 EOT;
 }
+
 echo <<<EOT
 <div id="t-wrapper" class="settings">
     <div class="panel panel-default ui-distribute">

@@ -21,6 +21,12 @@ final class CommonController extends AbstractController {
         ]);
     }
 
+    // phpinfo
+    public function getPHPInfo($request, $response, $args) {
+        // echo information directly
+        phpinfo();
+    }
+
     public function postHome ($request, $response, $args) {
 
         $post = $request->getParsedBody();
@@ -63,6 +69,7 @@ final class CommonController extends AbstractController {
 
         if($result) {
             Session::init()->getUser()->setLanguage($language);
+            CommonUtility::setLanguage($language);
             Session::init()->setUser(Session::init()->getUser());
         }
 
@@ -72,6 +79,117 @@ final class CommonController extends AbstractController {
         ]);
     }
 
+    public function getUser($request, $response, $args) {
+
+        $id = isset($args['id']) ? $args['id'] : 0;
+        $user = new UserModel();
+
+        if($id > 0) {
+            $result = UserManager::getUserById($id);
+            $user->setDisplay($result['display']);
+            $user->setRoleId($result['idrole']);
+            $user->setToken($result['token']);
+            $user->setLogin($result['login']);
+            $user->setLanguage($result['language']);
+            $user->setActiveTime($result['activetime']);
+        }
+
+        $roles = UserManager::getRoles();
+
+        return $this->view->render($response, 'user.php', [
+            'user' => $user, 
+            'id' => $id, 
+            'roles' => $roles
+        ]);
+    }
+
+    public function postUser($request, $response, $args) {
+
+        $post = $request->getParsedBody();
+        $id = isset($args['id']) ? $args['id'] : 0;
+        $isNew = TRUE;
+
+        if($id > 0) {
+            UserManager::updateUser($id, $post['display'], $post['login'], $post['idrole'], $post['passcode'], $post['language']);
+            $isNew = FALSE;
+        }
+        else {
+            $id = UserManager::addUser($post['display'], $post['login'], $post['idrole'], $post['passcode'], $post['language']);
+        }
+        if($isNew) {
+            return $response->withStatus(200)->withHeader('Location', "/users");
+        }
+
+        return $response->withStatus(200)->withHeader('Location', "/users/{$id}");
+    }
+        
+    public function getUsers($request, $response, $args) {
+
+        $users = UserManager::getUsers();
+        return $this->view->render($response, 'users.php', [
+            'users' => $users
+        ]);
+    }
+
+    public function getRole($request, $response, $args) {
+
+        $id = isset($args['id']) ? $args['id'] : 0;
+        $role = new RoleModel();
+
+        if($id > 0) {
+            $result = UserManager::getRoleById($id);
+            $role->setId($result['id']);
+            $role->setName($result['name']);
+            $role->setDescription($result['description']);
+        }
+
+        $acls = UserManager::getACLs($id);
+
+        return $this->view->render($response, 'role.php', [
+            'role' => $role, 
+            'id' => $id, 
+            'acls' => $acls
+        ]);
+    }
+
+    public function postRole($request, $response, $args) {
+
+        $post = $request->getParsedBody();
+
+        $id = isset($args['id']) ? $args['id'] : 0;
+        $isNew = TRUE;
+
+        if($id > 0) {
+            UserManager::updateRole($id, $post['name'], $post['description']);
+            $isNew = FALSE;
+        }
+        else {
+            $id = UserManager::addRole($post['name'], $post['description']);
+        }
+
+        $acls = $post['acls'];
+        UserManager::removeRoleACL($id);
+        foreach($acls as $idacl => $val) {
+
+            UserManager::addRoleACL($id, $idacl);
+        }
+
+        if($isNew) {
+            return $response->withStatus(200)->withHeader('Location', "/roles");
+        }
+
+        return $response->withStatus(200)->withHeader('Location', "/roles/{$id}");
+    }
+
+    public function getRoles($request, $response, $args) {
+
+        $roles = UserManager::getRoles();
+        return $this->view->render($response, 'roles.php', [
+            'roles' => $roles
+        ]);
+    }
+        
+    // Public access to the app builds
     public function getApp($request, $response, $args) {
 
         $id = isset($args['id']) ? $args['id'] : 0;

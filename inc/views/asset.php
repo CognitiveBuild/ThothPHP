@@ -60,46 +60,46 @@ echo <<<EOT
             <input type="hidden" name="id" value="{$id}" />
             <input type="hidden" name="language" value="{$language}" />
             <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="{$asset['name']}" />
+                <label for="name">{$translator->translate('Name')}</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="{$translator->translate('Name')}" value="{$asset['name']}" />
             </div>
 
             <div class="form-group">
-                <label for="industry">Industry</label>
+                <label for="industry">{$translator->translate('Industry')}</label>
                 <select class="form-control" id="industry" name="idindustry">
 {$industryHTML}
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="industry">Technology</label>
+                <label for="industry">{$translator->translate('Technology')}</label>
                 <div class="form-control form-control-auto-height" id="technology">
 {$technologyHTML}
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="description">Description</label>
-                <textarea type="text" class="form-control" id="description" name="description" placeholder="Description">{$asset['description']}</textarea>
+                <label for="description">{$translator->translate('Description')}</label>
+                <textarea type="text" class="form-control" id="description" name="description" placeholder="{$translator->translate('Description')}">{$asset['description']}</textarea>
             </div>
 
             <div class="form-group">
-                <label for="description">Logo URL</label>
-                <input type="text" class="form-control" id="logoUrl" name="logourl" placeholder="Logo URL" value="{$asset['logourl']}" />
+                <label for="description">{$translator->translate('Logo URL')}</label>
+                <input type="text" class="form-control" id="logoUrl" name="logourl" placeholder="{$translator->translate('Logo URL')}" value="{$asset['logourl']}" />
             </div>
 
             <div class="form-group">
-                <label for="description">Video URL</label>
-                <input type="text" class="form-control" id="videoUrl" name="videourl" placeholder="Video URL" value="{$asset['videourl']}" />
+                <label for="description">{$translator->translate('Video URL')}</label>
+                <input type="text" class="form-control" id="videoUrl" name="videourl" placeholder="{$translator->translate('Video URL')}" value="{$asset['videourl']}" />
             </div>
 
             <div class="form-group">
-                <label for="description">Link URL</label>
-                <input type="text" class="form-control" id="linkUrl" name="linkurl" placeholder="Link URL" value="{$asset['linkurl']}" />
+                <label for="description">{$translator->translate('Link URL')}</label>
+                <input type="text" class="form-control" id="linkUrl" name="linkurl" placeholder="{$translator->translate('Link URL')}" value="{$asset['linkurl']}" />
             </div>
 
             <div class="form-group attachment-group">
-                    <label for="description">Attachments</label>
+                    <label for="description">{$translator->translate('Attachments')}</label>
                     <div class="attachments">
 {$attachmentHTML}
                     <div class="file-group" data-id="0">
@@ -111,7 +111,7 @@ echo <<<EOT
                 </div>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-asset-save">Save changes</button>
+        <button type="submit" class="btn btn-primary btn-asset-save">{$translator->translate('Save changes')}</button>
         </form>
     </div>
 </div>

@@ -1,7 +1,7 @@
 <?php
 $translator = new Translator();
 
-echo <<<EOT
+$html = <<<EOT
 <!DOCTYPE html>
 <html>
 <head>
@@ -56,26 +56,66 @@ echo <<<EOT
         <div class="row">
             <div class="col-sm-3 col-md-2 sidebar">
                 <ul class="nav nav-sidebar">
-                    <li data-source="Home"><a href="/">{$translator->translate('Home')}</a></li>
+                  <li data-source="Home"><a href="/">{$translator->translate('Home')}</a></li>
 EOT;
-?>
-                    <?php
-                    if(Session::init()->getUser()->getLogin() === 'mihui') {
-                      echo <<<EOT
+
+$html .= Session::init()->whatIf('VIEW_ASSETS', <<<EOT
 <li data-source="Assets"><a href="/assets">{$translator->translate('Assets')}</a></li>
+EOT
+);
+
+$html .= Session::init()->whatIf('VIEW_CATALOG', <<<EOT
 <li data-source="Technologies"><a href="/catalog/TECHNOLOGY">{$translator->translate('Technologies')}</a></li>
 <li data-source="Industries"><a href="/catalog/INDUSTRY">{$translator->translate('Industries')}</a></li>
-<li data-source="Companies"><a href="/companies">{$translator->translate('Companies')}</a></li>
-<li data-source="Visitors"><a href="/visitors">{$translator->translate('Visitors')}</a></li>
-<li data-source="Events"><a href="/events">{$translator->translate('Events')}</a></li>
-EOT;
-                    }
-                    echo <<<EOT
-                    <li data-source="Apps"><a href="/apps">{$translator->translate('Apps')}</a></li>
-                    <li data-source="Settings"><a href="/settings">{$translator->translate('Settings')}</a></li>
-EOT;
-                    ?>
-                </ul>
+EOT
+);
 
-            </div>
-            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+$html .= Session::init()->whatIf('VIEW_COMPANIES', <<<EOT
+<li data-source="Companies"><a href="/companies">{$translator->translate('Companies')}</a></li>
+EOT
+);
+
+$html .= Session::init()->whatIf('VIEW_VISITORS', <<<EOT
+<li data-source="Visitors"><a href="/visitors">{$translator->translate('Visitors')}</a></li>
+EOT
+);
+
+$html .= Session::init()->whatIf('VIEW_EVENTS', <<<EOT
+<li data-source="Events"><a href="/events">{$translator->translate('Events')}</a></li>
+EOT
+);
+
+$html .= Session::init()->whatIf('VIEW_USERS', <<<EOT
+<li data-source="Users"><a href="/users">{$translator->translate('Users')}</a></li>
+EOT
+);
+
+$html .= Session::init()->whatIf('VIEW_ROLES', <<<EOT
+<li data-source="Roles"><a href="/roles">{$translator->translate('Roles')}</a></li>
+EOT
+);
+
+$html .= Session::init()->whatIf('VIEW_ACLS', <<<EOT
+<li data-source="ACLs"><a href="/acls">{$translator->translate('ACLs')}</a></li>
+EOT
+);
+
+$html .= Session::init()->whatIf('VIEW_APPS', <<<EOT
+<li data-source="Apps"><a href="/apps">{$translator->translate('Apps')}</a></li>
+EOT
+);
+
+$html .= Session::init()->whatIf('VIEW_SETTINGS', <<<EOT
+<li data-source="Settings"><a href="/settings">{$translator->translate('Settings')}</a></li>
+EOT
+);
+
+$html .= <<<EOT
+</ul>
+
+</div>
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+EOT;
+
+echo $html;
+?>
