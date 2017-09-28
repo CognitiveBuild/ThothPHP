@@ -86,7 +86,7 @@ final class CommonUtility {
         $list = $_ENV[INSTANCE]['TRANSLATION'][$language];
         if(empty($var))
             return $list;
-        return isset($list[$var]) ? vsprintf($list[$var], $args) : '*'.vsprintf($var, $args).'*';
+        return isset($list[$var]) ? vsprintf($list[$var], $args) : vsprintf($var, $args);
     }
 
     public static function loadTranslation($language) {
