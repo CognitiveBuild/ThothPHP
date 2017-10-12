@@ -105,7 +105,7 @@ final class EventController extends AbstractController {
 
         $id = isset($args['id']) ? $args['id'] : 0;
 
-        $result = [
+        $visitor = [
             'id' => 0, 
             'firstname' => '', 
             'lastname' => '', 
@@ -113,10 +113,13 @@ final class EventController extends AbstractController {
             'website' => '', 
             'linkedin' => '', 
             'facebook' => '',
-            'twitter' => ''
+            'twitter' => '', 
+            'order' => '0', 
+            'avatar' => NULL
         ];
 
-        $visitor = VisitorManager::getVisitor($id);
+        if($id > 0)
+            $visitor = VisitorManager::getVisitor($id);
         $companies = CompanyManager::getCompanies();
 
         return $this->view->render($response, 'visitor.php', [
@@ -172,7 +175,7 @@ final class EventController extends AbstractController {
 
         $id = isset($args['id']) ? $args['id'] : 0;
         $p = $request->getQueryParams();
-        $l = isset($p['language']) ? $p['language'] : LANGUAGE;
+        $l = CommonUtility::toLanguage($p);
         $industries = CatalogManager::getCatalog(KEY_INDUSTRY, $l);
 
         $result = [

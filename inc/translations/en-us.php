@@ -99,6 +99,7 @@ $lang = [
     'Distribution' => 'Distribution', 
     'Emails to be sent' => 'Emails to be sent', 
     'Message to the users' => 'Message to the users',
+    'You have successfully updated the settings, please re-visit the page to see the differences.' => 'You have successfully updated the settings, please re-visit the page to see the differences.',
 
     'You have sucessfully distributed the Build to: <br /><br /><strong>%s</strong>' => 'You have sucessfully distributed the Build to: <br /><br /><strong>%s</strong>',
     'Hi %s, you have signed out.' => 'Hi %s, you have signed out.',

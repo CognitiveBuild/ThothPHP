@@ -125,7 +125,7 @@ final class APIController extends AbstractController {
 
         $q = isset($args['q']) ? $args['q'] : KEY_INDUSTRY;
         $p = $request->getQueryParams();
-        $l = isset($p['language']) ? $p['language'] : LANGUAGE;
+        $l = CommonUtility::toLanguage($p);
 
         $list = CatalogManager::getCatalog($q, $l);
         return $response->withJson($list);
@@ -138,7 +138,7 @@ final class APIController extends AbstractController {
         $id = isset($post['id']) ? $post['id'] : 0;
         $key = isset($post['type']) ? $post['type'] : KEY_INDUSTRY;
         $name = isset($post['name']) ? $post['name'] : '';
-        $language = isset($post['language']) ? $post['language'] : '';
+        $language = CommonUtility::toLanguage($post);
 
         if($name === '' || $language === '') {
             return $response->withStatus(400)->withJson(array('status' => 400, 'id' => $id));

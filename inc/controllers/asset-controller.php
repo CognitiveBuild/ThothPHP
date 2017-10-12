@@ -9,7 +9,7 @@ final class AssetController extends AbstractController {
     public function getAssets($request, $response, $args) {
 
         $p = $request->getQueryParams();
-        $language = isset($p['language']) ? $p['language'] : LANGUAGE;
+        $language = CommonUtility::toLanguage($p);
         $list = AssetManager::getAssets($language);
 
         return $this->view->render($response, 'assets.php', [
@@ -22,7 +22,7 @@ final class AssetController extends AbstractController {
 
         $id = isset($args['id']) ? $args['id'] : 0;
         $p = $request->getQueryParams();
-        $l = isset($p['language']) ? $p['language'] : LANGUAGE;
+        $l = CommonUtility::toLanguage($p);
 
         $result = [
             'id' => 0, 
@@ -66,10 +66,11 @@ final class AssetController extends AbstractController {
 
         $images = $files['binary'];
         $technologies = $post['technology'];
+        $language = CommonUtility::toLanguage($post);
 
         if($id > 0) {
             // update asset
-            $result = AssetManager::updateAsset($id, $post['name'], $post['idindustry'], $post['description'], $post['logourl'], $post['videourl'], $post['linkurl'], $post['language']);
+            $result = AssetManager::updateAsset($id, $post['name'], $post['idindustry'], $post['description'], $post['logourl'], $post['videourl'], $post['linkurl'], $language);
 
             AssetManager::deleteCatalogToAsset($id);
             foreach($technologies as $idcatalog) {
@@ -82,7 +83,7 @@ final class AssetController extends AbstractController {
             return $response->withStatus(200)->withHeader('Location', "/assets/{$id}");
         }
         // insert asset
-        $id = AssetManager::addAsset($post['name'], $post['idindustry'], $post['description'], $post['logourl'], $post['videourl'], $post['linkurl'], $post['language']);
+        $id = AssetManager::addAsset($post['name'], $post['idindustry'], $post['description'], $post['logourl'], $post['videourl'], $post['linkurl'], $language);
 
         if($id > 0) {
             AssetManager::deleteCatalogToAsset($id);
@@ -101,7 +102,7 @@ final class AssetController extends AbstractController {
 
         $name = isset($args['name']) ? $args['name'] : KEY_INDUSTRY;
         $p = $request->getQueryParams();
-        $language = isset($p['language']) ? $p['language'] : LANGUAGE;
+        $language = CommonUtility::toLanguage($p);
 
         $result = CatalogManager::getCatalogWithAssetCount($name, $language);
 

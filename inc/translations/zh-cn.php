@@ -99,6 +99,7 @@ $lang = [
     'Distribution' => '分发', 
     'Emails to be sent' => '邮件地址（多个邮件地址用英文逗号隔开）', 
     'Message to the users' => '给用户发送的消息',
+    'You have successfully updated the settings, please re-visit the page to see the differences.' => '你已经成功更新了设置，请刷新页面。',
 
     'You have sucessfully distributed the Build to: <br /><br /><strong>%s</strong>' => '你已经成功地分发到以下邮件列表: <br /><br /><strong>%s</strong>',
     'Hi %s, you have signed out.' => '嗨 %s, 您已经退出登录。',

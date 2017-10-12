@@ -150,5 +150,9 @@ final class CommonUtility {
         self::setLanguage($ret);
 
 		return $ret;
-	}
+    }
+    
+    public static function toLanguage($query) {
+        return strtolower(isset($query['language']) ? $query['language'] : LANGUAGE);
+    }
 }
