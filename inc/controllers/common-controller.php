@@ -40,8 +40,10 @@ final class CommonController extends AbstractController {
         ];
     
         $template = 'signin.php';
-    
-        if(SessionManager::signIn($login, $passcode)) {
+
+        $result = SessionManager::signIn($login, $passcode);
+
+        if($result) {
             $data = [
                 'message' => translate('Welcome back %s.', [ Session::init()->getUser()->getDisplay() ])
             ];

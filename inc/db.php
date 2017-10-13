@@ -110,7 +110,7 @@ final class db
 	public static function queryFirst($sql, $args = array())
 	{
 		$rs = self::__query($sql, $args);
-		if($rs == NULL) return array();
+		if($rs === NULL) return FALSE;
 		$result = $rs->fetch();
 		return $result;
 	}

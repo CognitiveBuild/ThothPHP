@@ -10,7 +10,7 @@ final class SessionManager {
 
         $result = UserManager::getUserByLogin($login);
 
-        if($result === NULL || count($result) === 0) {
+        if($result === FALSE || $result === NULL || count($result) === 0) {
             return $succeed;
         }
 
