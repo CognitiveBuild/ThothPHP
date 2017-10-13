@@ -69,7 +69,7 @@ final class db
 			self::$_count++;
 			return $rs;
 		}
-		return null;
+		return NULL;
 	}
 
 	/**
@@ -81,7 +81,7 @@ final class db
 	public static function query($sql, $args = array())
 	{
 		$rs = self::__query($sql, $args);
-		if($rs == null) return array();
+		if($rs == NULL) return array();
 		return $rs->fetchAll();
 	}
 
@@ -110,7 +110,7 @@ final class db
 	public static function queryFirst($sql, $args = array())
 	{
 		$rs = self::__query($sql, $args);
-		if($rs == null) return array();
+		if($rs == NULL) return array();
 		$result = $rs->fetch();
 		return $result;
 	}
