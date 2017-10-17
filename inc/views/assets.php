@@ -54,7 +54,7 @@ foreach($assets as $asset) {
 
     echo <<<EOT
 <li class="list-group-item">
-    <a href="/assets/{$asset['id']}" class="name ui-modal-button">{$asset['name']}</a>
+    <a href="/assets/{$asset['id']}?language={$language}" class="name ui-modal-button">{$asset['name']}</a>
     {$file_icon}
     {$link_icon}
     {$logo_icon}
