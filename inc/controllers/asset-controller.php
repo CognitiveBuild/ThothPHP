@@ -35,16 +35,19 @@ final class AssetController extends AbstractController {
             'language' => $l
         ];
 
-        $industries = CatalogManager::getCatalog(KEY_INDUSTRY, $l);
-        $technologies = CatalogManager::getCatalog(KEY_TECHNOLOGY, $l);
         $technologies_applied = [];
         $attachments = [];
 
         if($id > 0) {
             $result = db::queryFirst('SELECT `*` FROM `asset` WHERE `id` = ? ORDER BY `id` DESC;', $id);
-            $technologies_applied = db::query('SELECT `idcatalog` FROM `catalog_to_asset` WHERE `key` = "'.KEY_TECHNOLOGY.'" AND `idasset` = ?;', $id);
-            $attachments = db::query('SELECT `*` FROM `asset_to_file` WHERE `idasset` = ?;', $id);
+            $l = $result['language'];
         }
+
+        $technologies_applied = db::query('SELECT `idcatalog` FROM `catalog_to_asset` WHERE `key` = "'.KEY_TECHNOLOGY.'" AND `idasset` = ?;', $id);
+        $attachments = db::query('SELECT `*` FROM `asset_to_file` WHERE `idasset` = ?;', $id);
+
+        $industries = CatalogManager::getCatalog(KEY_INDUSTRY, $l);
+        $technologies = CatalogManager::getCatalog(KEY_TECHNOLOGY, $l);
 
         return $this->view->render($response, 'asset.php', [
             'id' => $id, 
