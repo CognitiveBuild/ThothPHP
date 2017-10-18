@@ -242,7 +242,7 @@ $app->get('/api/v1/visitor/avatar/{id}', APIController::get('getVisitorAvatar'))
 /// Debug
 // PHP info
 $app->get('/api/v1/info', CommonController::get('getPHPInfo'));
-$app->get('/api/v1/test/image', CommonController::get('getImage'));
+$app->get('/api/v1/test/image', CommonController::get('getPage'));
 
 // unused
 // $app->delete('/api/v1/assets/{id}', function ($request, $response, $args) {

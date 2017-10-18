@@ -14,9 +14,13 @@ final class CommonController extends AbstractController {
     }
 
     // TEST ONLY
-    public function getImage($request, $response, $args) {
+    public function getPage($request, $response, $args) {
 
-        return $this->view->render($response, 'test.php', [
+        $p = $request->getQueryParams();
+
+        $page = isset($p['page']) ? $p['page'] : 'test.php';
+
+        return $this->view->render($response, $page, [
             
         ]);
     }
