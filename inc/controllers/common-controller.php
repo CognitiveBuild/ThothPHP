@@ -18,9 +18,9 @@ final class CommonController extends AbstractController {
 
         $p = $request->getQueryParams();
 
-        $page = isset($p['page']) ? $p['page'] : 'test.php';
+        $page = isset($p['page']) ? $p['page'] : 'test';
 
-        return $this->view->render($response, $page, [
+        return $this->view->render($response, "{$page}.php", [
             
         ]);
     }
