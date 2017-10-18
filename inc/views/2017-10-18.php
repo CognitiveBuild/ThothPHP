@@ -13,7 +13,7 @@ echo <<<EOT
 	<meta name="format-detection" content="telephone=no" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <style>@import url("http://fonts.googleapis.com/css?family=Noto+Sans");</style>
+    <style>@import url("https://fonts.googleapis.com/css?family=Noto+Sans");</style>
     <style>
         body {
         max-width: 1200px;
