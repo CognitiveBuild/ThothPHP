@@ -124,4 +124,6 @@ $lang = [
     <div>The formatting of this string must comply with <a href="http://www.faqs.org/rfcs/rfc2822" target="_blank">» RFC 2822</a>. Some examples are:</div>
     user@example.com<br />
     user@example.com, anotheruser@example.com<br />', 
+    'Install to mobile device now' => 'Install to mobile device now', 
+    'Download to PC and install later' => 'Download to PC and install later'
 ];

@@ -123,4 +123,6 @@ $lang = [
     <div>格式必须与 <a href="http://www.faqs.org/rfcs/rfc2822" target="_blank">» RFC 2822</a> 中定义的保持一致（多个邮件用英文逗号隔开）。 以下是一些例子:</div>
     user@example.com<br />
     user@example.com, anotheruser@example.com<br />', 
+    'Install to mobile device now' => '安装到移动设备', 
+    'Download to PC and install later' => '下载到本机稍后安装'
 ];

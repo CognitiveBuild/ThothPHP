@@ -1,6 +1,8 @@
 <?php
 $instance = INSTANCE;
-$language = LANGUAGE;
+// $language = LANGUAGE;
+$translator = new Translator();
+
 echo <<<EOT
 <!DOCTYPE html>
 <html>
@@ -36,11 +38,11 @@ echo <<<EOT
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">GBS Asset Center</a>
+          <a class="navbar-brand" href="#">{$translator->translate('Asset Center')}</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li data-source="Home"><a href="/">{$_ENV[$instance]['TRANSLATION'][$language]['Home']}</a></li>          
+            <li data-source="Home"><a href="/">{$translator->translate('Home')}</a></li>          
           </ul>
 
         </div>
@@ -87,11 +89,11 @@ EOT;
             </div>
 
             <div class="form-group">
-                <a class="btn btn-success btn-download btn-install" href="{$installUrl}">Install this Build now</a>
+                <a class="btn btn-success btn-download btn-install" href="{$installUrl}">{$translator->translate('Install to mobile device now')}</a>
             </div>
 
             <div class="form-group">
-                <a class="btn btn-info btn-download" href="{$downloadUrl}">Download from PC</a>
+                <a class="btn btn-info btn-download" href="{$downloadUrl}">{$translator->translate('Download to PC and install later')}</a>
             </div>
 
             <div class="form-group ui-release-notes">
@@ -102,7 +104,7 @@ EOT;
         if($count > 1)
             echo <<<EOT
     <div class="form-group">
-        <label>Other previous versions</label>
+        <label>{$translator->translate('Other previous versions')}</label>
     </div>
 EOT;
     }
