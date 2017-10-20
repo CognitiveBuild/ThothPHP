@@ -1,9 +1,7 @@
 <?php
 include('inc/header.php');
 
-$industryHTML = <<<EOT
-    <option value="0">{$translator->translate('--- Cross industries ---')}</option>
-EOT;
+$industryHTML = '';
 
 foreach($industries  as $industry) {
     $selected = '';
