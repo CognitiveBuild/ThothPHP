@@ -112,7 +112,7 @@ final class APIController extends AbstractController {
         $list = AssetManager::getAssetsByCatalogName($catalog, $name);
         return $response->withJson($list);
     }
-    
+
     public function getAttachment($request, $response, $args) {
 
         $id = isset($args['id']) ? $args['id'] : 0;

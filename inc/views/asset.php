@@ -1,12 +1,10 @@
 <?php
 include('inc/header.php');
 
-$industryHTML = '';
-if($id == '0') {
-    $industryHTML = <<<EOT
-<option value="0">{$translator->translate('Please choose one')}</option>
+$industryHTML = <<<EOT
+    <option value="0">{$translator->translate('--- Cross industries ---')}</option>
 EOT;
-}
+
 foreach($industries  as $industry) {
     $selected = '';
     if($industry['id'] === $asset['idindustry']) {

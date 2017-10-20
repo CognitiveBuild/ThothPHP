@@ -35,11 +35,12 @@ foreach($assets as $asset) {
     $link_icon = '';
 
     if(isset($asset['attachments']) && $asset['attachments'] != '') {
-        $json_arary = json_decode($asset['attachments'], true);
+        $json_arary = json_decode($asset['attachments'], TRUE);
         if(count($json_arary) > 0) {
             $file_icon = '<span class="glyphicon glyphicon-file glyphicon-icon-right"></span>';
         }
     }
+
     if($asset['logourl'] != '') {
         $logo_icon = '<span class="glyphicon glyphicon-picture glyphicon-icon-right"></span>';
     }
