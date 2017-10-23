@@ -11,7 +11,7 @@ define("OPTION_NO", "N");
 
 define('PRODUCTION_HOST', 'thoth-assets.mybluemix.net');
 define('TRANSLATION_DIR', str_replace('\\', DIRECTORY_SEPARATOR, dirname(__FILE__)));
-define('DEFAULT_LANGUAGE', 'en-us');
+define('DEFAULT_LANGUAGE', 'en-US');
 
 require 'vendor/autoload.php';
 require 'inc/translations/translator.php';

@@ -4,7 +4,7 @@ use GuzzleHttp\Psr7\Stream;
 final class CommonUtility {
 
     const PAGER_PER_PAGE = 30;
-    public static $SUPPORTED_LANGUAGES = [ 'English (United States)' => 'en-us', '中文 (简体)' => 'zh-cn' ];
+    public static $SUPPORTED_LANGUAGES = [ 'English (United States)' => 'en-US', '中文 (简体)' => 'zh-CN' ];
 
     public static function getBaseUrl($path = '', $encode = FALSE) {
 
@@ -94,7 +94,7 @@ final class CommonUtility {
         $languagefile = TRANSLATION_DIR."/inc/translations/{$language}.php";
 
         if(!is_readable($languagefile))
-            $languagefile = TRANSLATION_DIR."/inc/translations/en-us.php";
+            $languagefile = TRANSLATION_DIR."/inc/translations/en-US.php";
 
         include($languagefile);
         $_ENV[INSTANCE]['TRANSLATION'][$language] = $lang;
@@ -102,7 +102,7 @@ final class CommonUtility {
         $languagefile = TRANSLATION_DIR."/inc/translations/{$language}.php";
 
         if(!is_readable($languagefile))
-            $languagefile = TRANSLATION_DIR."/inc/translations/en-us.php";
+            $languagefile = TRANSLATION_DIR."/inc/translations/en-US.php";
         if(!is_readable($languagefile)) return;
 
         include($languagefile);
@@ -117,7 +117,7 @@ final class CommonUtility {
 
     public static function getAcceptedLanguage() {
 
-		$ret = 'en-us';
+		$ret = 'en-US';
 
 		$languages = '';
         $acceptLanguage = '';
@@ -146,7 +146,7 @@ final class CommonUtility {
 			}
         }
 
-        $ret = strtolower($ret);
+        // $ret = strtolower($ret);
         self::setLanguage($ret);
 
 		return $ret;
