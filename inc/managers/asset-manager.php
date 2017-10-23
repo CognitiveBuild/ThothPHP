@@ -12,15 +12,15 @@ class AssetManager {
         return db::query("SELECT {$asset_columns} FROM `asset` WHERE `language` = ?;", $language);
     }
 
-    public static function getAssetsByCatalogName($key, $name) {
+    public static function getAssetsByCatalogName($key, $name, $language = LANGUAGE) {
 
         $result = [];
         $asset_columns = self::$asset_columns;
         if($key === KEY_INDUSTRY) {
             $result = db::query("SELECT {$asset_columns} FROM `asset` 
                 JOIN `catalog` ON `catalog`.`id` = `asset`.`idindustry`
-                WHERE `catalog`.`key` = ? AND `catalog`.`name` LIKE ?;", 
-                [$key, $name]
+                WHERE ((`catalog`.`key` = ? AND `catalog`.`name` LIKE ?) OR `catalog`.`id` < 0) AND `catalog`.`language` = ?;", 
+                [$key, $name, $language]
             );
         }
         else {

@@ -108,8 +108,10 @@ final class APIController extends AbstractController {
 
         $catalog = isset($args['catalog']) ? $args['catalog'] : KEY_INDUSTRY;
         $name = isset($args['name']) ? $args['name'] : '';
+        $p = $request->getQueryParams();
+        $l = CommonUtility::toLanguage($p);
 
-        $list = AssetManager::getAssetsByCatalogName($catalog, $name);
+        $list = AssetManager::getAssetsByCatalogName($catalog, $name, $l);
         return $response->withJson($list);
     }
 
@@ -127,7 +129,7 @@ final class APIController extends AbstractController {
         $p = $request->getQueryParams();
         $l = CommonUtility::toLanguage($p);
 
-        $list = CatalogManager::getCatalog($q, $l);
+        $list = CatalogManager::getCatalog($q, $l, ' AND `id` > 0');
         return $response->withJson($list);
     }
 

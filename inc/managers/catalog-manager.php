@@ -1,9 +1,9 @@
 <?php
 final class CatalogManager {
 
-    public static function getCatalog($key, $language = DEFAULT_LANGUAGE) {
+    public static function getCatalog($key, $language = DEFAULT_LANGUAGE, $condition = '') {
 
-        return db::query("SELECT `id`, `name`, `language` FROM `catalog` WHERE `key` = ? AND `language` = ?;", [$key, $language]);
+        return db::query("SELECT `id`, `name`, `language` FROM `catalog` WHERE `key` = ? AND `language` = ?{$condition};", [$key, $language]);
     }
 
     public static function getCatalogWithAssetCount($key, $language = DEFAULT_LANGUAGE) {
