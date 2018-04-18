@@ -236,6 +236,8 @@ $app->get('/api/v1/assets/catalog/{catalog}/id/{id}', APIController::get('getAss
 $app->get('/api/v1/companies/logo/{id}', APIController::get('getCompanyLogo'));
 // Event of today, Watson uses it
 $app->get('/api/v1/event/today', APIController::get('getEventToday'));
+$app->get('/api/v1/event/recents', APIController::get('getRecentVisitors'));
+
 // Visitor avatar
 $app->get('/api/v1/visitor/avatar/{id}', APIController::get('getVisitorAvatar'));
 

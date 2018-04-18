@@ -63,6 +63,12 @@ final class APIController extends AbstractController {
         return $response->withJson([ 'event' => $event, 'visitors' => $visitors ]);
     }
 
+    public function getRecentVisitors($request, $response, $args) {
+
+        $visitors = EventManager::getRecentVisitors();
+        return $response->withJson([ 'visitors' => $visitors ]);
+    }
+
     public function getVisitorsByEvent($request, $response, $args) {
 
         $id = isset($args['id']) ? $args['id'] : 0;

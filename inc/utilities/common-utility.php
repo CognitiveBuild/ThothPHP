@@ -127,7 +127,7 @@ final class CommonUtility {
 
             $result = array_search($language, CommonUtility::$SUPPORTED_LANGUAGES);
 
-            if($result !== NULL) {
+            if($result !== false) {
                 $ret = CommonUtility::$SUPPORTED_LANGUAGES[$result];
             }
 		}
@@ -138,12 +138,18 @@ final class CommonUtility {
 			else
 				$acceptLanguage = getenv('HTTP_ACCEPT_LANGUAGE');
 
-			$languages = explode(';', isset($acceptLanguage) ? $acceptLanguage : '');
-			if(isset($languages[0])) {
-				$language = explode(',', $languages[0]);
-				if(isset($language[0]))
-					$ret = $language[0];
-			}
+            $languages = explode(';', isset($acceptLanguage) ? $acceptLanguage : '');
+
+            foreach($languages as $lKey => $lVal) {
+                $languageList = explode(',', $lVal);
+                foreach($languageList as $iKey => $iVal) {
+                    $exists = array_search($iVal, CommonUtility::$SUPPORTED_LANGUAGES);
+                    if($exists !== false) {
+                        $ret = $iVal;
+                        break;
+                    }
+                }
+            }
         }
 
         // $ret = strtolower($ret);
