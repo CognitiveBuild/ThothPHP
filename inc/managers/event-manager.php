@@ -77,7 +77,9 @@ final class EventManager {
 
     public static function getRecentVisitors() {
 
-        return db::query("SELECT `event`.`id`, `event`.`displayas`, `company`.`name` AS `company`, `catalog`.`name` AS `industry`, `event`.`visitdate` AS `date`, CASE WHEN `event`.`visitdate` = current_date() THEN 'Y' ELSE 'N' END AS `istoday`
+        return db::query("SELECT `event`.`id`, `event`.`displayas`, `company`.`name` AS `company`, `catalog`.`name` AS `industry`, `event`.`visitdate` AS `date`, 
+        CASE WHEN `event`.`visitdate` = current_date() THEN 'Y' ELSE 'N' END AS `istoday`, 
+        CASE WHEN `event`.`visitdate` >= current_date() THEN 'Y' ELSE 'N' END AS `isnew`
         FROM `event` 
         LEFT JOIN `company` ON `event`.`idcompany` = `company`.`id`
         LEFT JOIN `catalog` ON `company`.`idindustry` = `catalog`.`id`
