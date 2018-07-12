@@ -208,3 +208,13 @@ body.download {
 .ui-label-block {
   display: block;
 }
+
+.ui-pager { clear:both; padding: 0px 0px; font-size: 1.5rem; }
+.ui-pager li,
+.ui-pager span,
+.ui-pager a { display:inline-block; padding:2px 8px; margin-right:1px; border:1px solid #ccc; text-decoration: none; }
+
+.ui-pager li:hover,
+.ui-pager span:hover,
+.ui-pager a:hover, 
+.ui-pager .current{ color:#333; background:#eee; }

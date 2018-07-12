@@ -16,7 +16,6 @@ EOT;
 
 echo <<<EOT
 <div id="t-wrapper" class="asset">
-
     <div class="panel panel-default ui-asset">
         <div class="panel-heading">{$translator->translate('Assets')} <a href="/assets/0?language={$language}" class="ui-right ui-modal-button" data-id="0">{$translator->translate('Add a new Asset')}</a></div>
         <div class="panel-body">
@@ -25,6 +24,14 @@ echo <<<EOT
                 {$languageOptions}
             </div>
 
+            <form class="ui-form-keyword">
+                <input type="text" class="form-control ui-input-search" name="q" placeholder="Search by keywords" value="{$kw}" />
+                <input type="hidden" name="language" value="{$language}" />
+                <input type="hidden" name="p" value="{$pn}" />
+                <input type="submit" class="form-control hidden" />
+            </form>
+
+            <br />
             <ul class="list list-group list-group-highlight">
 EOT;
 
@@ -65,10 +72,16 @@ EOT;
 }
 ?>
             </ul>
+
+<div class="ui-pager">
+    <?php 
+    echo $pager;
+    ?>
+</div>
         </div>
+        
     </div>
 
-    
 </div>
 
 <?php

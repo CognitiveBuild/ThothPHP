@@ -3,7 +3,7 @@ use GuzzleHttp\Psr7\Stream;
 
 final class CommonUtility {
 
-    const PAGER_PER_PAGE = 30;
+    const PAGER_PER_PAGE = 10;
     public static $SUPPORTED_LANGUAGES = [ 'English (United States)' => 'en-US', '中文 (简体)' => 'zh-CN' ];
 
     public static function getBaseUrl($path = '', $encode = FALSE) {
@@ -53,9 +53,11 @@ final class CommonUtility {
 	 * @param int $page
 	 * @return Pager_Common
 	 */
-	public function getPager($data, $page = self::PAGER_PER_PAGE, $urlvar = 'p') {
+	public static function getPager($data, $base, $page = self::PAGER_PER_PAGE, $urlvar = 'p') {
 
 		$params = [
+            'fixFileName' => false, 
+            'fileName'   => $base, 
 		    'perPage'    => $page,
 		    'urlVar'     => $urlvar,
 			'curPageLinkClassName'=>'current',
@@ -159,6 +161,7 @@ final class CommonUtility {
     }
     
     public static function toLanguage($query) {
-        return strtolower(isset($query['language']) ? $query['language'] : LANGUAGE);
+        // strtolower
+        return (isset($query['language']) ? $query['language'] : LANGUAGE);
     }
 }

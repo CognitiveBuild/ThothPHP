@@ -49,6 +49,11 @@ EOT;
 }
 $html .= <<<EOT
 </ul>
+
+<div class="ui-pager">
+{$pager}
+</div>
+
 </div>
 </div>
 </div>

@@ -49,7 +49,7 @@ echo <<<EOT
 <div id="t-wrapper" class="asset">
 
     <div class="panel panel-default ui-asset">
-        <div class="panel-heading">{$translator->translate('Asset details')} - {$language}</div>
+        <div class="panel-heading">{$translator->translate('Asset details')}</div>
         <div class="panel-body">
             <form class="list list-group" method="POST" enctype="multipart/form-data">
 

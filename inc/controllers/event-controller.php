@@ -8,10 +8,18 @@ final class EventController extends AbstractController {
 
     public function getEvents($request, $response, $args) {
 
+        $p = $request->getQueryParams();
+
+        $pn = isset($p['p']) ? $p['p'] : '1';
+        
         $list = EventManager::getEvents();
 
+        $pager = CommonUtility::getPager($list, 'events');
+
         return $this->view->render($response, 'events.php', [
-            'events' => $list
+            'events' => $pager->getPageData(), 
+            'pager' => $pager->links, 
+            'pn' => $pn
         ]);
     }
 

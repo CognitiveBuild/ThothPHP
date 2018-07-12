@@ -6,10 +6,13 @@ class AssetManager {
     public static function getTable($name) {
         return db::query("SELECT * FROM `{$name}`;");
     }
-    public static function getAssets($language = LANGUAGE) {
+    public static function getAssets($language = LANGUAGE, $keyword = '') {
 
         $asset_columns = self::$asset_columns;
-        return db::query("SELECT {$asset_columns} FROM `asset` WHERE `language` = ?;", $language);
+        if(empty($keyword)) {
+            return db::query("SELECT {$asset_columns} FROM `asset` WHERE `language` = ?;", $language);
+        }
+        return db::query("SELECT {$asset_columns} FROM `asset` WHERE `language` = ? AND `name` LIKE ?;", [ $language, "%{$keyword}%" ]);
     }
 
     public static function getAssetsByCatalogName($key, $name, $language = LANGUAGE) {

@@ -9,12 +9,22 @@ final class AssetController extends AbstractController {
     public function getAssets($request, $response, $args) {
 
         $p = $request->getQueryParams();
+
+        $pn = isset($p['p']) ? $p['p'] : '1';
+        $kw = isset($p['q']) ? $p['q'] : '';
+
         $language = CommonUtility::toLanguage($p);
-        $list = AssetManager::getAssets($language);
+
+        $list = AssetManager::getAssets($language, $kw);
+
+        $pager = CommonUtility::getPager($list, 'assets');
 
         return $this->view->render($response, 'assets.php', [
-            'assets' => $list, 
-            'language' => $language
+            'assets' => $pager->getPageData(), 
+            'language' => $language, 
+            'pager' => $pager->links, 
+            'pn' => $pn, 
+            'kw' => $kw
         ]);
     }
 
