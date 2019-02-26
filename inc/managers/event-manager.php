@@ -75,7 +75,7 @@ final class EventManager {
         WHERE `event`.`visitdate` = current_date() AND `event`.`isactive` = ?;", OPTION_YES);
     }
 
-    public static function getRecentVisitors() {
+    public static function getRecentVisitors($limit = 5) {
 
         return db::query("SELECT `event`.`id`, `event`.`displayas`, `company`.`name` AS `company`, `catalog`.`name` AS `industry`, `event`.`visitdate` AS `date`, 
         CASE WHEN `event`.`visitdate` = current_date() THEN 'Y' ELSE 'N' END AS `istoday`, 
@@ -83,7 +83,7 @@ final class EventManager {
         FROM `event` 
         LEFT JOIN `company` ON `event`.`idcompany` = `company`.`id`
         LEFT JOIN `catalog` ON `company`.`idindustry` = `catalog`.`id`
-        WHERE `event`.`isactive` = ? ORDER BY `event`.`visitdate` DESC LIMIT 5;", OPTION_YES);
+        WHERE `event`.`isactive` = ? ORDER BY `event`.`visitdate` DESC LIMIT {$limit};", OPTION_YES);
     }
     
 }

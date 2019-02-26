@@ -39,6 +39,7 @@ include 'inc/managers/visitor-manager.php';
 include 'inc/managers/event-manager.php';
 include 'inc/managers/distribution-manager.php';
 include 'inc/managers/user-manager.php';
+include 'inc/managers/file-manager.php';
 // Controllers
 include 'inc/controllers/abstract-controller.php';
 include 'inc/controllers/common-controller.php';
@@ -46,6 +47,7 @@ include 'inc/controllers/api-controller.php';
 include 'inc/controllers/app-controller.php';
 include 'inc/controllers/event-controller.php';
 include 'inc/controllers/asset-controller.php';
+include 'inc/controllers/file-controller.php';
 
 if(isset($_ENV["VCAP_SERVICES"]) === FALSE) {
     $env = new Dotenv\Dotenv(__DIR__);
@@ -132,6 +134,8 @@ if(SessionManager::validate()) {
         $app->post('/assets/{id}', AssetController::get('postAsset'));
         // Asset details
         $app->get('/assets/{id}', AssetController::get('getAsset'));
+        $app->get('/files', FileController::get('getFiles'));
+        $app->get('/files/{id}', FileController::get('getFile'));
         // Delete attachment
         $app->delete('/api/v1/assets/attachment/{id}', APIController::get('deleteAssetAttachment'));
     });
