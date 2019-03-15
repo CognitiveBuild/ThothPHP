@@ -46,7 +46,7 @@ echo <<<EOT
 	<div class="container-fluid">
         <div class="row">
             <div class="main">
-                <img src="/views/images/tmp/Agenda.PNG" style="width: 100%;" />
+                <img src="/views/images/tmp/agenda.jpg" style="width: 100%;" />
             </div>
         </div>
         </div>
